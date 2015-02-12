@@ -12,6 +12,8 @@ public class MainActivity extends ActionBarActivity {
     int test=1;
     int test2=2;
     int test3 = 3;
+    int test4 = 4;
+
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
