@@ -3,4 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context="yu.kyp.MemoWriteActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_scan" android:title="스캔"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>
