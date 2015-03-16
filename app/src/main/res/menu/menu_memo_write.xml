@@ -5,4 +5,6 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/action_scan" android:title="스캔"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_show_result" android:title="결과"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>

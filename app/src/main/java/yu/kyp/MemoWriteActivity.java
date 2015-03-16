@@ -1,10 +1,11 @@
 package yu.kyp;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import yu.kyp.bluno.BlunoLibrary;
 
@@ -12,6 +13,7 @@ import yu.kyp.bluno.BlunoLibrary;
 public class MemoWriteActivity extends BlunoLibrary {
 
     private static final String TAG = MemoWriteActivity.class.getSimpleName();
+    private StringBuffer strBuffer = new StringBuffer();
 
     @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
@@ -43,9 +45,10 @@ public class MemoWriteActivity extends BlunoLibrary {
 
     @Override
     public void onSerialReceived(String theString) {							//Once connection data received, this function will be called
-        Log.d(TAG,theString);
         //serialReceivedText.append(theString);							//append the text into the EditText
-        //The Serial data from the BLUNO may be sub-packaged, so using a buffer to hold the String is a good choice.
+        //The Serial data from the BLUNO may be sub-packaged, so using a recvBuffer to hold the String is a good choice.
+        Log.d(TAG,"onSerialReceived:"+theString);
+        strBuffer.append(theString);
 
     }
 
@@ -81,9 +84,78 @@ public class MemoWriteActivity extends BlunoLibrary {
             buttonScanOnClickProcess();
             return true;
         }
+        else if (id==R.id.action_show_result)
+        {
+            TokenCommands();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void TokenCommands() {
+        Log.d(TAG,"strBuffer:"+ strBuffer.toString());
 
+        int outStatus = 0;
+        StringBuffer temp = new StringBuffer();
+        for (int i=0; i<strBuffer.length(); i++)
+        {
+            int ch = strBuffer.charAt(i);
+            if(outStatus==0 && ch==2)
+            {
+                outStatus = 1;
+                temp = new StringBuffer();
+            }
+            else if (outStatus==1)
+            {
+                if(ch==3)
+                {
+                    outStatus = 0;
+                    Log.d(TAG,temp.toString());
+                    continue;
+                }
+                temp.append(strBuffer.charAt(i));
+            }
+        }
+        if(temp.length()>0)
+            Log.d(TAG,temp.toString());
+
+
+    }
+
+    public void buttonSetting_OnClick(View v)
+    {
+        startActivity(new Intent(this,SettingsActivity.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG,"onResume Process");
+        onResumeProcess();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        onPauseProcess();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        onStopProcess();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        onDestroyProcess();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        onActivityResultProcess(requestCode, resultCode, data);					//onActivityResult Process by BlunoLibrary
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }
