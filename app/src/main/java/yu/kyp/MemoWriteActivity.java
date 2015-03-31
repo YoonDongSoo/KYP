@@ -2,18 +2,25 @@ package yu.kyp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import yu.kyp.bluno.BlunoLibrary;
+import yu.kyp.image.Note;
+import yu.kyp.image.NoteManager;
+import yu.kyp.image.PointData;
+import yu.kyp.image.Stroke;
 
 
 public class MemoWriteActivity extends BlunoLibrary {
 
     private static final String TAG = MemoWriteActivity.class.getSimpleName();
     private StringBuffer strBuffer = new StringBuffer();
+    private NoteManager noteManager = null;
 
     @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
@@ -58,6 +65,33 @@ public class MemoWriteActivity extends BlunoLibrary {
         setContentView(R.layout.activity_memo_write);
         onCreateProcess();
         serialBegin(115200);
+
+
+        StringBuilder sb = new StringBuilder();
+        try {
+            noteManager = new NoteManager(this);
+            Intent i = getIntent();
+            int noteNo = i.getIntExtra("NOTE_NO",0);
+            if(noteNo>0) {
+                Note note = noteManager.getNote(noteNo);
+
+                for(Stroke s: note.listStroke)
+                {
+                    sb.append("COLOR:"+s.COLOR+"\n");
+                    sb.append("THICKNESS:"+s.THICKNESS+"\n");
+                    for(PointData p: s.listPointData)
+                    {
+                        sb.append(p.X+","+p.Y+"\n");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        TextView textPointData = (TextView)findViewById(R.id.textViewPointData);
+        textPointData.setMovementMethod(new ScrollingMovementMethod());
+        textPointData.setText(sb.toString());
+
     }
 
 
