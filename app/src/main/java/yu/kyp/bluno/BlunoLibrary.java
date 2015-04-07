@@ -1,7 +1,6 @@
 package yu.kyp.bluno;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -17,10 +16,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +31,7 @@ import java.util.List;
 
 import yu.kyp.R;
 
-public abstract  class BlunoLibrary extends ActionBarActivity {
+public abstract  class BlunoLibrary extends Activity {
 
 	private Context mainContext=this;
 

@@ -41,7 +41,21 @@
             android:label="@string/title_activity_settings" >
 
         </activity>
+
+        <activity
+            android:name=".PenPaletteActivity"
+            android:label="@string/pen_palette_dialog" >
+
+        </activity>
+
+        <activity
+            android:name=".EraserPaletteActivity"
+            android:label="" >
+
+        </activity>
+
         <service android:name="yu.kyp.bluno.BluetoothLeService" android:enabled="true"/>
+
 
     </application>
 
