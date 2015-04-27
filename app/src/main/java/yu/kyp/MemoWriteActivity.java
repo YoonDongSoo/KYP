@@ -65,6 +65,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         setContentView(R.layout.activity_memo_write);
         onCreateProcess();
         serialBegin(115200);
+        //serialBegin(9600);
 
 
         StringBuilder sb = new StringBuilder();
