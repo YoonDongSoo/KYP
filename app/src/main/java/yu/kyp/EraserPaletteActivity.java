@@ -29,7 +29,7 @@ public class EraserPaletteActivity extends Activity {
 
     public static OnEraserSelectedListener listener;
 
-    public interface OnEraserSelectedListener {
+    public interface OnEraserSelectedListener { //지우개 사이즈 누른것 체크
         public void onEraserSelected(int eraser);
     }
 
@@ -79,15 +79,14 @@ class EraserDataAdapter extends BaseAdapter {
     /**
      * Erasers defined
      */
-    public static final int [] erasers = new int[] {
-            1,2,3,4,5,
-            6,7,8,9,10,
-            11,13,15,17,20
+    public static final int[] erasers = new int[]{
+            3, 6, 9, 12, 15,
+            18, 21, 24, 27, 30,
+            33, 36, 39, 42, 45
     };
 
     int rowCount;
     int columnCount;
-
 
 
     public EraserDataAdapter(Context context) {
@@ -130,7 +129,7 @@ class EraserDataAdapter extends BaseAdapter {
 
         // create a eraser Image
         int areaWidth = 10;
-        int areaHeight = 20;
+        int areaHeight = 50;
 
         Bitmap eraserBitmap = Bitmap.createBitmap(areaWidth, areaHeight, Bitmap.Config.ARGB_8888);
         Canvas eraserCanvas = new Canvas();
@@ -141,8 +140,8 @@ class EraserDataAdapter extends BaseAdapter {
         eraserCanvas.drawRect(0, 0, areaWidth, areaHeight, mPaint);
 
         mPaint.setColor(Color.BLACK);
-        mPaint.setStrokeWidth((float)erasers[position]);
-        eraserCanvas.drawLine(0, areaHeight/2, areaWidth-1, areaHeight/2, mPaint);
+        mPaint.setStrokeWidth((float) erasers[position]);
+        eraserCanvas.drawLine(0, areaHeight / 2, areaWidth - 1, areaHeight / 2, mPaint);
         BitmapDrawable eraserDrawable;
         eraserDrawable = new BitmapDrawable(mContext.getResources(), eraserBitmap);
 
@@ -159,15 +158,19 @@ class EraserDataAdapter extends BaseAdapter {
         aItem.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (EraserPaletteActivity.listener != null) {
-                    EraserPaletteActivity.listener.onEraserSelected(((Integer)v.getTag()).intValue());
+                    EraserPaletteActivity.listener.onEraserSelected(((Integer) v.getTag()).intValue());
                 }
 
-                ((EraserPaletteActivity)mContext).finish();
+                ((EraserPaletteActivity) mContext).finish();
             }
         });
 
         return aItem;
+
+
     }
+
+
 }
 
 
