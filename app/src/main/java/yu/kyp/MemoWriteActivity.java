@@ -1,10 +1,9 @@
 package yu.kyp;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +18,8 @@ import java.util.ArrayList;
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
-
+import yu.kyp.image.PointData;
+import yu.kyp.image.Stroke;
 
 public class MemoWriteActivity extends BlunoLibrary {
 
@@ -37,7 +37,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     Button colorLegendBtn;
     TextView sizeLegendTxt;
 
-//    Button pictureBtn;
+    //    Button pictureBtn;
     Button textBtn;
     Button penBtn;
     Button eraserBtn;
@@ -118,7 +118,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         setContentView(R.layout.activity_memo_write);
         Scroll_Vertical = (ScrollView) findViewById(R.id.scrollView);
         Scroll_Horizontal = (HorizontalScrollView) findViewById(R.id.horScrollView);
-//        pictureBtn = (Button) findViewById(R.id.buttonPic);
+//      pictureBtn = (Button) findViewById(R.id.buttonPic);
         textBtn = (Button) findViewById(R.id.buttonText);
         penBtn = (Button) findViewById(R.id.buttonPen);
         eraserBtn = (Button) findViewById(R.id.buttonEraser);
@@ -139,8 +139,8 @@ public class MemoWriteActivity extends BlunoLibrary {
         paintboard = new PaintBoard(this);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                1000,
-                1200);                  //스크롤을 위한 캔버스의 크기 조절 부분
+                1500,
+                2000);                  //스크롤을 위한 캔버스의 크기 조절 부분
 
         paintboard.setLayoutParams(params);
         paintboard.setPadding(2, 2, 2, 2);
@@ -201,7 +201,8 @@ public class MemoWriteActivity extends BlunoLibrary {
                             displayPaintProperty();
                         }
                     };
-
+                    Log.d("!!!!!!!!!!","펜 선택 color 값"+mColor);
+                    Log.d("!!!!!!!!!!","펜 선택 size 값"+mSize);
                     Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
                     startActivity(intent);
                 }
@@ -216,21 +217,24 @@ public class MemoWriteActivity extends BlunoLibrary {
                         penBtn.setEnabled(false);
                         undoBtn.setEnabled(false);
 
-                        penBtn.invalidate();
-                        undoBtn.invalidate();
+                       // penBtn.invalidate();
+                       // undoBtn.invalidate();
 
                         oldColor = mColor;
                         oldSize = mSize;
 
-                        mColor = Color.WHITE;
+                        //mColor = Color.WHITE;
 
                         EraserPaletteActivity.listener = new EraserPaletteActivity.OnEraserSelectedListener() {
                             public void onEraserSelected(int size) {
                                 mSize = size;
-                                paintboard.updatePaintProperty(mColor, mSize);
+                                paintboard.setEraserPaint(mSize);
                                 displayPaintProperty();
                             }
                         };
+                        penBtn.invalidate();
+                        undoBtn.invalidate();
+
 
                         Intent intent = new Intent(getApplicationContext(), EraserPaletteActivity.class);
 
@@ -247,6 +251,8 @@ public class MemoWriteActivity extends BlunoLibrary {
 
                         mColor = oldColor;
                         mSize = oldSize;
+                        Log.d("!!!!!!!!!!","color 값"+mColor);
+                        Log.d("!!!!!!!!!!","size 값"+mSize);
 
                         paintboard.updatePaintProperty(mColor, mSize);
                         displayPaintProperty();
@@ -290,7 +296,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         colorBtn.setBackgroundColor(mColor);
         sizetextview.setText("Size : " + mSize);
 
-//        addedLayout.invalidate();
+        //addedLayout.invalidate();
     }
 
     public static void temp(){
@@ -395,3 +401,4 @@ public class MemoWriteActivity extends BlunoLibrary {
         super.onActivityResult(requestCode, resultCode, data);
     }
 }
+

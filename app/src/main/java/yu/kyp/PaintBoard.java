@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -31,22 +33,26 @@ public class PaintBoard extends View {
      */
     public boolean changed = false;
 
+    //추가
 
+    private boolean mEraserMode = false;
     /**
      * Undo data
      */
     Stack undos = new Stack();
 
+    //stack -> Arraylist로 변경
+    ArrayList<Bitmap> undo = new ArrayList<Bitmap>();
     /**
      * Maximum Undos
      */
-    public static int maxUndos = 10;
-
+    public static int maxUndos = 11;
+    private int index=0;
     /**
      * Canvas instance
      */
     Canvas mCanvas;
-
+    Canvas c;
     /**
      * Bitmap for double buffering(즐겨찾기 참고할 것)
      */
@@ -135,6 +141,7 @@ public class PaintBoard extends View {
         mPaint.setStrokeWidth(mStrokeWidth);
         mPaint.setDither(DITHER_FLAG);      //이미지보다 장비의 표현력이 떨어질때 이미지 색상을 낮추어 출력
 
+
         lastX = -1;
         lastY = -1;
 
@@ -142,17 +149,10 @@ public class PaintBoard extends View {
     }
 
 
-    /**
-     * Undo
-     */
-    public void undo()
-    {
-        Bitmap prev = null;
-        try {
-            prev = (Bitmap)undos.pop();
-        } catch(Exception ex) {
-            //Log.e("GoodPaintBoard", "Exception : " + ex.getMessage());
-        }
+//        Canvas canvas = new Canvas();
+        // 1.마지막 stroke삭제
+        if(stroke.size() >0 ) {
+            stroke.remove(stroke.size() - 1);
 
         if (prev != null){
             drawBackground(mCanvas);
@@ -171,9 +171,13 @@ public class PaintBoard extends View {
      */
     public void drawBackground(Canvas canvas)
     {
-        if (canvas != null) {
-            canvas.drawColor(Color.WHITE);                       //캔버스의 배경색 설정
-        }
+       // if (canvas != null) {
+        //    canvas.drawColor(Color.BLACK);                       //캔버스의 배경색 설정
+       // }
+        canvas.drawColor(Color.YELLOW);
+       //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+
+       // canvas.drawBitmap(bitmap,0,0,null);
     }
 
     /***
@@ -183,13 +187,30 @@ public class PaintBoard extends View {
      */
     public void updatePaintProperty(int color, int size)
     {
+        mEraserMode = false;
+        mPaint.setXfermode(null);
+        mPaint.setAlpha(0xFF);
+
         mPaint.setColor(color);
+        Log.v("!!!","pen color"+color);
         mPaint.setStrokeWidth(size);
         temp_color=color;
         temp_thickness=size;
         //Log.d("!!!!!!!!!!","값 나오는 중"+temp_color);
     }
 
+    public void setEraserPaint(int size) {
+        Log.d("!!!!","지우개모드들어옴");
+        mEraserMode=true;
+        mPaint.setXfermode(null);
+        mPaint.setAlpha(0);
+        mPaint.setXfermode(new PorterDuffXfermode(
+                PorterDuff.Mode.CLEAR));
+        mPaint.setStrokeWidth(size);
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeWidth(size);
+        //temp_thickness=size;
+    }
     /**
      * Create a new image
      */
@@ -198,6 +219,8 @@ public class PaintBoard extends View {
         if(mBitmap != null){
             mBitmap.recycle();
         }
+        c = new Canvas();
+        drawBackground(c);
 
         Bitmap img = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas();
@@ -207,11 +230,11 @@ public class PaintBoard extends View {
         mBitmap = img;
         mCanvas = canvas;
 
-        drawBackground(mCanvas);
+
 
         changed = false;
 
-
+        Log.i("!!!!!!!!!!", "newImage");
         invalidate();
     }
 
@@ -226,6 +249,7 @@ public class PaintBoard extends View {
 
 
         setImageSize(newImage.getWidth(), newImage.getHeight(), newImage);
+        Log.d("!!!!!!!!!!","setImage");
         invalidate();
     }
 
@@ -244,10 +268,12 @@ public class PaintBoard extends View {
         }
 
         if (width < 1 || height < 1) return;
+        c = new Canvas();
+        drawBackground(c);
 
         Bitmap img = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas();
-        drawBackground(canvas);
+
 
         if (newImage != null) {
             canvas.setBitmap(newImage);
@@ -262,7 +288,10 @@ public class PaintBoard extends View {
         mCanvas = canvas;
 
         while(true) {
-            Bitmap prev = (Bitmap)undos.pop();
+            //Bitmap prev = (Bitmap)undos.pop();
+            Bitmap prev = (Bitmap)undo.get(index-1);
+            undo.remove(index-1);
+            index--;
             if (prev == null) return;
 
             prev.recycle();
@@ -287,9 +316,18 @@ public class PaintBoard extends View {
         super.onDraw(canvas);
 
 //        Log.i("onDraw","");
-        if (mBitmap != null) {
-            canvas.drawBitmap(mBitmap, 0, 0, null);
-        }
+        Log.d("!!!!!!!!!!","ondraw");
+
+        //c.drawBitmap(mBitmap, 0, 0, null);
+        //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        canvas.drawColor(Color.YELLOW);
+
+
+
+        if(!mEraserMode)
+            canvas.drawPath(mPath, mPaint);
+
+        canvas.drawBitmap(mBitmap, 0, 0, null);
 
 
     }
@@ -311,7 +349,9 @@ public class PaintBoard extends View {
                 if (rect != null) {
                     invalidate(rect);
                 }
-
+               /* this.getParent().requestDisallowInterceptTouchEvent(true);
+                touchUp(event,false);
+                invalidate();*/
                 mPath.rewind();
 
                 return true;
@@ -323,19 +363,30 @@ public class PaintBoard extends View {
                     ;
                 }
 
-                while (undos.size() >= maxUndos){
-                    Bitmap i = (Bitmap)undos.get(undos.size()-1);
-                    i.recycle();
-                    undos.remove(i);
-                    Log.i("saveundo","");
-                }
+
 
                 Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas();
                 canvas.setBitmap(img);
-                canvas.drawBitmap(mBitmap, 0, 0, mPaint);
+                canvas.drawBitmap(mBitmap, 0, 0, null);
 
-                undos.push(img);
+                //undos.push(img);
+
+                undo.add(img);
+                index++;
+                Log.i("!!!", "push 됨?");
+
+                int i=0;
+                while (undo.size() >= maxUndos){
+                    //Bitmap i = (Bitmap)undos.get(undos.size()-1);
+                    //Bitmap i = (Bitmap)undo.get();
+                    //i.recycle();
+                    //undos.remove(i);
+                    undo.remove(i);
+                    i++;
+                    index--;
+                    // Log.i("saveundo","" +);
+                }
 
                 this.getParent().requestDisallowInterceptTouchEvent(true);
                 rect = touchDown(event);
@@ -344,7 +395,9 @@ public class PaintBoard extends View {
                 if (rect != null) {
                     invalidate(rect);
                 }
-
+               /* this.getParent().requestDisallowInterceptTouchEvent(true);
+                touchDown(event);
+                invalidate();*/
                 return true;
 
             case MotionEvent.ACTION_MOVE:
@@ -357,12 +410,17 @@ public class PaintBoard extends View {
                 if (rect != null) {
                     invalidate(rect);
                 }
+               /* this.getParent().requestDisallowInterceptTouchEvent(true);
+                touchMove(event);
+                invalidate();*/
 
                 return true;
         }
 
         return false;
     }
+
+
 
     /**
      * Process event for touch down
@@ -415,6 +473,7 @@ public class PaintBoard extends View {
      * @return
      */
     private Rect touchMove(MotionEvent event) {
+
         Rect rect = processMove(event);
 
         return rect;
@@ -427,18 +486,20 @@ public class PaintBoard extends View {
 
         stroke.add(new Stroke(temp_color,temp_thickness,s.listPoint));
 
-        for(i=0; i<stroke.size(); i++) {
+            for(i=0; i<stroke.size(); i++) {
 //            Log.i("i는","? " + i);
 
-            size = stroke.get(i).listPoint.size();
-            Log.i("color",", size" + stroke.get(i).color +", " + stroke.get(i).thickness);
+                size = stroke.get(i).listPoint.size();
+                Log.i("color", ", size" + stroke.get(i).color + ", " + stroke.get(i).thickness);
 
 //            Log.i("size는","? " + size);
-            for(j=0; j<size; j++){
+                for (j = 0; j < size; j++) {
 //                Log.i("터치업","" + stroke.get(i).listPoint.get(j).x + ", " + stroke.get(i).listPoint.get(j).y);
 
+                }
             }
-        }
+
+
 //        s.listPoint.clear();
 //        stroke.clear();
         return rect;
