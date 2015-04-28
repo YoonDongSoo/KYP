@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/mainLayout">
+
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/linearLayout1"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:layout_gravity="top">
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:id="@+id/linearLayout3">
+            <Button android:text="enLarge"
+                android:id="@+id/upscale"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </Button>
+            <Button
+                android:text="downScale"
+                android:id="@+id/downscale"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </Button>
+            <Button android:text="reset"
+                android:id="@+id/reset"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </Button>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:id="@+id/linearLayout4">
+            <Button
+                android:text="100%"
+                android:id="@+id/zoomin100"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </Button>
+            <Button
+                android:text="125%"
+                android:id="@+id/zoomin125"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </Button>
+            <Button
+                android:text="150%"
+                android:id="@+id/zoomin150"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </Button>
+            <Button
+                android:text="175%"
+                android:id="@+id/zoomin175"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </Button>
+            <Button
+                android:text="200%"
+                android:id="@+id/zoomin200"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </Button>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:id="@+id/linearLayout5">
+            <Button
+                android:text="75%"
+                android:id="@+id/zoomout75"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </Button>
+            <Button
+                android:text="50%"
+                android:id="@+id/zoomout50"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </Button>
+            <Button
+                android:text="25%"
+                android:id="@+id/zoomout25"
+                android:onClick="onClick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </Button>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
