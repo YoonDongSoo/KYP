@@ -41,11 +41,13 @@ public class PaintBoard extends View {
      */
     Stack undos = new Stack();
 
+    //stack -> Arraylist로 변경
+    ArrayList<Bitmap> undo = new ArrayList<Bitmap>();
     /**
      * Maximum Undos
      */
-    public static int maxUndos = 10;
-
+    public static int maxUndos = 11;
+    private int index=0;
     /**
      * Canvas instance
      */
@@ -154,7 +156,10 @@ public class PaintBoard extends View {
     {
         Bitmap prev = null;
         try {
-            prev = (Bitmap)undos.pop();
+            //prev = (Bitmap)undos.pop();
+            prev = (Bitmap)undo.get(index-1);
+            undo.remove(index-1);
+            index--;
         } catch(Exception ex) {
             //Log.e("GoodPaintBoard", "Exception : " + ex.getMessage());
         }
@@ -292,7 +297,10 @@ public class PaintBoard extends View {
         mCanvas = canvas;
 
         while(true) {
-            Bitmap prev = (Bitmap)undos.pop();
+            //Bitmap prev = (Bitmap)undos.pop();
+            Bitmap prev = (Bitmap)undo.get(index-1);
+            undo.remove(index-1);
+            index--;
             if (prev == null) return;
 
             prev.recycle();
@@ -364,20 +372,30 @@ public class PaintBoard extends View {
                     ;
                 }
 
-                while (undos.size() >= maxUndos){
-                    Bitmap i = (Bitmap)undos.get(undos.size()-1);
-                    i.recycle();
-                    undos.remove(i);
-                   // Log.i("saveundo","" +);
-                }
+
 
                 Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas();
                 canvas.setBitmap(img);
                 canvas.drawBitmap(mBitmap, 0, 0, null);
 
-                undos.push(img);
+                //undos.push(img);
+
+                undo.add(img);
+                index++;
                 Log.i("!!!", "push 됨?");
+
+                int i=0;
+                while (undo.size() >= maxUndos){
+                    //Bitmap i = (Bitmap)undos.get(undos.size()-1);
+                    //Bitmap i = (Bitmap)undo.get();
+                    //i.recycle();
+                    //undos.remove(i);
+                    undo.remove(i);
+                    i++;
+                    index--;
+                    // Log.i("saveundo","" +);
+                }
 
                 this.getParent().requestDisallowInterceptTouchEvent(true);
                 rect = touchDown(event);
