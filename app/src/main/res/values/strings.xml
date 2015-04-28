@@ -17,4 +17,5 @@
     <string name="unknown_device">알수없는 장치</string>
     <string name="unknown_characteristic">알수없는 characteristic</string>
     <string name="unknown_service">알수없느 서비스</string>
+    <string name="pen_palette_dialog" />
 </resources>
