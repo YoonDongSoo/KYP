@@ -13,6 +13,7 @@ import android.view.View;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * 페인트보드에 기능 추가
@@ -24,10 +25,22 @@ import java.util.ArrayList;
 public class PaintBoard extends View {
 
 
+    private static final String TAG = PaintBoard.class.getSimpleName();
     /**
      * Changed flag
      */
     public boolean changed = false;
+
+
+    /**
+     * Undo data
+     */
+    Stack undos = new Stack();
+
+    /**
+     * Maximum Undos
+     */
+    public static int maxUndos = 10;
 
     /**
      * Canvas instance
@@ -66,13 +79,11 @@ public class PaintBoard extends View {
     private static final boolean RENDERING_ANTIALIAS = true;
     private static final boolean DITHER_FLAG = true;
 
-    private int mCertainColor = 0xFF000000;
+    private int mCertainColor = Color.BLACK;
     private float mStrokeWidth = 2.0f;
 
     static int temp_color;
     static int temp_thickness;
-    static float temp_x;
-    static float temp_y;
 
 
 
@@ -106,6 +117,7 @@ public class PaintBoard extends View {
 //    Path for_draw = new Path();
 
 
+
     /**
      * Initialize paint object and coordinates
      *
@@ -129,42 +141,28 @@ public class PaintBoard extends View {
         //Log.i("GoodPaintBoard", "initialized.");
     }
 
-    public void undo(){
 
-//        Canvas canvas = new Canvas();
-        // 1.마지막 stroke삭제
-        if(stroke.size() >0 ) {
-            stroke.remove(stroke.size() - 1);
-
-            // 2. 배경색 덮기
-            drawBackground(mCanvas);
-            invalidate();
-
-            // 3. 다시 stroke 그리기
-//            if (stroke.size() == 0)
-//                return;
-            for (Stroke s : stroke) {
-                mPath = new Path();
-                lastX = -1f;
-                lastY = -1f;
-                for (PointData p : s.listPoint) {
-                    if (lastX == -1f && lastY == -1f) {
-                        lastX = p.x;
-                        lastY = p.y;
-                        mPath.moveTo(p.x, p.y);
-                        continue;
-                    }
-                    invalidate();
-                    mPaint.setColor(s.color);
-                    mPaint.setStrokeWidth(s.thickness);
-                    drawPointData(p);
-                    lastX = p.x;
-                    lastY = p.y;
-                }
-
-            }
-            invalidate();
+    /**
+     * Undo
+     */
+    public void undo()
+    {
+        Bitmap prev = null;
+        try {
+            prev = (Bitmap)undos.pop();
+        } catch(Exception ex) {
+            //Log.e("GoodPaintBoard", "Exception : " + ex.getMessage());
         }
+
+        if (prev != null){
+            drawBackground(mCanvas);
+            mCanvas.drawBitmap(prev, 0, 0, mPaint);
+            invalidate();
+
+            prev.recycle();
+        }
+
+        //Log.i("GoodPaintBoard", "undo() called.");
     }
 
     /**
@@ -197,9 +195,14 @@ public class PaintBoard extends View {
      */
     public void newImage(int width, int height)
     {
+        if(mBitmap != null){
+            mBitmap.recycle();
+        }
+
         Bitmap img = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas();
         canvas.setBitmap(img);
+
 
         mBitmap = img;
         mCanvas = canvas;
@@ -207,6 +210,8 @@ public class PaintBoard extends View {
         drawBackground(mCanvas);
 
         changed = false;
+
+
         invalidate();
     }
 
@@ -256,7 +261,12 @@ public class PaintBoard extends View {
         mBitmap = img;
         mCanvas = canvas;
 
+        while(true) {
+            Bitmap prev = (Bitmap)undos.pop();
+            if (prev == null) return;
 
+            prev.recycle();
+        }
     }
 
 
@@ -297,7 +307,7 @@ public class PaintBoard extends View {
 
                 this.getParent().requestDisallowInterceptTouchEvent(false);
                 Rect rect = touchUp(event, false);      //터치 메소드 호출
-
+                s = null;   // Stroke 인스턴스 삭제
                 if (rect != null) {
                     invalidate(rect);
                 }
@@ -309,6 +319,23 @@ public class PaintBoard extends View {
             case MotionEvent.ACTION_DOWN:
 //                Log.i("draw", "actiondown called.");
 
+                if (mBitmap == null){
+                    ;
+                }
+
+                while (undos.size() >= maxUndos){
+                    Bitmap i = (Bitmap)undos.get(undos.size()-1);
+                    i.recycle();
+                    undos.remove(i);
+                    Log.i("saveundo","");
+                }
+
+                Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas();
+                canvas.setBitmap(img);
+                canvas.drawBitmap(mBitmap, 0, 0, mPaint);
+
+                undos.push(img);
 
                 this.getParent().requestDisallowInterceptTouchEvent(true);
                 rect = touchDown(event);
@@ -350,8 +377,8 @@ public class PaintBoard extends View {
 
         s = new Stroke();
 
-        temp_x = x;
-        temp_y = y;
+//        temp_x = x;
+//        temp_y = y;
 
 
         s.listPoint.add(new PointData(x, y));
@@ -402,6 +429,7 @@ public class PaintBoard extends View {
 
         for(i=0; i<stroke.size(); i++) {
 //            Log.i("i는","? " + i);
+
             size = stroke.get(i).listPoint.size();
             Log.i("color",", size" + stroke.get(i).color +", " + stroke.get(i).thickness);
 
@@ -427,7 +455,7 @@ public class PaintBoard extends View {
         final float y = event.getY();
         PointData p = new PointData(x, y);
         s.listPoint.add(p);
-        Rect mInvalidRect = drawPointData(p);
+        Rect mInvalidRect = drawPointData(p, mPath, mPaint);
 
         return mInvalidRect;
     }
@@ -437,7 +465,7 @@ public class PaintBoard extends View {
      * lastX,lastY값을 사용한다
      *
      */
-    private Rect drawPointData(PointData p) {
+    private Rect drawPointData(PointData p, Path path, Paint paint) {
 
         float x = p.x;
         float y = p.y;
@@ -455,7 +483,7 @@ public class PaintBoard extends View {
             float cY = mCurveEndY = (y + lastY) / 2;
 
 
-            mPath.quadTo(lastX, lastY, cX, cY);     //패스 객체에 현재 좌표값을 곡선으로 추가
+            path.quadTo(lastX, lastY, cX, cY);     //패스 객체에 현재 좌표값을 곡선으로 추가
 
             // union with the control point of the new curve
             mInvalidRect.union((int) lastX - border, (int) lastY - border,
@@ -468,7 +496,7 @@ public class PaintBoard extends View {
             lastX = x;
             lastY = y;
 
-            mCanvas.drawPath(mPath, mPaint);
+            mCanvas.drawPath(path, paint);
 
         }
         return mInvalidRect;

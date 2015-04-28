@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -27,7 +28,6 @@ public class PenPaletteActivity extends Activity {
     private static final String TAG = ColorPickerDialog.class.getSimpleName();
     GridView colorgrid;
     GridView sizegrid;
-//    Button closeBtn;
     Button othersBtn;
     Button selectBtn;
     PenDataAdapter penadapter;
@@ -38,20 +38,19 @@ public class PenPaletteActivity extends Activity {
 
     public static OnPenSelectedListener penlistener;
     public static OnColorSelectedListener colorlistener;
-//    public static OnCacleSelectedListener canclelistener;
     public static OnCompleteSelectedListener completelistener;
 
-//    public ColorPickerDialog.OnColorChangedListener colorChangedListener = new ColorPickerDialog.OnColorChangedListener() {
-//        @Override
-//        public void colorChanged(int color) {
-//            if (PenPaletteDialog.colorlistener != null) {
-//                PenPaletteDialog.colorlistener.onColorSelected(color);
-//            }
-//
-//            finish();
-//            Log.d(TAG,"color:"+color);
-//        }
-//    };
+    public ColorPickerDialog.OnColorChangedListener colorChangedListener = new ColorPickerDialog.OnColorChangedListener() {
+        @Override
+        public void colorChanged(int color) {
+            if (PenPaletteActivity.colorlistener != null) {
+                PenPaletteActivity.colorlistener.onColorSelected(color);
+            }
+
+            finish();
+            Log.d(TAG, "color:" + color);
+        }
+    };
 
     public interface OnPenSelectedListener {
         public void onPenSelected(int pen);
@@ -120,14 +119,14 @@ public class PenPaletteActivity extends Activity {
 //            }
 //        });
 
-//        othersBtn.setOnClickListener(new OnClickListener(){
-//            public void onClick(View v) {
-//                System.out.println("click otherBtn");
-//                ColorPickerDialog dlg =  new ColorPickerDialog(PenPaletteDialog.this,colorChangedListener, mPaint.getColor());
-//                dlg.show();
-//
-//            }
-//        });
+        othersBtn.setOnClickListener(new OnClickListener(){
+            public void onClick(View v) {
+                System.out.println("click otherBtn");
+                ColorPickerDialog dlg =  new ColorPickerDialog(PenPaletteActivity.this,colorChangedListener, mPaint.getColor());
+                dlg.show();
+
+            }
+        });
         selectBtn.setOnClickListener(new OnClickListener(){
             public void onClick(View v) {
                 System.out.println("click selectBtn");
