@@ -149,10 +149,20 @@ public class PaintBoard extends View {
     }
 
 
-//        Canvas canvas = new Canvas();
-        // 1.마지막 stroke삭제
-        if(stroke.size() >0 ) {
-            stroke.remove(stroke.size() - 1);
+    /**
+     * Undo
+     */
+    public void undo()
+    {
+        Bitmap prev = null;
+        try {
+            //prev = (Bitmap)undos.pop();
+            prev = (Bitmap)undo.get(index-1);
+            undo.remove(index-1);
+            index--;
+        } catch(Exception ex) {
+            //Log.e("GoodPaintBoard", "Exception : " + ex.getMessage());
+        }
 
         if (prev != null){
             drawBackground(mCanvas);
@@ -225,7 +235,6 @@ public class PaintBoard extends View {
         Bitmap img = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas();
         canvas.setBitmap(img);
-
 
         mBitmap = img;
         mCanvas = canvas;

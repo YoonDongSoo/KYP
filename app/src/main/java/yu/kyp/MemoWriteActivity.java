@@ -1,9 +1,10 @@
 package yu.kyp;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,8 +19,6 @@ import java.util.ArrayList;
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
-import yu.kyp.image.PointData;
-import yu.kyp.image.Stroke;
 
 public class MemoWriteActivity extends BlunoLibrary {
 
@@ -52,7 +51,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     int mColor = 0xff000000;
     int mSize = 2;
     int oldColor = 0;
-    int oldSize = 0;
+    int oldSize =0;
     int temp_size;
     int temp_color;
     boolean eraserSelected = false;
@@ -116,6 +115,8 @@ public class MemoWriteActivity extends BlunoLibrary {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_write);
+        onCreateProcess();
+        serialBegin(115200);
         Scroll_Vertical = (ScrollView) findViewById(R.id.scrollView);
         Scroll_Horizontal = (HorizontalScrollView) findViewById(R.id.horScrollView);
 //      pictureBtn = (Button) findViewById(R.id.buttonPic);
@@ -130,13 +131,13 @@ public class MemoWriteActivity extends BlunoLibrary {
         colorBtn = (Button) findViewById(R.id.buttoncolor);
         sizetextview = (TextView) findViewById(R.id.textviewsize);
 
-        onCreateProcess();
-        serialBegin(115200);
-
 
         final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
 
+
         paintboard = new PaintBoard(this);
+
+
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 1500,
@@ -195,8 +196,8 @@ public class MemoWriteActivity extends BlunoLibrary {
                     };
                     PenPaletteActivity.completelistener = new PenPaletteActivity.OnCompleteSelectedListener() {
                         public void onCompleteSelected() {
-//                            mColor = oldColor;
-//                            mSize = oldSize;
+                            mColor = oldColor;
+                            mSize = oldSize;
                             paintboard.updatePaintProperty(mColor, mSize);
                             displayPaintProperty();
                         }
@@ -281,7 +282,6 @@ public class MemoWriteActivity extends BlunoLibrary {
         Scroll_Horizontal.scrollBy(x, 0);
         Scroll_Vertical.scrollBy(0, y);
     }
-
 
 
     public int getChosenColor() {
