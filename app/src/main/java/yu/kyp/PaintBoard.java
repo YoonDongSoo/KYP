@@ -46,7 +46,7 @@ public class PaintBoard extends View {
     /**
      * Maximum Undos
      */
-    public static int maxUndos = 11;
+    public static int maxUndos = 13;
     private int index=0;
     /**
      * Canvas instance
@@ -154,12 +154,14 @@ public class PaintBoard extends View {
      */
     public void undo()
     {
+
         Bitmap prev = null;
         try {
             //prev = (Bitmap)undos.pop();
             prev = (Bitmap)undo.get(index-1);
-            undo.remove(index-1);
+            undo.remove(index - 1);
             index--;
+
         } catch(Exception ex) {
             //Log.e("GoodPaintBoard", "Exception : " + ex.getMessage());
         }
@@ -296,14 +298,18 @@ public class PaintBoard extends View {
         mBitmap = img;
         mCanvas = canvas;
 
+
         while(true) {
             //Bitmap prev = (Bitmap)undos.pop();
-            Bitmap prev = (Bitmap)undo.get(index-1);
-            undo.remove(index-1);
-            index--;
-            if (prev == null) return;
 
+            Bitmap prev = (Bitmap)undo.get(index-1);
+            undo.remove(index - 1);
+            index--;
+
+            if (prev == null) return;
             prev.recycle();
+
+
         }
     }
 
