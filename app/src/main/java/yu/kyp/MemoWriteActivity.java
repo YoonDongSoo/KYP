@@ -3,24 +3,22 @@ package yu.kyp;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
-import yu.kyp.test.ZoomActivity;
 
 public class MemoWriteActivity extends BlunoLibrary {
 
@@ -49,6 +47,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     Button backBtn;
     Button colorBtn;
     TextView sizetextview;
+    Button scrollBtn;
 
     int mColor = 0xff000000;
     int mSize = 2;
@@ -119,7 +118,15 @@ public class MemoWriteActivity extends BlunoLibrary {
         onCreateProcess();
         serialBegin(115200);
 
-        Scroll_Vertical = (ScrollView) findViewById(R.id.scrollView);
+        DisplayMetrics outMetrics = new DisplayMetrics();    getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+
+        int sum = outMetrics.densityDpi;
+
+        Log.d("sum","**********************************************" + sum);
+
+
+
+                Scroll_Vertical = (ScrollView) findViewById(R.id.scrollView);
         Scroll_Horizontal = (HorizontalScrollView) findViewById(R.id.horScrollView);
 //      pictureBtn = (Button) findViewById(R.id.buttonPic);
         textBtn = (Button) findViewById(R.id.buttonText);
@@ -132,7 +139,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         backBtn = (Button) findViewById(R.id.buttonBack);
         colorBtn = (Button) findViewById(R.id.buttoncolor);
         sizetextview = (TextView) findViewById(R.id.textviewsize);
-
+        scrollBtn = (Button) findViewById(R.id.buttonScroll);
 
         final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
 
@@ -142,8 +149,10 @@ public class MemoWriteActivity extends BlunoLibrary {
 
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                1500,
-                2000);                  //스크롤을 위한 캔버스의 크기 조절 부분
+                2000,
+                2400);                  //스크롤을 위한 캔버스의 크기 조절 부분
+
+
 
         paintboard.setLayoutParams(params);
         paintboard.setPadding(2, 2, 2, 2);
@@ -257,6 +266,108 @@ public class MemoWriteActivity extends BlunoLibrary {
                 public void onClick(View v) {
                     paintboard.undo();
 
+                }
+            });
+            scrollBtn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+
+                    scrollSelected=!scrollSelected;
+
+                    if (scrollSelected) {
+                        Log.i("scrollBtn", "clicked.");
+                        colorBtn.setEnabled(false);
+                        penBtn.setEnabled(false);
+                        eraserBtn.setEnabled(false);
+                        undoBtn.setEnabled(false);
+                        alarmBtn.setEnabled(false);
+//                        scrollBtn.setEnabled(false);
+
+                        colorBtn.invalidate();
+                        penBtn.invalidate();
+                        eraserBtn.invalidate();
+                        undoBtn.invalidate();
+                        alarmBtn.invalidate();
+//                        scrollBtn.invalidate();
+
+                        paintboard.setOnTouchListener(new View.OnTouchListener() {
+
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                Scroll_Vertical.setOnTouchListener(this);
+                                Scroll_Horizontal.setOnTouchListener(this);
+
+
+                                switch (event.getAction())
+                                {
+                                    case MotionEvent.ACTION_DOWN:
+                                        Scroll_Vertical.requestDisallowInterceptTouchEvent(true);
+                                        Log.i("scroll", "down");
+                                        currentX = (int)event.getRawX();
+                                        currentY = (int)event.getRawY();
+
+                                        break;
+
+                                    case MotionEvent.ACTION_MOVE:
+                                        Scroll_Vertical.requestDisallowInterceptTouchEvent(true);
+                                        Log.i("scroll", "move");
+                                        int x2 = (int)event.getRawX();
+                                        int y2 = (int)event.getRawY();
+                                        scrollBy(currentX - x2, currentY - y2);
+                                        currentX = x2;
+                                        currentY = y2;
+                                        break;
+
+                                    case MotionEvent.ACTION_UP:
+                                        Scroll_Vertical.requestDisallowInterceptTouchEvent(true);
+                                        Log.i("scroll", "up");
+                                        break;
+
+                                    default:
+                                        Scroll_Vertical.requestDisallowInterceptTouchEvent(true);
+                                        Log.i("scroll", "default");
+                                        currentX = (int)event.getRawX();
+                                        currentY = (int)event.getRawY();
+                                        break;
+                                }
+                                currentX = (int)event.getRawX();
+                                currentY = (int)event.getRawY();
+
+                                return true;
+                            }
+
+
+
+                        });
+
+
+                    }
+                    else {
+                        Log.i("scrollBtn", "unclicked.");
+                        colorBtn.setEnabled(true);
+                        penBtn.setEnabled(true);
+                        eraserBtn.setEnabled(true);
+                        undoBtn.setEnabled(true);
+                        alarmBtn.setEnabled(true);
+//                        scrollBtn.setEnabled(true);
+
+                        colorBtn.invalidate();
+                        penBtn.invalidate();
+                        eraserBtn.invalidate();
+                        undoBtn.invalidate();
+                        alarmBtn.invalidate();
+//                        scrollBtn.invalidate();
+
+                        paintboard.setOnTouchListener(new View.OnTouchListener() {
+
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                return false;
+                            }
+                        });
+
+                        paintboard.updatePaintProperty(mColor, mSize);
+                        displayPaintProperty();
+                    }
                 }
             });
         } catch (Exception e) {

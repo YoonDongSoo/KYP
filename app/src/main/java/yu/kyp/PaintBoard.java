@@ -13,7 +13,6 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public class PaintBoard extends View {
     /**
      * Maximum Undos
      */
-    public static int maxUndos = 11;
+    public static int maxUndos = 5;
     private int index=0;
     /**
      * Canvas instance
@@ -131,6 +130,8 @@ public class PaintBoard extends View {
 
         width = right-left;
         height = bottom-top;
+
+
     }
 
     /**
@@ -354,7 +355,7 @@ public class PaintBoard extends View {
         mPaint.setAlpha(0xFF);
 
         mPaint.setColor(color);
-        Log.v("!!!","pen color"+color);
+        Log.v("!!!", "pen color" + color);
         mPaint.setStrokeWidth(size);
         temp_color=color;
         temp_thickness=size;

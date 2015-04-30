@@ -58,6 +58,7 @@
             android:label="@string/title_activity_zoom" >
         </activity>
 
+
     </application>
 
 </manifest>
