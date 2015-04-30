@@ -13,12 +13,14 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
+import yu.kyp.test.ZoomActivity;
 
 public class MemoWriteActivity extends BlunoLibrary {
 
@@ -59,20 +61,6 @@ public class MemoWriteActivity extends BlunoLibrary {
     boolean dragSelected = false;
 
 
-    class Stroke{
-        int stroke_no;
-        int COLOR;
-        int THICKNESS;
-        ArrayList<PointData> listPointData;
-    }
-    class PointData{
-        int point_no;
-        int stroke_no;
-        float X;
-        float Y;
-    }
-
-    ArrayList<Stroke> stroke = new ArrayList<Stroke>();
 
     @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {//Once connection state changes, this function will be called
@@ -109,6 +97,19 @@ public class MemoWriteActivity extends BlunoLibrary {
         Log.d(TAG,"onSerialReceived:"+theString);
         strBuffer.append(theString);
 
+        if(theString.contains("ZOM01")==true)
+        {
+            paintboard.zoomInBitmap();
+        }
+        else if(theString.contains("ZOM02")==true)
+        {
+            paintboard.zoomOutBitmap();
+        }
+        else if(theString.contains("ZOM03")==true)
+        {
+            paintboard.zoomResetBitmap();
+        }
+
     }
 
     @Override
@@ -117,6 +118,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         setContentView(R.layout.activity_memo_write);
         onCreateProcess();
         serialBegin(115200);
+
         Scroll_Vertical = (ScrollView) findViewById(R.id.scrollView);
         Scroll_Horizontal = (HorizontalScrollView) findViewById(R.id.horScrollView);
 //      pictureBtn = (Button) findViewById(R.id.buttonPic);
@@ -164,16 +166,6 @@ public class MemoWriteActivity extends BlunoLibrary {
             if(noteNo>0) {
                 Note note = noteManager.getNote(noteNo);
 
-
-                for(Stroke s: stroke)
-                {
-                    sb.append("COLOR:"+s.COLOR+"\n");
-                    sb.append("THICKNESS:"+s.THICKNESS+"\n");
-                    for(PointData p: s.listPointData)
-                    {
-                        sb.append(p.X+","+p.Y+"\n");
-                    }
-                }
 
             }
             penBtn.setOnClickListener(new View.OnClickListener() {
@@ -370,6 +362,30 @@ public class MemoWriteActivity extends BlunoLibrary {
         startActivity(new Intent(this,SettingsActivity.class));
     }
 
+    public void buttonBack_OnClick(View v)
+    {
+        // 확대 테스트
+        paintboard.zoomInBitmap();
+    }
+
+    public void buttonText_OnClick(View v)
+    {
+        // 축소 테스트
+        //Toast.makeText(this,"텍스트",Toast.LENGTH_SHORT).show();
+        paintboard.zoomOutBitmap();
+    }
+
+    public void buttonPicture_OnClick(View v)
+    {
+        // reset
+        paintboard.zoomResetBitmap();
+    }
+
+    public void buttonAlarm_OnClick(View v)
+    {
+        // 블루투스 연결
+        buttonScanOnClickProcess();
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -393,6 +409,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     protected void onDestroy() {
         super.onDestroy();
         onDestroyProcess();
+        paintboard.undo.clearList();
     }
 
     @Override
