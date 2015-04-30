@@ -73,7 +73,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="그림"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:id="@+id/buttonPicture"
+            android:onClick="buttonPicture_OnClick" />
 
         </RelativeLayout>
 
@@ -114,13 +116,15 @@
             android:layout_height="wrap_content"
             android:text="←"
             android:id="@+id/buttonBack"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="buttonBack_OnClick" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="T"
             android:id="@+id/buttonText"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="buttonText_OnClick" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -138,7 +142,8 @@
             android:layout_height="wrap_content"
             android:text="알람"
             android:id="@+id/buttonAlarm"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="buttonAlarm_OnClick" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
