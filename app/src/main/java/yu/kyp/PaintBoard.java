@@ -336,7 +336,7 @@ public class PaintBoard extends View {
        // if (canvas != null) {
         //    canvas.drawColor(Color.BLACK);                       //캔버스의 배경색 설정
        // }
-        canvas.drawColor(Color.YELLOW);
+        canvas.drawColor(Color.WHITE);
        //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 
        // canvas.drawBitmap(bitmap,0,0,null);
@@ -475,7 +475,7 @@ public class PaintBoard extends View {
 
         //canvasBackground.drawBitmap(mBitmap, 0, 0, null);
         //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-        canvas.drawColor(Color.YELLOW);
+        canvas.drawColor(Color.WHITE);
 
 
 
