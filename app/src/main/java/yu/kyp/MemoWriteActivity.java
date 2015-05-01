@@ -3,7 +3,6 @@ package yu.kyp;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -118,15 +117,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         onCreateProcess();
         serialBegin(115200);
 
-        DisplayMetrics outMetrics = new DisplayMetrics();    getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
-
-        int sum = outMetrics.densityDpi;
-
-        Log.d("sum","**********************************************" + sum);
-
-
-
-                Scroll_Vertical = (ScrollView) findViewById(R.id.scrollView);
+        Scroll_Vertical = (ScrollView) findViewById(R.id.scrollView);
         Scroll_Horizontal = (HorizontalScrollView) findViewById(R.id.horScrollView);
 //      pictureBtn = (Button) findViewById(R.id.buttonPic);
         textBtn = (Button) findViewById(R.id.buttonText);
@@ -149,8 +140,8 @@ public class MemoWriteActivity extends BlunoLibrary {
 
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                2000,
-                2400);                  //스크롤을 위한 캔버스의 크기 조절 부분
+                800,
+                1000);                  //스크롤을 위한 캔버스의 크기 조절 부분
 
 
 
@@ -177,13 +168,19 @@ public class MemoWriteActivity extends BlunoLibrary {
 
 
             }
+            /**
+             * 메모 작성 화면에서 펜 버튼을 눌렀을 경우
+             */
             penBtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
                         public void onPenSelected(int size) {
                             mSize = size;
                             oldSize = mSize;
+
+                            //선택되어진 두께을 업데이트
                             paintboard.updatePaintProperty(mColor, mSize);
+                            //화면의 좌측 상단에 선택한 두께를 업데이트
                             displayPaintProperty();
                         }
                     };
@@ -191,7 +188,10 @@ public class MemoWriteActivity extends BlunoLibrary {
                         public void onColorSelected(int color) {
                             mColor = color;
                             oldColor = mColor;
+
+                            //선택되어진 색상을 업데이트
                             paintboard.updatePaintProperty(mColor, mSize);
+                            //화면의 좌측 상단에 선택한 색상을 업데이트
                             displayPaintProperty();
                         }
                     };
@@ -199,16 +199,22 @@ public class MemoWriteActivity extends BlunoLibrary {
                         public void onCompleteSelected() {
                             mColor = oldColor;
                             mSize = oldSize;
+
+                            //완료 버튼이 눌렸을 때 색상과 두께를 업데이트
                             paintboard.updatePaintProperty(mColor, mSize);
+                            //화면의 좌측 상단에 선택한 색상과 두께를 업데이트트
                             displayPaintProperty();
                         }
-                    };
+                   };
                     Log.d("!!!!!!!!!!","펜 선택 color 값"+mColor);
                     Log.d("!!!!!!!!!!","펜 선택 size 값"+mSize);
                     Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
                     startActivity(intent);
                 }
             });
+            /**
+             * 메모 작성 화면에서 지우개 버튼을 눌렀을 경우
+             */
             eraserBtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
 
@@ -262,17 +268,27 @@ public class MemoWriteActivity extends BlunoLibrary {
                 }
             });
 
+            /**
+             * 메모 작성 화면에서 undo 버튼 눌렀을 경우
+             */
             undoBtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     paintboard.undo();
 
                 }
             });
+
+            /**
+             * 메모 작성 화면에서 scroll 버튼 눌렀을 경우
+             * 차후에 펜 자체의 기능이 될 것으로 임시로 버튼 생성함
+             */
             scrollBtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
 
                     scrollSelected=!scrollSelected;
 
+                    //스크롤 버튼이 눌렸을 경우
+                    //스크롤 버튼을 제외한 나머지 버튼들을 비활성화인 false 상태로 만듦
                     if (scrollSelected) {
                         Log.i("scrollBtn", "clicked.");
                         colorBtn.setEnabled(false);
@@ -341,6 +357,9 @@ public class MemoWriteActivity extends BlunoLibrary {
 
 
                     }
+
+                    //스크롤 버튼이 한번 더 눌렸을 경우
+                    //스크롤 이외의 버튼을 활성화인 true를 해줌
                     else {
                         Log.i("scrollBtn", "unclicked.");
                         colorBtn.setEnabled(true);
@@ -380,6 +399,11 @@ public class MemoWriteActivity extends BlunoLibrary {
 
     }
 
+    /**
+     * 스크롤 할 때 좌표값을 이동
+     * @param x
+     * @param y
+     */
     public static void scrollBy(int x, int y)
     {
         Scroll_Horizontal.scrollBy(x, 0);
@@ -395,15 +419,15 @@ public class MemoWriteActivity extends BlunoLibrary {
         return mSize;
     }
 
+    /**
+     * 펜 사용시 선택한 색상과 두께 값을
+     * 화면의 좌측 상단에 표시
+     */
     private void displayPaintProperty() {
         colorBtn.setBackgroundColor(mColor);
         sizetextview.setText("Size : " + mSize);
 
         //addedLayout.invalidate();
-    }
-
-    public static void temp(){
-
     }
 
     @Override
