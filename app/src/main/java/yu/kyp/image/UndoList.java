@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by DONGSOO on 2015-04-28.
  */
 public class UndoList extends ArrayList<Bitmap> {
-    private static final int MAX_UNDOS = 10;
+    private static final int MAX_UNDOS = 5;
     private static final String TAG = UndoList.class.getSimpleName();
 
 

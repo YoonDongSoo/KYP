@@ -167,12 +167,6 @@ class PenDataAdapter extends BaseAdapter {
     int columnCount;
 
 
-    public void temp1(int size){
-
-
-        temp_size = size;
-    }
-
     public PenDataAdapter(Context context) {
         super();
 
@@ -245,7 +239,6 @@ class PenDataAdapter extends BaseAdapter {
                 if (PenPaletteActivity.penlistener != null) {
                     PenPaletteActivity.penlistener.onPenSelected(((Integer)v.getTag()).intValue());
 //                    Log.i("pen thickness","clicked");
-                    temp1(((Integer)v.getTag()).intValue());
                 }
 
 //                ((PenPaletteDialog)mContext).finish();

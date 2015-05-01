@@ -46,6 +46,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     Button backBtn;
     Button colorBtn;
     TextView sizetextview;
+    Button scrollBtn;
 
     int mColor = 0xff000000;
     int mSize = 2;
@@ -129,6 +130,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         backBtn = (Button) findViewById(R.id.buttonBack);
         colorBtn = (Button) findViewById(R.id.buttoncolor);
         sizetextview = (TextView) findViewById(R.id.textviewsize);
+        scrollBtn = (Button) findViewById(R.id.buttonScroll);
 
 
         final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
@@ -139,8 +141,8 @@ public class MemoWriteActivity extends BlunoLibrary {
 
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                2000,
-                2800);                  //스크롤을 위한 캔버스의 크기 조절 부분
+                800,
+                1000);                  //스크롤을 위한 캔버스의 크기 조절 부분
 
         paintboard.setLayoutParams(params);
         paintboard.setPadding(2, 2, 2, 2);

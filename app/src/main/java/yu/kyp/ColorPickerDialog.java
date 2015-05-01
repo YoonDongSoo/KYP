@@ -35,7 +35,9 @@ public class ColorPickerDialog extends Dialog {
                     0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00,
                     0xFFFFFF00, 0xFFFF0000
             };
-            Shader s = new SweepGradient(0, 0, mColors, null);      //원형 그라디언트
+
+            //위의 색상들을 사용해 원형 그라디언트 생성성
+           Shader s = new SweepGradient(0, 0, mColors, null);
 
             //테두리 원
             mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);      //중간색 설정
@@ -56,27 +58,40 @@ public class ColorPickerDialog extends Dialog {
         protected void onDraw(Canvas canvas) {
             float r = CENTER_X - mPaint.getStrokeWidth()*0.5f;
 
+            //(0,0) 좌표값을 (CENTER_X, CENTER_X)로 바꿈
             canvas.translate(CENTER_X, CENTER_X);
 
+            //new RectF(-r, -r, r, r)에  mPaint 객체를 사용하여
+            //원형 그라디언트를 나타낼 바깥원을 그림(영역에 내접하는 원)
             canvas.drawOval(new RectF(-r, -r, r, r), mPaint);
+
+            //CENTER_X, CENTER_X)에  mCenterPaint 객체를 사용하여
+            //터치한 부분의 색상 값이 나타나게 하는 반지름이 CENTER_RADIUS인 중앙원을 그림
             canvas.drawCircle(0, 0, CENTER_RADIUS, mCenterPaint);
 
-            if (mTrackingCenter) {
-                int c = mCenterPaint.getColor();
-                mCenterPaint.setStyle(Paint.Style.STROKE);
+//            if (mTrackingCenter) {
+//
+//                int c = mCenterPaint.getColor();
+                //외각선을 그림
+//                mCenterPaint.setStyle(Paint.Style.STROKE);
 
-                if (mHighlightCenter) {
-                    mCenterPaint.setAlpha(0xFF);        //객체 투명도 설정
-                } else {
-                    mCenterPaint.setAlpha(0x80);        //객체 투명도 설정
-                }
-                canvas.drawCircle(0, 0,
-                        CENTER_RADIUS + mCenterPaint.getStrokeWidth(),
-                        mCenterPaint);
+//                if (mHighlightCenter) {
+//                    mCenterPaint.setAlpha(0xFF);        //객체 투명도 설정
+//                    Log.d("투명도1","");
+//                } else {
+//                    mCenterPaint.setAlpha(0x80);        //객체 투명도 설정
+//                    Log.d("투명도222222","");
+//                }
 
-                mCenterPaint.setStyle(Paint.Style.FILL);
-                mCenterPaint.setColor(c);
-            }
+                //중앙원을 눌러 색상이 선택되었을 때
+                //잠깐 나타나는 원
+//                canvas.drawCircle(0, 0,
+//                        CENTER_RADIUS + mCenterPaint.getStrokeWidth(),
+//                        mCenterPaint);
+
+//                mCenterPaint.setStyle(Paint.Style.FILL);
+//                mCenterPaint.setColor(c);
+//            }
         }
 
         @Override
@@ -115,6 +130,7 @@ public class ColorPickerDialog extends Dialog {
 
             float p = unit * (colors.length - 1);
             int i = (int)p;
+            //p = p-i
             p -= i;
 
             // now p is just the fractional part [0...1) and i is the index
@@ -155,14 +171,24 @@ public class ColorPickerDialog extends Dialog {
 
         private static final float PI = 3.1415926f;
 
-        //테두리 원 터치와 중앙의 현재 색상을 나타내는 원 터치 처리를 하는 onTouchEvent
+        /**
+         * 테두리 원 터치와 중앙의 현재 색상을 나타내는 원 터치 처리
+         * @param event
+         * @return
+         */
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             float x = event.getX() - CENTER_X;
             float y = event.getY() - CENTER_Y;
+
+            //sqrt한 값이 CENTER_RADIUS보다 작거나 같다면 true
+            //sqrt한 값이 CENTER_RADIUS보다 크다면 false
             boolean inCenter = java.lang.Math.sqrt(x*x + y*y) <= CENTER_RADIUS;
 
+            //터치 액션 값을 인식
             switch (event.getAction()) {
+
+                //1. 터치다운일때
                 case MotionEvent.ACTION_DOWN:
                     mTrackingCenter = inCenter;
                     if (inCenter) {
@@ -170,6 +196,8 @@ public class ColorPickerDialog extends Dialog {
                         invalidate();
                         break;
                     }
+
+                    //2. 터치무브일때
                 case MotionEvent.ACTION_MOVE:
                     if (mTrackingCenter) {
                         if (mHighlightCenter != inCenter) {
@@ -177,19 +205,25 @@ public class ColorPickerDialog extends Dialog {
                             invalidate();
                         }
                     } else {
-                        float angle = (float)java.lang.Math.atan2(y, x);     //arc tangent(높이, 밑변)
+                        //각도를 구하기 위해 arc tangent(높이, 밑변) 사용
+                        float angle = (float)java.lang.Math.atan2(y, x);
                         // need to turn angle [-PI ... PI] into unit [0....1]
                         float unit = angle/(2*PI);
                         if (unit < 0) {
                             unit += 1;
                         }
+
+                        //터치된 곳에 대응하는 색상을 중앙에 표시함
                         mCenterPaint.setColor(interpColor(mColors, unit));
                         invalidate();
                     }
                     break;
+
+                //3. 터치업일때
                 case MotionEvent.ACTION_UP:
                     if (mTrackingCenter) {
-                        if (inCenter) {     //현재 색상 값 반환
+                        if (inCenter) {
+                            //마지막 색상 값을 중앙에 표시
                             mListener.colorChanged(mCenterPaint.getColor());
                         }
                         mTrackingCenter = false;    // so we draw w/o halo
@@ -210,16 +244,24 @@ public class ColorPickerDialog extends Dialog {
         mInitialColor = initialColor;
     }
 
+    /**
+     * 컬러피커 중앙의 색을 선택(클릭)하여 다양한 색의 펜 사용 가능
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //2. 만약 컬러피커 중앙의 색이 선택된 경우
         OnColorChangedListener l = new OnColorChangedListener() {
             public void colorChanged(int color) {
+//                Log.d("picker","색상 변경");
                 mListener.colorChanged(color);
                 dismiss();
             }
         };
 
+        //1. 다양색을 선택할 수 있는 컬러피커 팔레트가 뜸
         setContentView(new ColorPickerView(getContext(), l, mInitialColor));
         setTitle("Pick a Color");
     }

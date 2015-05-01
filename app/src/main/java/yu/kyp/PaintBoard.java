@@ -122,7 +122,6 @@ public class PaintBoard extends View {
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
-
         top = this.getTop();
         bottom = this.getBottom();
         left = this.getLeft();
@@ -130,9 +129,6 @@ public class PaintBoard extends View {
 
         width = right-left;
         height = bottom-top;
-
-
-
     }
 
     /**
@@ -185,8 +181,6 @@ public class PaintBoard extends View {
             x= right/2;
             y = bottom/2;
         }
-
-
         float xF = getFixedX(x, sx - additionalFactor);
         float yF = getFixedY(y, sy - additionalFactor);
 
@@ -245,7 +239,6 @@ public class PaintBoard extends View {
         Paint paintLine = new Paint();  // 선을 긋기 위한 페인트 생성
         paintLine.setARGB(70, 255, 0, 0);
         paintLine.setStrokeWidth(5);  // 굵기
-
 
         sx = 1f;
         sy = 1f;
@@ -324,6 +317,7 @@ public class PaintBoard extends View {
 
     /**
      * Undo
+     * undo 개수가
      */
     public void undo()
     {
@@ -354,7 +348,9 @@ public class PaintBoard extends View {
        // if (canvas != null) {
         //    canvas.drawColor(Color.BLACK);                       //캔버스의 배경색 설정
        // }
+        canvas.drawColor(Color.WHITE);
        //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+
        // canvas.drawBitmap(bitmap,0,0,null);
     }
 
@@ -664,7 +660,6 @@ public class PaintBoard extends View {
         final int border = mInvalidateExtraBorder;
         //다시 그려질 영역으로 현재 이동한 좌표 추가
         mInvalidRect.set((int) x - border, (int) y - border, (int) x + border, (int) y + border);
-
 
         mCurveEndX = x;
         mCurveEndY = y;
