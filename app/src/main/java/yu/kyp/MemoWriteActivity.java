@@ -7,20 +7,17 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
-import yu.kyp.test.ZoomActivity;
 
 public class MemoWriteActivity extends BlunoLibrary {
 
@@ -142,8 +139,8 @@ public class MemoWriteActivity extends BlunoLibrary {
 
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                1500,
-                2000);                  //스크롤을 위한 캔버스의 크기 조절 부분
+                2000,
+                2800);                  //스크롤을 위한 캔버스의 크기 조절 부분
 
         paintboard.setLayoutParams(params);
         paintboard.setPadding(2, 2, 2, 2);
@@ -162,113 +159,144 @@ public class MemoWriteActivity extends BlunoLibrary {
         try {
             noteManager = new NoteManager(this);
             Intent i = getIntent();
-            int noteNo = i.getIntExtra("NOTE_NO",0);
-            if(noteNo>0) {
+            int noteNo = i.getIntExtra("NOTE_NO", 0);
+            if (noteNo > 0) {
                 Note note = noteManager.getNote(noteNo);
-
-
             }
-            penBtn.setOnClickListener(new View.OnClickListener() {
+
+            View.OnClickListener buttonListener = new View.OnClickListener() {
+                @Override
                 public void onClick(View v) {
-                    PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
-                        public void onPenSelected(int size) {
-                            mSize = size;
-                            oldSize = mSize;
-                            paintboard.updatePaintProperty(mColor, mSize);
-                            displayPaintProperty();
-                        }
-                    };
-                    PenPaletteActivity.colorlistener = new PenPaletteActivity.OnColorSelectedListener() {
-                        public void onColorSelected(int color) {
-                            mColor = color;
-                            oldColor = mColor;
-                            paintboard.updatePaintProperty(mColor, mSize);
-                            displayPaintProperty();
-                        }
-                    };
-                    PenPaletteActivity.completelistener = new PenPaletteActivity.OnCompleteSelectedListener() {
-                        public void onCompleteSelected() {
-                            mColor = oldColor;
-                            mSize = oldSize;
-                            paintboard.updatePaintProperty(mColor, mSize);
-                            displayPaintProperty();
-                        }
-                    };
-                    Log.d("!!!!!!!!!!","펜 선택 color 값"+mColor);
-                    Log.d("!!!!!!!!!!","펜 선택 size 값"+mSize);
-                    Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
-                    startActivity(intent);
-                }
-            });
-            eraserBtn.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-
-                    eraserSelected = !eraserSelected;
-
-                    if (eraserSelected) {
-
-                        penBtn.setEnabled(false);
-                        undoBtn.setEnabled(false);
-
-                       // penBtn.invalidate();
-                       // undoBtn.invalidate();
-
-                        oldColor = mColor;
-                        oldSize = mSize;
-
-                        //mColor = Color.WHITE;
-
-                        EraserPaletteActivity.listener = new EraserPaletteActivity.OnEraserSelectedListener() {
-                            public void onEraserSelected(int size) {
-                                mSize = size;
-                                paintboard.setEraserPaint(mSize);
-                                displayPaintProperty();
-                            }
-                        };
-                        penBtn.invalidate();
-                        undoBtn.invalidate();
-
-
-                        Intent intent = new Intent(getApplicationContext(), EraserPaletteActivity.class);
-
-                        startActivity(intent);
-
+                    switch (v.getId()) {
+                        case R.id.buttonPen:
+                            buttonPen_OnClick(v);
+                        case R.id.buttonEraser:
+                            buttonEraser_OnClick(v);
+                        case R.id.buttonUndo:
+                            buttonUndo_OnClick(v);
+                        case R.id.buttonScroll:
+                            buttonScroll_OnClick(v);
+                        case R.id.buttonBack:
+                            buttonBack_OnClick(v);
+                        case R.id.buttonAlarm:
+                            buttonAlarm_OnClick(v);
+                        case R.id.buttonSetting:
+                            buttonSetting_OnClick(v);
+                        case R.id.buttonPicture:
+                            buttonPicture_OnClick(v);
                     }
-                    else {
-
-                        penBtn.setEnabled(true);
-                        undoBtn.setEnabled(true);
-
-                        penBtn.invalidate();
-                        undoBtn.invalidate();
-
-                        mColor = oldColor;
-                        mSize = oldSize;
-                        Log.d("!!!!!!!!!!","color 값"+mColor);
-                        Log.d("!!!!!!!!!!","size 값"+mSize);
-
-                        paintboard.updatePaintProperty(mColor, mSize);
-                        displayPaintProperty();
-                    }
-                }
-            });
-
-            undoBtn.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    paintboard.undo();
 
                 }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            };
+        }catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+//            penBtn.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
+//                        public void onPenSelected(int size) {
+//                            mSize = size;
+//                            oldSize = mSize;
+//                            paintboard.updatePaintProperty(mColor, mSize);
+//                            displayPaintProperty();
+//                        }
+//                    };
+//                    PenPaletteActivity.colorlistener = new PenPaletteActivity.OnColorSelectedListener() {
+//                        public void onColorSelected(int color) {
+//                            mColor = color;
+//                            oldColor = mColor;
+//                            paintboard.updatePaintProperty(mColor, mSize);
+//                            displayPaintProperty();
+//                        }
+//                    };
+//                    PenPaletteActivity.completelistener = new PenPaletteActivity.OnCompleteSelectedListener() {
+//                        public void onCompleteSelected() {
+//                            mColor = oldColor;
+//                            mSize = oldSize;
+//                            paintboard.updatePaintProperty(mColor, mSize);
+//                            displayPaintProperty();
+//                        }
+//                    };
+//                    Log.d("!!!!!!!!!!","펜 선택 color 값"+mColor);
+//                    Log.d("!!!!!!!!!!","펜 선택 size 값"+mSize);
+//                    Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
+//                    startActivity(intent);
+//                }
+//            });
+//            eraserBtn.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//
+//                    eraserSelected = !eraserSelected;
+//
+//                    if (eraserSelected) {
+//
+//                        penBtn.setEnabled(false);
+//                        undoBtn.setEnabled(false);
+//
+//                       // penBtn.invalidate();
+//                       // undoBtn.invalidate();
+//
+//                        oldColor = mColor;
+//                        oldSize = mSize;
+//
+//                        //mColor = Color.WHITE;
+//
+//                        EraserPaletteActivity.listener = new EraserPaletteActivity.OnEraserSelectedListener() {
+//                            public void onEraserSelected(int size) {
+//                                mSize = size;
+//                                paintboard.setEraserPaint(mSize);
+//                                displayPaintProperty();
+//                            }
+//                        };
+//                        penBtn.invalidate();
+//                        undoBtn.invalidate();
+//
+//
+//                        Intent intent = new Intent(getApplicationContext(), EraserPaletteActivity.class);
+//
+//                        startActivity(intent);
+//
+//                    }
+//                    else {
+//
+//                        penBtn.setEnabled(true);
+//                        undoBtn.setEnabled(true);
+//
+//                        penBtn.invalidate();
+//                        undoBtn.invalidate();
+//
+//                        mColor = oldColor;
+//                        mSize = oldSize;
+//                        Log.d("!!!!!!!!!!","color 값"+mColor);
+//                        Log.d("!!!!!!!!!!","size 값"+mSize);
+//
+//                        paintboard.updatePaintProperty(mColor, mSize);
+//                        displayPaintProperty();
+//                    }
+//                }
+//            });
+//
+//            undoBtn.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    paintboard.undo();
+//
+//                }
+//            });
+
 
 //        TextView textPointData = (TextView)findViewById(R.id.textViewPointData);
 //        textPointData.setMovementMethod(new ScrollingMovementMethod());
 //        textPointData.setText(sb.toString());
 
-    }
 
+
+    /**
+     * 스크롤 할 때 좌표값을 이동
+     * @param x
+     * @param y
+     */
     public static void scrollBy(int x, int y)
     {
         Scroll_Horizontal.scrollBy(x, 0);
@@ -284,6 +312,9 @@ public class MemoWriteActivity extends BlunoLibrary {
         return mSize;
     }
 
+    /**
+     * 좌측 상단에 선택된 색상, 크기를 표시한다.
+     */
     private void displayPaintProperty() {
         colorBtn.setBackgroundColor(mColor);
         sizetextview.setText("Size : " + mSize);
@@ -362,12 +393,20 @@ public class MemoWriteActivity extends BlunoLibrary {
         startActivity(new Intent(this,SettingsActivity.class));
     }
 
+    /**
+     * 뒤로가기
+     * @param v
+     */
     public void buttonBack_OnClick(View v)
     {
         // 확대 테스트
         paintboard.zoomInBitmap();
     }
 
+    /**
+     * 키보드
+     * @param v
+     */
     public void buttonText_OnClick(View v)
     {
         // 축소 테스트
@@ -375,16 +414,257 @@ public class MemoWriteActivity extends BlunoLibrary {
         paintboard.zoomOutBitmap();
     }
 
+    /**
+     * 지우개 기능을 활성화한다.
+     * @param v
+     */
+    public void buttonEraser_OnClick(View v)
+    {
+
+        eraserSelected = !eraserSelected;
+        // 지우개 버튼이 선택되면
+        if (eraserSelected) {
+            //펜 버튼, undo 버튼 비활성화
+            penBtn.setEnabled(false);
+            undoBtn.setEnabled(false);
+
+            penBtn.invalidate();
+            undoBtn.invalidate();
+
+            //펜 사이즈, 크기  저장
+            oldColor = mColor;
+            oldSize = mSize;
+
+            //mColor = Color.WHITE;
+
+            //선택된 크기로 지우개 기능 활성화
+            EraserPaletteActivity.listener = new EraserPaletteActivity.OnEraserSelectedListener() {
+                public void onEraserSelected(int size) {
+                    mSize = size;
+                    paintboard.setEraserPaint(mSize);
+                    //화면의 좌측 상단에 선택한 색상을 표시한다.
+                    displayPaintProperty();
+                }
+            };
+
+            //지우개 크기 선택 화면 띄우기
+            Intent intent = new Intent(getApplicationContext(), EraserPaletteActivity.class);
+
+            startActivity(intent);
+
+        }
+        //지우개 버튼 선택이 해제되면
+        else {
+            //펜, undo 버튼 활성화
+            penBtn.setEnabled(true);
+            undoBtn.setEnabled(true);
+
+            penBtn.invalidate();
+            undoBtn.invalidate();
+
+            //이전에 저장해놓은 색상, 크기 값을 가져온다.
+            mColor = oldColor;
+            mSize = oldSize;
+            Log.d("!!!!!!!!!!","color 값"+mColor);
+            Log.d("!!!!!!!!!!","size 값"+mSize);
+
+            //선택되어진 색상과 크기를 적용한다.
+            paintboard.updatePaintProperty(mColor, mSize);
+            displayPaintProperty();
+        }
+
+    }
+
+    /**
+     * 손글씨를 위한 펜 기능을 활성화한다.
+     * @param v
+     */
+    public void buttonPen_OnClick(View v)
+    {
+        //펜 굵기 선택 팔레트를 눌렀을 때
+        PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
+            public void onPenSelected(int size) {
+                mSize = size;
+                oldSize = mSize;
+                //선택되어진 굵기를 적용한다.
+                paintboard.updatePaintProperty(mColor, mSize);
+                //화면 좌측 상단에 선택한 굵기를 표시한다.
+                displayPaintProperty();
+            }
+        };
+        //펜 색상 선택 팔레트를 눌렀을 때
+        PenPaletteActivity.colorlistener = new PenPaletteActivity.OnColorSelectedListener() {
+            public void onColorSelected(int color) {
+                mColor = color;
+                oldColor = mColor;
+                //선택되어진 색상을 적용한다.
+                paintboard.updatePaintProperty(mColor, mSize);
+                //화면의 좌측 상단에 선택한 색상을 표시한다.
+                displayPaintProperty();
+            }
+        };
+        //완료 버튼을 눌렀을 때
+        PenPaletteActivity.completelistener = new PenPaletteActivity.OnCompleteSelectedListener() {
+            public void onCompleteSelected() {
+                mColor = oldColor;
+                mSize = oldSize;
+                //색상과 굵기를 적용한다.
+                paintboard.updatePaintProperty(mColor, mSize);
+                //화면의 좌측상단에 선택한 색상과 굵기를 표시한다.
+                displayPaintProperty();
+            }
+        };
+        Log.d("!!!!!!!!!!","펜 선택 color 값"+mColor);
+        Log.d("!!!!!!!!!!","펜 선택 size 값"+mSize);
+
+        //펜 색상, 굵기변경 팔레트 띄우기
+        Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
+        startActivity(intent);
+
+    }
+
+    /**
+     * 사진 (보류)
+     * @param v
+     */
     public void buttonPicture_OnClick(View v)
     {
         // reset
         paintboard.zoomResetBitmap();
     }
 
+    /**
+     * 알람 설정
+     * @param v
+     */
     public void buttonAlarm_OnClick(View v)
     {
         // 블루투스 연결
         buttonScanOnClickProcess();
+    }
+
+    /**
+     * Undo 기능을 활성화한다.
+     * @param v
+     */
+    public void buttonUndo_OnClick(View v)
+    {
+        paintboard.undo();
+    }
+
+    /**
+     * 스크롤 기능을 활성화한다.
+     * 차후에 펜 자체의 기능이 될 것으로 임시로 버튼을 생성함
+     * @param v
+     */
+    public void buttonScroll_OnClick(View v)
+    {
+        scrollSelected=!scrollSelected;
+
+        //스크롤 버튼이 눌렸을 경우
+        //스크롤 버튼을 제외한 나머지 버튼들을 비활성화인 false 상태로 만듦
+        if (scrollSelected) {
+            Log.i("scrollBtn", "clicked.");
+            colorBtn.setEnabled(false);
+            penBtn.setEnabled(false);
+            eraserBtn.setEnabled(false);
+            undoBtn.setEnabled(false);
+            alarmBtn.setEnabled(false);
+//            scrollBtn.setEnabled(false);
+
+            colorBtn.invalidate();
+            penBtn.invalidate();
+            eraserBtn.invalidate();
+            undoBtn.invalidate();
+            alarmBtn.invalidate();
+//                        scrollBtn.invalidate();
+
+            paintboard.setOnTouchListener(new View.OnTouchListener() {
+
+                //스크롤을 위해 화면을 터치하였을 때
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    Scroll_Vertical.setOnTouchListener(this);
+                    Scroll_Horizontal.setOnTouchListener(this);
+
+
+                    switch (event.getAction())
+                    {
+                        //처음 눌렀을 때 좌표값을 저장한다.
+                        case MotionEvent.ACTION_DOWN:
+                            Scroll_Vertical.requestDisallowInterceptTouchEvent(true);
+                            Log.i("scroll", "down");
+                            currentX = (int)event.getRawX();
+                            currentY = (int)event.getRawY();
+
+                            break;
+
+                        //처음 좌표값 - 움직인 후의 좌표값만큼 이동한다.
+                        case MotionEvent.ACTION_MOVE:
+                            Scroll_Vertical.requestDisallowInterceptTouchEvent(true);
+                            Log.i("scroll", "move");
+                            int x2 = (int)event.getRawX();
+                            int y2 = (int)event.getRawY();
+                            scrollBy(currentX - x2, currentY - y2);
+                            currentX = x2;
+                            currentY = y2;
+                            break;
+
+                        case MotionEvent.ACTION_UP:
+                            Scroll_Vertical.requestDisallowInterceptTouchEvent(true);
+                            Log.i("scroll", "up");
+                            break;
+
+                        default:
+                            Scroll_Vertical.requestDisallowInterceptTouchEvent(true);
+                            Log.i("scroll", "default");
+                            currentX = (int)event.getRawX();
+                            currentY = (int)event.getRawY();
+                            break;
+                    }
+                    currentX = (int)event.getRawX();
+                    currentY = (int)event.getRawY();
+
+                    return true;
+                }
+
+
+
+            });
+
+
+        }
+
+        //스크롤 버튼이 한번 더 눌렸을 경우
+        //스크롤 이외의 버튼을 활성화인 true를 해줌
+        else {
+            Log.i("scrollBtn", "unclicked.");
+            colorBtn.setEnabled(true);
+            penBtn.setEnabled(true);
+            eraserBtn.setEnabled(true);
+            undoBtn.setEnabled(true);
+            alarmBtn.setEnabled(true);
+//                        scrollBtn.setEnabled(true);
+
+            colorBtn.invalidate();
+            penBtn.invalidate();
+            eraserBtn.invalidate();
+            undoBtn.invalidate();
+            alarmBtn.invalidate();
+//                        scrollBtn.invalidate();
+
+            paintboard.setOnTouchListener(new View.OnTouchListener() {
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return false;
+                }
+            });
+
+            paintboard.updatePaintProperty(mColor, mSize);
+            displayPaintProperty();
+        }
+
     }
     @Override
     protected void onResume() {

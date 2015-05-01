@@ -130,13 +130,15 @@
             android:layout_height="wrap_content"
             android:text="펜"
             android:id="@+id/buttonPen"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="buttonPen_OnClick"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="지우"
             android:id="@+id/buttonEraser"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="buttonEraser_OnClick"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -149,7 +151,15 @@
             android:layout_height="wrap_content"
             android:text="und"
             android:id="@+id/buttonUndo"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="buttonUndo_OnClick"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="scr"
+            android:id="@+id/buttonScroll"
+            android:layout_weight="1"
+            android:onClick="buttonScroll_OnClick"/>
     </LinearLayout>
 
 </RelativeLayout>

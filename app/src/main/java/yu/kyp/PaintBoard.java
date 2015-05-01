@@ -13,11 +13,9 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Stack;
 
 import yu.kyp.image.UndoList;
 
@@ -43,7 +41,7 @@ public class PaintBoard extends View {
     /**
      * Undo data
      */
-    Stack undos = new Stack();
+    //Stack undos = new Stack();
 
     //stack -> Arraylist로 변경
     UndoList undo = new UndoList();
@@ -124,6 +122,7 @@ public class PaintBoard extends View {
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
+
         top = this.getTop();
         bottom = this.getBottom();
         left = this.getLeft();
@@ -131,6 +130,9 @@ public class PaintBoard extends View {
 
         width = right-left;
         height = bottom-top;
+
+
+
     }
 
     /**
@@ -139,11 +141,16 @@ public class PaintBoard extends View {
     public void zoomInBitmap() {
         zoomBitmap(0.25f);
     }
-
+    /**
+     * PaintBoard View를 25% 축소한다.
+     */
     public void zoomOutBitmap() {
         zoomBitmap(-0.25f);
     }
 
+    /**
+     * 비율을 받아 PaintBoard View를 원하는 위치에서 확대/축소한다.
+     */
     public void zoomBitmap(float additionalFactor) {
         // 배율이 25% 밑으로 떨어지지 않도록 처리.
         if(sx+additionalFactor <= 0f || sy+additionalFactor<= 0f)
@@ -163,11 +170,12 @@ public class PaintBoard extends View {
         float[] values = new float[9];
         int x1, y1, x2, y2;
 
-
+        //배율값을 계속 더해줘서 배율값만큼 계속 확대/축소가 되도록한다.
         sx += additionalFactor;
         sy += additionalFactor;
 
 
+        //글쓰기 화면의 canvas를 배경으로 둔다.
         drawBackground(canvasWrite);
 
 
@@ -177,6 +185,8 @@ public class PaintBoard extends View {
             x= right/2;
             y = bottom/2;
         }
+
+
         float xF = getFixedX(x, sx - additionalFactor);
         float yF = getFixedY(y, sy - additionalFactor);
 
@@ -188,6 +198,7 @@ public class PaintBoard extends View {
             yF = bottom/2;
         }
 
+        //터치한 위치를 중심으로 확대/축소를 하기위한 위치값 계산
         x1 =(int) ((1-sx)*xF);
         y1 = (int) (0*sy + (1-sy)*(yF));
         x2=(int)(width*sx +(1-sx)*xF);
@@ -200,6 +211,7 @@ public class PaintBoard extends View {
         int scalewidth = x2-x1;
         int scaleheight = y2-y1;
 
+        //마지막에 저장된 비트맵을 불러와 확대/축소하고 비트맵을 다시 그려준다.
         Bitmap bitmap = undo.getLast();
         canvasWrite.drawBitmap(bitmap, new Rect(0 ,0,(int)width, (int)height), new Rect(x1, y1, x2, y2), null/*mPaint*/);
         canvasWrite.drawLine(0, (bottom - 0) / 2, right, (bottom - 0) / 2, paintLine);
@@ -221,7 +233,9 @@ public class PaintBoard extends View {
 
         return (y-(1-scaleY)*lastYF)/scaleY;
     }
-
+    /**
+     * PaintBoard View를 원래상태로 리셋한다.
+     */
     public void zoomResetBitmap() {
         globalX=0f; globalY=top;
         scalewidth=width; scaleheight=height;
@@ -232,13 +246,15 @@ public class PaintBoard extends View {
         paintLine.setARGB(70, 255, 0, 0);
         paintLine.setStrokeWidth(5);  // 굵기
 
+
         sx = 1f;
         sy = 1f;
 
-
+        //매트릭스를 만들어 화면 중앙을 중심으로 100% 배율로 확대한다.
         Matrix zoom = new Matrix();
         zoom.postScale(sx, sy, right / 2, (bottom - top) / 2);
 
+        //매트릭스를 사용하여 마지막에 저장된 비트맵에 그린다.
         Bitmap bitmap = undo.getLast();
         drawBackground(canvasWrite);
         canvasWrite.drawBitmap(bitmap, zoom, mPaint);
@@ -308,7 +324,6 @@ public class PaintBoard extends View {
 
     /**
      * Undo
-     * undo 개수가
      */
     public void undo()
     {
@@ -333,12 +348,13 @@ public class PaintBoard extends View {
      */
     public void drawBackground(Canvas canvas)
     {
+        //캔버스의 배경색 설정
+        canvas.drawColor(Color.WHITE);
+
        // if (canvas != null) {
         //    canvas.drawColor(Color.BLACK);                       //캔버스의 배경색 설정
        // }
-        canvas.drawColor(Color.WHITE);
        //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-
        // canvas.drawBitmap(bitmap,0,0,null);
     }
 
@@ -349,10 +365,12 @@ public class PaintBoard extends View {
      */
     public void updatePaintProperty(int color, int size)
     {
+        //지우개 모드를 false로 변경
         mEraserMode = false;
         mPaint.setXfermode(null);
         mPaint.setAlpha(0xFF);
 
+        //전달받은 색상과 크기 적용
         mPaint.setColor(color);
         Log.v("!!!","pen color"+color);
         mPaint.setStrokeWidth(size);
@@ -361,9 +379,15 @@ public class PaintBoard extends View {
         //Log.d("!!!!!!!!!!","값 나오는 중"+temp_color);
     }
 
+    /**
+     * 지우개 기능
+     * @param size
+     */
     public void setEraserPaint(int size) {
         Log.d("!!!!","지우개모드들어옴");
+        //지우개 모드를 true로 바꾼다.
         mEraserMode=true;
+
         mPaint.setXfermode(null);
         mPaint.setAlpha(0);
         mPaint.setXfermode(new PorterDuffXfermode(
@@ -375,17 +399,28 @@ public class PaintBoard extends View {
     }
     /**
      * Create a new image
+     * 배경을 위한 canvas를 제일 밑부분에 깔고 그위에 손글씨를 작성할 canvas를 생성한다.
+     * 이렇게 해야 지우개를 사용하였을 때 배경이 지워지지 않는다.
      */
     public void newImage(int width, int height)
     {
+        //비트맵이 존재하면 비트맵 이미지를 해제
+        //(메모리 최적화를 위해 사용)
         if(mBitmap != null){
             mBitmap.recycle();
         }
+        //배경 canvas를 생성한다.
         canvasBackground = new Canvas();
+        //배경 canvas의 배경색을 설정한다.
         drawBackground(canvasBackground);
 
+        //비트맵 생성(Config.ARGB_8888: 투명값 지정)
         Bitmap img = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        /*비트맵에 직접 그림을 그리거나 다른 이미지를 그릴려고 하면 새로운 canvas를 만들어야 canvas에
+        그리는 모든 작업이 bitmap에 반영된다.*/
+        //캔버스 생성
         Canvas canvas = new Canvas();
+        //캔버스에 비트맵 이미지 적용
         canvas.setBitmap(img);
 
         mBitmap = img;
@@ -478,35 +513,42 @@ public class PaintBoard extends View {
         canvas.drawColor(Color.WHITE);
 
 
-
+        //지우개 모드가 아닐 경우 Path객체를 그린다.
+        //지우개는 검은색 선이라서 지우개 모드일 경우 Path객체 그리면 안됨
         if(!mEraserMode)
             canvas.drawPath(mPath, mPaint);
-
+        //비트맵을 화면에 그린다.
         canvas.drawBitmap(mBitmap, 0, 0, null);
 
 
     }
 
     /**
-     * Handles touch event, UP, DOWN and MOVE                        (for drawing)
+     * Handles touch event, UP, DOWN and MOVE(for drawing)
      */
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean  onTouchEvent(MotionEvent event) {
         int action = event.getAction();
 
         switch (action) {
+            //손을 떼었을 때
             case MotionEvent.ACTION_UP:
 //                Log.i("draw", "actionup called.");
                 changed = true;
 
                 this.getParent().requestDisallowInterceptTouchEvent(false);
-                Rect rect = touchUp(event, false);      //터치 메소드 호출
-                s = null;   // Stroke 인스턴스 삭제
+                //touchUp 메소드 호출
+                Rect rect = touchUp(event, false);
+                //s = null;   // Stroke 인스턴스 삭제
+
+                //화면을 갱신한다.
                 if (rect != null) {
-                    invalidate(rect);
-                }
+                invalidate(rect);
+            }
                /* this.getParent().requestDisallowInterceptTouchEvent(true);
                 touchUp(event,false);
                 invalidate();*/
+
+                //Path 객체 초기화
                 mPath.rewind();
 
                 // undo 목록에 넣기
@@ -517,19 +559,20 @@ public class PaintBoard extends View {
                 undo.addList(img);
 
                 return true;
-
+            //화면에 손을 댔을 때
             case MotionEvent.ACTION_DOWN:
 //                Log.i("draw", "actiondown called.");
 
                 if (mBitmap == null){
                     ;
                 }
-
+                //scrollview에 영향을 안받고 draw 기능 적용
                 this.getParent().requestDisallowInterceptTouchEvent(true);
+                //touchDown()메소드 호출
                 rect = touchDown(event);
 
 
-
+                //화면을 갱신한다.
                 if (rect != null) {
                     invalidate(rect);
                 }
@@ -554,21 +597,24 @@ public class PaintBoard extends View {
                 //===================================
                 //터치 관련 처리
                 //===================================
+                //좌표값 저장
                 x = event.getRawX();
                 y = event.getRawY();
+                //터치 상태
                 istouched = true;
                 touchx = x; touchy =y;
                 String msg = "터치를 입력받음 : " + x + " / " + y;
                 Log.d(TAG,msg);
                 return true;
-
+            //움직일 때
             case MotionEvent.ACTION_MOVE:
 //                Log.i("draw", "actionmove called.");
-
+                //scrollview에 영향을 안받고 draw 기능 적용
                 this.getParent().requestDisallowInterceptTouchEvent(true);
+                //touchMove() 메소드 호출
                 rect = touchMove(event);
 
-
+                //화면을 갱신한다.
                 if (rect != null) {
                     invalidate(rect);
                 }
@@ -595,33 +641,35 @@ public class PaintBoard extends View {
         float y = event.getY();
         int i;
 
-        s = new Stroke();
+        //s = new Stroke();
 
 //        temp_x = x;
 //        temp_y = y;
 
 
-        s.listPoint.add(new PointData(x, y));
+       // s.listPoint.add(new PointData(x, y));
 
 
         lastX = x;
         lastY = y;
 
+        //Path 정보를 초기화
         mPath.reset();
 
         Rect mInvalidRect = new Rect();
-        mPath.moveTo(x, y);             //현재 좌표값 추가
-
+        //Path객체에 현재 좌표값 추가
+        mPath.moveTo(x, y);
         /**********************/
 
         final int border = mInvalidateExtraBorder;
-        mInvalidRect.set((int) x - border, (int) y - border, (int) x + border, (int) y + border);
         //다시 그려질 영역으로 현재 이동한 좌표 추가
+        mInvalidRect.set((int) x - border, (int) y - border, (int) x + border, (int) y + border);
+
 
         mCurveEndX = x;
         mCurveEndY = y;
 
-
+        //Path객체를 그린다.
         canvasWrite.drawPath(mPath, mPaint);
 
         return mInvalidRect;
@@ -643,55 +691,47 @@ public class PaintBoard extends View {
 
     private Rect touchUp(MotionEvent event, boolean cancel) {
         Rect rect = processMove(event);
-        int i,j;
-        int size;
-
-        stroke.add(new Stroke(temp_color,temp_thickness,s.listPoint));
-
-            for(i=0; i<stroke.size(); i++) {
-//            Log.i("i는","? " + i);
-
-                size = stroke.get(i).listPoint.size();
-                Log.i("color", ", size" + stroke.get(i).color + ", " + stroke.get(i).thickness);
-
-//            Log.i("size는","? " + size);
-                for (j = 0; j < size; j++) {
-//                Log.i("터치업","" + stroke.get(i).listPoint.get(j).x + ", " + stroke.get(i).listPoint.get(j).y);
-
-                }
-            }
-
-
-//        s.listPoint.clear();
-//        stroke.clear();
         return rect;
+//        int i,j;
+//        int size;
+//
+//        stroke.add(new Stroke(temp_color,temp_thickness,s.listPoint));
+//
+//            for(i=0; i<stroke.size(); i++) {
+////            Log.i("i는","? " + i);
+//
+//                size = stroke.get(i).listPoint.size();
+//                Log.i("color", ", size" + stroke.get(i).color + ", " + stroke.get(i).thickness);
+//
+////            Log.i("size는","? " + size);
+//                for (j = 0; j < size; j++) {
+////                Log.i("터치업","" + stroke.get(i).listPoint.get(j).x + ", " + stroke.get(i).listPoint.get(j).y);
+//
+//                }
+//            }
+//
+//
+////        s.listPoint.clear();
+////        stroke.clear();
     }
 
     /**
      * Process Move Coordinates
+     * x,y값을 mPath에 넣어서 라인을 quadTo를 사용해서 그린다
+     * lastX,lastY값을 사용한다
      * @param event
      * @return
      */
     private Rect processMove(MotionEvent event) {            /******************************/
 
+//        final float x = event.getX();
+//        final float y = event.getY();
+//        PointData p = new PointData(x, y);
+//        s.listPoint.add(p);
+//        Rect mInvalidRect = drawPointData(p, mPath, mPaint);
+//
         final float x = event.getX();
         final float y = event.getY();
-        PointData p = new PointData(x, y);
-        s.listPoint.add(p);
-        Rect mInvalidRect = drawPointData(p, mPath, mPaint);
-
-        return mInvalidRect;
-    }
-
-    /**
-     * x,y값을 mPath에 넣어서 라인을 quadTo를 사용해서 그린다
-     * lastX,lastY값을 사용한다
-     *
-     */
-    private Rect drawPointData(PointData p, Path path, Paint paint) {
-
-        float x = p.x;
-        float y = p.y;
 
         final float dx = Math.abs(x - lastX);
         final float dy = Math.abs(y - lastY);
@@ -699,14 +739,15 @@ public class PaintBoard extends View {
         Rect mInvalidRect = new Rect();
         if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
             final int border = mInvalidateExtraBorder;
-            mInvalidRect.set((int) mCurveEndX - border, (int) mCurveEndY - border,      //이동좌표 추가
+            //다시 그려질 영역으로 현재 이동한 좌표 추가
+            mInvalidRect.set((int) mCurveEndX - border, (int) mCurveEndY - border,
                     (int) mCurveEndX + border, (int) mCurveEndY + border);
 
             float cX = mCurveEndX = (x + lastX) / 2;
             float cY = mCurveEndY = (y + lastY) / 2;
 
-
-            path.quadTo(lastX, lastY, cX, cY);     //패스 객체에 현재 좌표값을 곡선으로 추가
+            //Path 객체에 현재 좌표값을 곡선으로 추가
+            mPath.quadTo(lastX, lastY, cX, cY);
 
             // union with the control point of the new curve
             mInvalidRect.union((int) lastX - border, (int) lastY - border,
@@ -719,11 +760,54 @@ public class PaintBoard extends View {
             lastX = x;
             lastY = y;
 
-            canvasWrite.drawPath(path, paint);
-
+            //Path객체를 그린다.
+            canvasWrite.drawPath(mPath, mPaint);
         }
+
         return mInvalidRect;
     }
+
+//    /**
+//     * x,y값을 mPath에 넣어서 라인을 quadTo를 사용해서 그린다
+//     * lastX,lastY값을 사용한다
+//     *
+//     */
+//    private Rect drawPointData(PointData p, Path path, Paint paint) {
+//
+//        float x = p.x;
+//        float y = p.y;
+//
+//        final float dx = Math.abs(x - lastX);
+//        final float dy = Math.abs(y - lastY);
+//
+//        Rect mInvalidRect = new Rect();
+//        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+//            final int border = mInvalidateExtraBorder;
+//            mInvalidRect.set((int) mCurveEndX - border, (int) mCurveEndY - border,      //이동좌표 추가
+//                    (int) mCurveEndX + border, (int) mCurveEndY + border);
+//
+//            float cX = mCurveEndX = (x + lastX) / 2;
+//            float cY = mCurveEndY = (y + lastY) / 2;
+//
+//
+//            path.quadTo(lastX, lastY, cX, cY);     //패스 객체에 현재 좌표값을 곡선으로 추가
+//
+//            // union with the control point of the new curve
+//            mInvalidRect.union((int) lastX - border, (int) lastY - border,
+//                    (int) lastX + border, (int) lastY + border);
+//
+//            // union with the end point of the new curve
+//            mInvalidRect.union((int) cX - border, (int) cY - border,
+//                    (int) cX + border, (int) cY + border);
+//
+//            lastX = x;
+//            lastY = y;
+//
+//            canvasWrite.drawPath(path, paint);
+//
+//        }
+//        return mInvalidRect;
+//    }
 
     /**
      * Save this contents into a Jpeg image

@@ -99,6 +99,10 @@ class EraserDataAdapter extends BaseAdapter {
 
     }
 
+    /**
+     * 지우개 굵기 변경 테이블 열 갯수 리턴
+     * @return
+     */
     public int getNumColumns() {
         return columnCount;
     }
