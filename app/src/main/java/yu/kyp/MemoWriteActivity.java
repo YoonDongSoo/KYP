@@ -633,8 +633,6 @@ public class MemoWriteActivity extends BlunoLibrary {
 
 
             });
-
-
         }
 
         //스크롤 버튼이 한번 더 눌렸을 경우
