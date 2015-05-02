@@ -2,6 +2,9 @@ package yu.kyp.common.database;
 
 import android.content.Context;
 
+import org.apache.http.message.BasicNameValuePair;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -22,35 +25,46 @@ public class CreateTables {
         col.clear();
         col.put("NOTE_NO", "INTEGER PK AUTO");
         col.put("TITLE", "TEXT");
-        col.put("CONTENT", "TEXT");
-        col.put("LAST_MOD_DT","TEXT");
+        col.put("NOTE_DATA", "BLOB");
+        col.put("LAST_MOD_DT","TEXT NOT NULL");
+        col.put("IS_DEL","INTEGER NOT NULL");
+        col.put("BACKGROUND","TEXT");
         if(dropTables==true)
             db.dropTable("NOTE");
         db.createTableWithoutDefaultPK("NOTE", col);
 
-
-        // 획 Vector 정보
-        col.clear();
-        col.put("STROKE_NO", "INTEGER PK AUTO");
-        col.put("NOTE_NO", "INTEGER");
-        col.put("COLOR", "INTEGER");
-        col.put("THICKNESS", "INTEGER");
-        col.put("FOREIGN KEY(NOTE_NO) REFERENCES NOTE(NOTE_NO)","");
+        // 썸네일
+        ArrayList<BasicNameValuePair> list = new ArrayList<>();
+        list.add(new BasicNameValuePair("THUM_NO", "INTEGER PK AUTO"));
+        list.add(new BasicNameValuePair("NOTE_NO", "INTEGER NOT NULL"));
+        list.add(new BasicNameValuePair("THUM_DATA", "BLOB NOT NULL"));
+        list.add(new BasicNameValuePair("FOREIGN KEY(NOTE_NO) REFERENCES NOTE(NOTE_NO)",""));
+        /*col.clear();
+        col.put("THUM_NO", "INTEGER PK AUTO");
+        col.put("NOTE_NO", "INTEGER NOT NULL");
+        col.put("THUM_DATA", "BLOB NOT NULL");
+        col.put("FOREIGN KEY(NOTE_NO) REFERENCES NOTE(NOTE_NO)","");*/
         if(dropTables==true)
-            db.dropTable("STROKE");
-        db.createTableWithoutDefaultPK("STROKE", col);
+            db.dropTable("THUMBNAIL");
+        db.createTableWithoutDefaultPK("THUMBNAIL", list);
 
-        // 좌표 Vector 정보
-        col.clear();
-        col.put("POINT_NO", "INTEGER PK AUTO");
-        col.put("STROKE_NO", "INTEGER");
-        col.put("X", "REAL");
-        col.put("Y", "REAL");
-        col.put("FOREIGN KEY(STROKE_NO) REFERENCES STROKE(STROKE_NO)","");
+        // 알람 정보
+        list = new ArrayList<>();
+        list.add(new BasicNameValuePair("ALARM_NO", "INTEGER PK AUTO"));
+        list.add(new BasicNameValuePair("NOTE_NO", "INTEGER NOT NULL"));
+        list.add(new BasicNameValuePair("ALARM_DT", "TEXT NOT NULL"));
+        list.add(new BasicNameValuePair("FOREIGN KEY(NOTE_NO) REFERENCES NOTE(NOTE_NO)",""));
+        /*col.clear();
+        col.put("ALARM_NO", "INTEGER PK AUTO");
+        col.put("NOTE_NO", "INTEGER NOT NULL");
+        col.put("ALARM_DT", "TEXT NOT NULL");
+        col.put("FOREIGN KEY(NOTE_NO) REFERENCES NOTE(NOTE_NO)","");*/
         if(dropTables==true)
-            db.dropTable("POINT_DATA");
-        db.createTableWithoutDefaultPK("POINT_DATA", col);
-        db.createIndex("POINT_DATA", "STROKE_NO");
+            db.dropTable("ALARM");
+        db.createTableWithoutDefaultPK("ALARM", list);
+        //db.createIndex("POINT_DATA", "STROKE_NO");
+
+
     }
 
 }
