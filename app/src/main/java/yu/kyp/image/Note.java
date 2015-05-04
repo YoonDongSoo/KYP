@@ -19,7 +19,7 @@ public class Note {
     /**
      * 내용(이미지데이터)
      */
-    public Bitmap NOTE_DATA;
+    public Bitmap NOTE_DATA = null;
     /**
      * 최종수정일시 yyyy-MM-dd HH:mm:ss
      */
@@ -28,7 +28,7 @@ public class Note {
      * 삭제여부. 삭제된 메모일 때 true이고 휴지통에서 검색할 수 있다.
      * 보통은 false이다.
      */
-    public boolean IS_DEL;
+    public boolean IS_DEL = false;
     /**
      * 배경
      */
@@ -37,10 +37,10 @@ public class Note {
     /**
      * 썸네일 객체
      */
-    public Thumbnail thumbnail;
+    public Thumbnail thumbnail = null;
     /**
      * 알람 객체
      */
-    public Alarm alarm;
+    public Alarm alarm = null;
 
 }

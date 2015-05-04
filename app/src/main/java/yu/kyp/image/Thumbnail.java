@@ -26,6 +26,10 @@ public class Thumbnail {
 
     }
 
+    /**
+     * 원본이미지를 넣으면 썸네일을 만든다.
+     * @param bitmap
+     */
     public Thumbnail(Bitmap bitmap) {
 
         ThumbnailUtils.extractThumbnail(bitmap, THUMBSIZE, THUMBSIZE);

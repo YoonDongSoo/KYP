@@ -30,14 +30,14 @@
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
-        <TextView
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="신규"
-            android:id="@+id/textView17"
-            android:layout_centerVertical="true"
+            android:id="@+id/buttonNewMemo"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_centerVertical="true"
+            android:onClick="buttonNewMemo_OnClick" />
     </RelativeLayout>
 
     <ListView

@@ -117,8 +117,8 @@ public class NoteManager {
      * @return
      */
     private int removeThumbnail(int noteNo) {
-        String table = "THUMBNAIL A ";
-        String whereClause = "A.NOTE_NO="+noteNo;
+        String table = "THUMBNAIL ";
+        String whereClause = "NOTE_NO="+noteNo;
         int removed = db.execDelete(table,whereClause);
         Log.v(TAG, "삭제된 획record수:" + removed);
         return removed;
@@ -130,8 +130,8 @@ public class NoteManager {
      * @return
      */
     private int removeAlarm(int noteNo) {
-        String table = "ALARM A ";
-        String whereClause = "A.NOTE_NO="+noteNo;
+        String table = "ALARM ";
+        String whereClause = "NOTE_NO="+noteNo;
         int removed = db.execDelete(table,whereClause);
         Log.v(TAG,"삭제된 획record수:"+removed);
         return removed;
@@ -279,7 +279,7 @@ public class NoteManager {
      */
     public Cursor getNoteList()
     {
-        return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
+        return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
     }
 
     /**
