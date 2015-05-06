@@ -1,6 +1,5 @@
 package yu.kyp;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,14 +11,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import yu.kyp.common.activity.ActivityBase;
-import yu.kyp.common.database.DataTable;
 import yu.kyp.image.NoteManager;
 
 
@@ -86,5 +79,18 @@ public class MemoListActivity extends ActivityBase {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "Settings.getDefaultFactor():" + settings.getDefaultFactor());
+        Log.i(TAG,"Setting.getFontType():"+settings.getFontType());
+        Log.i(TAG,"Setting.getZoomFactor():"+settings.getZoomFactor());
+        Log.i(TAG,"Setting.getBackgroundType():"+settings.getBackgroundType());
+        Log.i(TAG,"Setting.getAlarmType():"+settings.getAlarmType());
+        Log.i(TAG,"Setting.getListType():"+settings.getListType());
+
+
     }
 }
