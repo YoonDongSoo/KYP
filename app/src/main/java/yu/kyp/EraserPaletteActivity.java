@@ -18,8 +18,6 @@ import android.widget.GridView;
 /**
  * 지우개의 굵기를 선택하는 대화상자용 액티비티
  *
- * @author Mike
- *
  */
 public class EraserPaletteActivity extends Activity {
 
@@ -34,6 +32,10 @@ public class EraserPaletteActivity extends Activity {
     }
 
 
+    /**
+     * 지우개 두께 선택을 위한 팔레트
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +43,9 @@ public class EraserPaletteActivity extends Activity {
 
         this.setTitle("지우개굵기 선택");
 
+        //지우개를 위한 그리드 그리드
         grid = (GridView) findViewById(R.id.colorGrid);
+        //취소버튼
         closeBtn = (Button) findViewById(R.id.closeBtn);
 
         grid.setColumnWidth(14);
@@ -49,13 +53,16 @@ public class EraserPaletteActivity extends Activity {
         grid.setVerticalSpacing(4);
         grid.setHorizontalSpacing(4);
 
+        //지우개데이터어댑터와 연결
         adapter = new EraserDataAdapter(this);
         grid.setAdapter(adapter);
         grid.setNumColumns(adapter.getNumColumns());
 
+        //닫기 버튼을 눌렀을 때
         closeBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // dispose this activity
+
+                //지우개 액티비티 종료
                 finish();
             }
         });
@@ -66,8 +73,6 @@ public class EraserPaletteActivity extends Activity {
 
 /**
  * Adapter for Pen Data
- *
- * @author Mike
  */
 class EraserDataAdapter extends BaseAdapter {
 
@@ -78,6 +83,7 @@ class EraserDataAdapter extends BaseAdapter {
 
     /**
      * Erasers defined
+     * 지우개 사이즈 선택을 위한 Int형 사이즈 배열 선언
      */
     public static final int[] erasers = new int[]{
             3, 6, 9, 12, 15,
@@ -94,31 +100,58 @@ class EraserDataAdapter extends BaseAdapter {
 
         mContext = context;
 
+        //3*5 그리드
         rowCount = 3;
         columnCount = 5;
 
     }
 
     /**
-     * 지우개 굵기 변경 테이블 열 갯수 리턴
+     * 지우개 굵기를 선택하는 그리드뷰에서
+     * 선택한 부분의 column 값을 리턴
      * @return
      */
     public int getNumColumns() {
         return columnCount;
     }
 
+    /**
+     * 지우개 굵기를 선택하는 그리드뷰에서
+     * 지우개 사이즈 갯수를 리턴
+     * @return
+     */
     public int getCount() {
         return rowCount * columnCount;
     }
 
+    /**
+     * 지우개 굵기를 선택하는 그리드뷰에서
+     * 지우개 굵기의 포지션을 리턴
+     * @param position
+     * @return
+     */
     public Object getItem(int position) {
         return erasers[position];
     }
 
+    /**
+     * 지우개 굵기를 선택하는 그리드뷰에서
+     * 선택된 값을 확인
+     * @param position
+     * @return
+     */
     public long getItemId(int position) {
         return 0;
     }
 
+    /**
+     * 지우개 굵기를 선택하는 그리드뷰를
+     * 만드는 함수
+     * @param position
+     * @param view
+     * @param group
+     * @return
+     */
     public View getView(int position, View view, ViewGroup group) {
         //Log.d("EraserDataAdapter", "getView(" + position + ") called.");
 
@@ -127,11 +160,12 @@ class EraserDataAdapter extends BaseAdapter {
         int columnIndex = position % rowCount;
         // Log.d("EraserDataAdapter", "Index : " + rowIndex + ", " + columnIndex);
 
+        //지우개 굵기를 나타낼 그리드뷰 생성
         GridView.LayoutParams params = new GridView.LayoutParams(
                 GridView.LayoutParams.MATCH_PARENT,
                 GridView.LayoutParams.MATCH_PARENT);
 
-        // create a eraser Image
+        //지우개 굵기를 나타낼 가로, 세로 높이 지정
         int areaWidth = 10;
         int areaHeight = 50;
 
@@ -140,6 +174,7 @@ class EraserDataAdapter extends BaseAdapter {
         eraserCanvas.setBitmap(eraserBitmap);
 
         Paint mPaint = new Paint();
+        //지우개 굵기 선택 그리드뷰의 배경 색
         mPaint.setColor(Color.WHITE);
         eraserCanvas.drawRect(0, 0, areaWidth, areaHeight, mPaint);
 
@@ -158,7 +193,8 @@ class EraserDataAdapter extends BaseAdapter {
         aItem.setHeight(64);
         aItem.setTag(erasers[position]);
 
-        // set listener
+        //지우개 사이즈 그리드뷰에서
+        //하나의 값을 선택(클릭)하였을 때
         aItem.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (EraserPaletteActivity.listener != null) {
@@ -169,12 +205,9 @@ class EraserDataAdapter extends BaseAdapter {
             }
         });
 
+        //선택한 것을 리턴
         return aItem;
-
-
     }
-
-
 }
 
 

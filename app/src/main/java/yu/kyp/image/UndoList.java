@@ -42,6 +42,11 @@ public class UndoList extends ArrayList<Bitmap> {
         return bmp;
     }
 
+    /**
+     * Bitmap을 undo 목록에 추가한다.
+     * 최대 MAX_UNDOS 까지 저장된다.
+     * @param bitmap
+     */
     public void addList(Bitmap bitmap)
     {
         add(bitmap);

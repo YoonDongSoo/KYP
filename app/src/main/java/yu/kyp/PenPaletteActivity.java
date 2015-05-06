@@ -33,8 +33,6 @@ public class PenPaletteActivity extends Activity {
     PenDataAdapter penadapter;
     ColorDataAdapter coloradapter;
     Paint mPaint;
-    int temp_color2;
-    int temp_size2;
 
     public static OnPenSelectedListener penlistener;
     public static OnColorSelectedListener colorlistener;
@@ -67,7 +65,10 @@ public class PenPaletteActivity extends Activity {
         public void onCompleteSelected();
     }
 
-
+    /**
+     * 펜 색상과 두께 선택을 위한 팔레트
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,26 +88,30 @@ public class PenPaletteActivity extends Activity {
 
         this.setTitle("선굵기 및 색상 선택");
 
+        //색상 그리드
         colorgrid = (GridView) findViewById(R.id.colorGrid);
+        //사이즈 그리드
         sizegrid = (GridView) findViewById(R.id.sizeGrid);
-//        closeBtn = (Button) findViewById(R.id.closeBtn);
+
         othersBtn = (Button) findViewById(R.id.othersBtn);
         selectBtn = (Button) findViewById(R.id.selectBtn);
 
-        colorgrid.setColumnWidth(14);                   //색상 선택을 위한
+        colorgrid.setColumnWidth(14);
         colorgrid.setBackgroundColor(Color.GRAY);
         colorgrid.setVerticalSpacing(4);
         colorgrid.setHorizontalSpacing(4);
 
+        //컬러데이터어댑터와 연결
         coloradapter = new ColorDataAdapter(this);
         colorgrid.setAdapter(coloradapter);
         colorgrid.setNumColumns(coloradapter.getNumColumns());
 
-        sizegrid.setColumnWidth(14);            //펜의 사이즈 선택을 위한
+        sizegrid.setColumnWidth(14);
         sizegrid.setBackgroundColor(Color.GRAY);
         sizegrid.setVerticalSpacing(4);
         sizegrid.setHorizontalSpacing(4);
 
+        //펜데이터어댑터와 연결
         penadapter = new PenDataAdapter(this);
         sizegrid.setAdapter(penadapter);
         sizegrid.setNumColumns(penadapter.getNumColumns());
@@ -119,18 +124,24 @@ public class PenPaletteActivity extends Activity {
 //            }
 //        });
 
+        //다른색 버튼을 눌렀을 때
         othersBtn.setOnClickListener(new OnClickListener(){
             public void onClick(View v) {
                 System.out.println("click otherBtn");
+                //컬러피커 다이얼로그 생성
                 ColorPickerDialog dlg =  new ColorPickerDialog(PenPaletteActivity.this,colorChangedListener, mPaint.getColor());
+                //컬러피커 다이얼로그 show
                 dlg.show();
 
             }
         });
+
+        //완료 버튼을 눌렀을 때
         selectBtn.setOnClickListener(new OnClickListener(){
             public void onClick(View v) {
                 System.out.println("click selectBtn");
 
+                //펜팔레트 액티비티 종료
                 finish();
             }
         });
@@ -156,6 +167,7 @@ class PenDataAdapter extends BaseAdapter {
 
     /**
      * Pens defined
+     * 펜의 사이즈 선택을 위한 Int형 사이즈 배열 선언
      */
     public static final int [] pens = new int[] {
             1,2,3,4,5,
@@ -172,27 +184,58 @@ class PenDataAdapter extends BaseAdapter {
 
         mContext = context;
 
+        //3*5 그리드
         rowCount = 3;
         columnCount = 5;
 
     }
 
+    /**
+     * 펜 사이즈를 선택하는 그리드뷰에서
+     * 선택한 부분의 column 값을 리턴
+     * @return
+     */
     public int getNumColumns() {
         return columnCount;
     }
 
+    /**
+     * 펜 사이즈를 선택하는 그리드뷰에서
+     * 펜 사이즈의 갯수를 리턴
+     * @return
+     */
     public int getCount() {
         return rowCount * columnCount;
     }
 
+    /**
+     * 펜 사이즈를 선택하는 그리드뷰에서
+     * 펜 사이즈의 포지션을 리턴
+     * @param position
+     * @return
+     */
     public Object getItem(int position) {
         return pens[position];
     }
 
+    /**
+     * 펜 사이즈를 선택하는 그리드뷰에서
+     * 선택된 값을 확인
+     * @param position
+     * @return
+     */
     public long getItemId(int position) {
         return 0;
     }
 
+    /**
+     * 펜 사이즈를 선택하는 그리드뷰를
+     * 만드는 함수
+     * @param position
+     * @param view
+     * @param group
+     * @return
+     */
     public View getView(int position, View view, ViewGroup group) {
 
         //Log.d("PenDataAdapter", "getView(" + position + ") called.");
@@ -202,11 +245,12 @@ class PenDataAdapter extends BaseAdapter {
         int columnIndex = position % rowCount;
         //Log.d("PenDataAdapter", "Index : " + rowIndex + ", " + columnIndex);
 
+        //펜 사이즈를 나타낼 그리드뷰 생성
         GridView.LayoutParams params = new GridView.LayoutParams(
                 GridView.LayoutParams.MATCH_PARENT,
                 GridView.LayoutParams.MATCH_PARENT);
 
-        // create a Pen Image
+        //펜 사이즈를 나타낼 가로, 세로 높이 지정
         int areaWidth = 10;
         int areaHeight = 20;
 
@@ -215,7 +259,8 @@ class PenDataAdapter extends BaseAdapter {
         penCanvas.setBitmap(penBitmap);
 
         Paint mPaint = new Paint();
-        mPaint.setColor(Color.WHITE);        //펜 굵기 선택 그리드뷰의 배경 색
+        //펜 사이즈 선택 그리드뷰의 배경 색
+        mPaint.setColor(Color.WHITE);
         penCanvas.drawRect(0, 0, areaWidth, areaHeight, mPaint);
 
         mPaint.setColor(Color.BLACK);
@@ -233,7 +278,8 @@ class PenDataAdapter extends BaseAdapter {
         aItem.setHeight(64);
         aItem.setTag(pens[position]);
 
-        // set listener
+        //펜 사이즈 그리드뷰에서
+        //하나의 값을 선택(클릭)하였을 때
         aItem.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (PenPaletteActivity.penlistener != null) {
@@ -245,6 +291,8 @@ class PenDataAdapter extends BaseAdapter {
             }
         });
         //Log.d("aItem ","getView(" +aItem+") called");
+
+        //선택한 것을 리턴
         return aItem;
     }
 }
@@ -261,10 +309,11 @@ class ColorDataAdapter extends BaseAdapter {
      */
     Context mContext;
 
-    int temp_color;
     /**
      * Colors defined
      */
+
+    //펜의 색상 선택을 위한 Int형 색상 배열 생성
     public static final int [] colors = new int[] {
             0xff000000,0xff00007f,0xff0000ff,0xff007f00,0xff007f7f,0xff00ff00,0xff00ff7f,
             0xff00ffff,0xff7f007f,0xff7f00ff,0xff7f7f00,0xff7f7f7f,0xffff0000,0xffff007f,
@@ -274,11 +323,6 @@ class ColorDataAdapter extends BaseAdapter {
     int rowCount;
     int columnCount;
 
-    public void temp2(int color){
-
-
-        temp_color = color;
-    }
 
     public ColorDataAdapter(Context context) {
         super();
@@ -291,22 +335,52 @@ class ColorDataAdapter extends BaseAdapter {
 
     }
 
+    /**
+     * 펜 색상을 선택하는 그리드뷰에서
+     * 선택한 부분의 column 값을 리턴
+     * @return
+     */
     public int getNumColumns() {
         return columnCount;
     }
 
+    /**
+     * 펜 색상을 선택하는 그리드뷰에서
+     * 펜 색상의 갯수를 리턴
+     * @return
+     */
     public int getCount() {
         return rowCount * columnCount;
     }
 
+    /**
+     *펜 색상을 선택하는 그리드뷰에서
+     * 펜 색상의 포지션을 리턴
+     * @param position
+     * @return
+     */
     public Object getItem(int position) {
         return colors[position];
     }
 
+    /**
+     * 펜 색상을 선택하는 그리드뷰에서
+     * 선택된 값을 확인
+     * @param position
+     * @return
+     */
     public long getItemId(int position) {
         return 0;
     }
 
+    /**
+     * 펜 색상을 선택하는 그리드뷰를
+     * 만드는 함수
+     * @param position
+     * @param view
+     * @param group
+     * @return
+     */
     public View getView(int position, View view, ViewGroup group) {
         //Log.d("ColorDataAdapter", "getView(" + position + ") called.");
 
@@ -315,6 +389,7 @@ class ColorDataAdapter extends BaseAdapter {
         int columnIndex = position % rowCount;
         //Log.d("ColorDataAdapter", "Index : " + rowIndex + ", " + columnIndex);
 
+        //펜 색상을 나타낼 그리드뷰 생성
         GridView.LayoutParams params = new GridView.LayoutParams(
                 GridView.LayoutParams.MATCH_PARENT,
                 GridView.LayoutParams.MATCH_PARENT);
@@ -328,12 +403,12 @@ class ColorDataAdapter extends BaseAdapter {
         aItem.setHeight(64);
         aItem.setTag(colors[position]);
 
-        // set listener
+        //펜 색상 그리드뷰에서
+        //하나의 값을 선택(클릭)하였을 때
         aItem.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (PenPaletteActivity.colorlistener != null) {
-                    PenPaletteActivity.colorlistener.onColorSelected(((Integer)v.getTag()).intValue());
-                    temp2(((Integer)v.getTag()).intValue());
+                    PenPaletteActivity.colorlistener.onColorSelected(((Integer) v.getTag()).intValue());
                 }
 
 //                ((PenPaletteDialog)mContext).finish();
@@ -341,7 +416,7 @@ class ColorDataAdapter extends BaseAdapter {
         });
 
 
-
+        //선택한 것을 리턴
         return aItem;
     }
 }
