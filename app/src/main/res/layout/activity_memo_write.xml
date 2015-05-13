@@ -93,12 +93,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
-            <LinearLayout
+            <FrameLayout
                 android:id="@+id/boardLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
-            </LinearLayout>
+                android:orientation="horizontal"
+                >
+            </FrameLayout>
         </ScrollView>
     </HorizontalScrollView>
 

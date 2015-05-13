@@ -259,6 +259,9 @@ public class PaintBoard extends View {
 
 
 
+
+
+
     class Stroke{
         //int stroke_no;
         int color;
