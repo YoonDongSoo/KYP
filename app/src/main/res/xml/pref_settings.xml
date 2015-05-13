@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+                  <!--xmlns:example ="seekbarpreference.SeekBarPreference">-->
+    <PreferenceCategory android:title = "확대/축소 설정">
+
+        <!--<yu.kyp.SeekBarPreference-->
+            <!--android:key = "button_percent_setting"-->
+            <!--android:title="기본 배율설정"-->
+            <!--android:persistent="false"/>-->
+
+        <!--<ListPreference-->
+            <!--android:key="button_percent_setting"-->
+            <!--android:title="기본 배율설정" />-->
+        <!-- opens another nested subscreen -->
+        <!--<yu.kyp.SeekBarPreference2-->
+            <!--android:key="button_zoominout_percent_setting"-->
+            <!--android:title="확대/축소 배율설정"-->
+            <!--android:persistent="false"/>-->
+        <ListPreference
+            android:key = "button_percent_setting"
+            android:title="기본 배율설정"
+            android:entries="@array/entries_percent"
+            android:entryValues="@array/entryvalues_percent"
+            />
+        <ListPreference
+            android:key="button_zoominout_percent_setting"
+            android:title="확대/축소 배율설정"
+            android:entries="@array/entries_zoom_percent"
+            android:entryValues="@array/entryvalues_zoom_percent"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title = "기타 설정">
+        <ListPreference
+        android:key="button_font_setting"
+        android:title="폰트설정"
+        android:entries="@array/entries_font"
+        android:entryValues="@array/entryvalues_font"
+        />
+        <ListPreference
+            android:key="button_background_setting"
+            android:title="배경설정"
+            android:entries="@array/entries_background"
+            android:entryValues="@array/entryvalues_background"
+
+            />
+        <ListPreference
+            android:key="button_alarm_setting"
+            android:title="알림설정"
+            android:entries="@array/entries_alarm"
+            android:entryValues="@array/entryvalues_alarm"
+            />
+        <!--<ListPreference-->
+            <!--android:key="button_backup_setting"-->
+            <!--android:title="백업설정"-->
+            <!--android:persistent="false"/>-->
+
+        <ListPreference
+            android:key="button_list_setting"
+            android:title="목록보기방식설정"
+            android:entries="@array/entries_list"
+            android:entryValues="@array/entryvalues_list"
+            />
+
+
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

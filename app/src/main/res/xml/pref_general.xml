@@ -1,34 +1,26 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--확대/축소방법선택-->
-    <PreferenceScreen
-        android:key="button_zoomtype_category_key"
-        android:title="확대/축소 방법선택"
-        android:persistent="false">
+    <PreferenceCategory android:title = "확대/축소 설정">
+        <!--<ListPreference-->
+            <!--android:key="button_zoomtype_category_key"-->
+            <!--android:title="확대/축소 방법선택"-->
+            <!--android:entries="@array/확대축소방법선택"-->
+            <!--android:entryValues="@array/확대축소방법선택_values"-->
+            <!--android:persistent="false"/>-->
         <ListPreference
-            android:key="button_voicemail_provider_key"
-            android:title="aaaa" />
+            android:key="button_percent_setting"
+            android:title="기본 배율설정" />
         <!-- opens another nested subscreen -->
-        <PreferenceScreen
-            android:key="button_voicemail_setting_key"
-            android:title="cccc"
-            android:persistent="false">
-            <RingtonePreference
-                android:key="button_voicemail_ringtone_key"
-                android:title="dddd"
-                android:ringtoneType="notification"  />
-        </PreferenceScreen>
-        <RingtonePreference
-            android:key="button_voicemail_ringtone_key"
-            android:title="bbbb"
-            android:ringtoneType="notification"  />
-    </PreferenceScreen>
+        <ListPreference
+            android:key="button_zoominout_percent_setting"
+            android:title="확대/축소 배율설정"
 
-    <CheckBoxPreference
-        android:key="example_checkbox"
-        android:title="@string/pref_title_social_recommendations"
-        android:summary="@string/pref_description_social_recommendations"
-        android:defaultValue="true" />
+            android:persistent="false"/>
+
+    </PreferenceCategory>
+
+
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->

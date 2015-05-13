@@ -396,10 +396,13 @@ public class PaintBoard extends View {
         //지우개 모드를 true로 바꾼다.
         mEraserMode=true;
 
+        //setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR)) -> 검은색 펜
+        // 을 이용하여 지우개와 동일한 기능을 사용할 수 있다.
         mPaint.setXfermode(null);
         mPaint.setAlpha(0);
         mPaint.setXfermode(new PorterDuffXfermode(
                 PorterDuff.Mode.CLEAR));
+        //지우개 크기 적용
         mPaint.setStrokeWidth(size);
         mPaint.setAntiAlias(true);
         mPaint.setStrokeWidth(size);
