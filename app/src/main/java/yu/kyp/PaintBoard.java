@@ -354,6 +354,18 @@ public class PaintBoard extends View {
        // canvas.drawBitmap(bitmap,0,0,null);
     }
 
+    /**
+     * print EditText's string
+     * @param x
+     * @param y
+     */
+    public void printText(float x, float y, String str){
+        mPaint = new Paint();
+        Canvas canvas = new Canvas();
+        canvasWrite = canvas;
+        canvasWrite.drawText(str,x,y,mPaint);
+    }
+
     /***
      * Update paint properties
      * @param color
