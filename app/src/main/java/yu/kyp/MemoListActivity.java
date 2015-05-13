@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,7 +56,13 @@ public class MemoListActivity extends ActivityBase {
         super.onResume();
         // ListView에 노트 내용 뿌려주기.
         bindNote();
-        Log.d(TAG,"onResume");
+        Log.d(TAG, "onResume");
+        Log.d(TAG, "Settings.getDefaultFactor():" + settings.getDefaultFactor());
+        Log.i(TAG,"Setting.getFontType():"+settings.getFontType());
+        Log.i(TAG,"Setting.getZoomFactor():"+settings.getZoomFactor());
+        Log.i(TAG,"Setting.getBackgroundType():"+settings.getBackgroundType());
+        Log.i(TAG,"Setting.getAlarmType():"+settings.getAlarmType());
+        Log.i(TAG,"Setting.getListType():"+settings.getListType());
     }
 
     /**
@@ -98,18 +105,6 @@ public class MemoListActivity extends ActivityBase {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "Settings.getDefaultFactor():" + settings.getDefaultFactor());
-        Log.i(TAG,"Setting.getFontType():"+settings.getFontType());
-        Log.i(TAG,"Setting.getZoomFactor():"+settings.getZoomFactor());
-        Log.i(TAG,"Setting.getBackgroundType():"+settings.getBackgroundType());
-        Log.i(TAG,"Setting.getAlarmType():"+settings.getAlarmType());
-        Log.i(TAG,"Setting.getListType():"+settings.getListType());
-
-
-    }
 
     public void buttonNewMemo_OnClick(View v)
     {
