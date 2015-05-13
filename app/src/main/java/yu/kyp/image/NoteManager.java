@@ -279,7 +279,7 @@ public class NoteManager {
      */
     public Cursor getNoteList()
     {
-        return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
+        return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE WHERE IS_DEL=0 ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
     }
 
     /**
@@ -325,5 +325,14 @@ public class NoteManager {
         note.alarm = null;
 
         saveNoteData(note);
+    }
+
+    /**
+     * 삭제된 노트를 리턴한다.
+     * @return
+     * 삭제된 노트 목록 cursor
+     */
+    public Cursor getTrashList() {
+        return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE WHERE IS_DEL=1 ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
     }
 }
