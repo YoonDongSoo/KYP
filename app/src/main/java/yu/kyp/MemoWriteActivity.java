@@ -15,6 +15,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
@@ -203,9 +204,9 @@ public class MemoWriteActivity extends BlunoLibrary {
 
             };
         }catch (Exception e) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         }
+    }
 //            penBtn.setOnClickListener(new View.OnClickListener() {
 //                public void onClick(View v) {
 //                    PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
@@ -434,9 +435,88 @@ public class MemoWriteActivity extends BlunoLibrary {
      */
     public void buttonText_OnClick(View v)
     {
-        // 축소 테스트
-        //Toast.makeText(this,"텍스트",Toast.LENGTH_SHORT).show();
-        paintboard.zoomOutBitmap();
+        textSelected = !textSelected;
+        if (textSelected) {
+//            setContentView(R.layout.text_popup);
+
+//            Context mContext = getApplicationContext();
+//            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
+//
+//            View layout = inflater.inflate(R.layout.text_popup, (ViewGroup) findViewById(R.id.popup));
+//            final AlertDialog.Builder aDialog = new AlertDialog.Builder(this);
+//
+//            aDialog.setTitle("");
+//            aDialog.setView(layout);
+//
+//            final AlertDialog ad = aDialog.create();
+//            ad.show();
+
+
+//            //팝업의 확인 버튼이 눌렸을 때
+//            textOKBtn.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    registerForContextMenu(textOKBtn);
+//                    openContextMenu(textOKBtn);
+//                    finish();
+//                }
+//
+//            });
+            penBtn.setEnabled(false);
+            eraserBtn.setEnabled(false);
+            undoBtn.setEnabled(false);
+            alarmBtn.setEnabled(false);
+            scrollBtn.setEnabled(false);
+
+
+            penBtn.invalidate();
+            eraserBtn.invalidate();
+            undoBtn.invalidate();
+            alarmBtn.invalidate();
+            scrollBtn.invalidate();
+
+
+
+            //화면이 터치 되었을때
+            paintboard.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    final float x = event.getX();
+                    final float y = event.getY();
+
+                    Toast.makeText(MemoWriteActivity.this, x + "," + y, Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(getApplicationContext(), TextDialog.class);
+                    intent.putExtra("x",x);
+                    intent.putExtra("y",y);
+                    startActivity(intent);
+
+                    return true;
+                }
+            });
+        }
+        else{
+            penBtn.setEnabled(true);
+            eraserBtn.setEnabled(true);
+            undoBtn.setEnabled(true);
+            alarmBtn.setEnabled(true);
+            scrollBtn.setEnabled(true);
+
+            penBtn.invalidate();
+            eraserBtn.invalidate();
+            undoBtn.invalidate();
+            alarmBtn.invalidate();
+            scrollBtn.invalidate();
+
+            paintboard.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return false;
+                }
+            });
+
+            paintboard.updatePaintProperty(mColor, mSize);
+            displayPaintProperty();
+        }
     }
 
     /**

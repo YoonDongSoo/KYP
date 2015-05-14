@@ -1,9 +1,13 @@
 package yu.kyp;
 
+import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +35,37 @@ public class MemoListActivity extends ActivityBase {
         }
     };
     private SimpleCursorAdapter adapterListNote = null;
+    private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+    {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch(which)
+            {
+                case DialogInterface.BUTTON_POSITIVE:
+                    ContentValues values = new ContentValues();
+                    values.put("IS_DEL","1");
+                    int cnt = db.execUpdate("NOTE", values, "NOTE_NO=" + deleteId);
+                    Log.i(TAG,"cnt:"+cnt);
+                    bindNote();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    break;
+            }
+        }
+    };
+
+    private long deleteId;
+    private AdapterView.OnItemLongClickListener longClickListenerListNote = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            deleteId  = id;
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage("삭제하시겠습니까?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+
+            return true;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +82,7 @@ public class MemoListActivity extends ActivityBase {
         // ListView OnItemClickLIstener 설정
         ListView listviewNote = (ListView) findViewById(R.id.listViewNote);
         listviewNote.setOnItemClickListener(listenerListNote);
+        listviewNote.setOnItemLongClickListener(longClickListenerListNote);
 
     }
 
@@ -55,7 +91,13 @@ public class MemoListActivity extends ActivityBase {
         super.onResume();
         // ListView에 노트 내용 뿌려주기.
         bindNote();
-        Log.d(TAG,"onResume");
+        Log.d(TAG, "onResume");
+        Log.d(TAG, "Settings.getDefaultFactor():" + settings.getDefaultFactor());
+        Log.i(TAG,"Setting.getFontType():"+settings.getFontType());
+        Log.i(TAG,"Setting.getZoomFactor():"+settings.getZoomFactor());
+        Log.i(TAG,"Setting.getBackgroundType():"+settings.getBackgroundType());
+        Log.i(TAG,"Setting.getAlarmType():"+settings.getAlarmType());
+        Log.i(TAG,"Setting.getListType():"+settings.getListType());
     }
 
     /**
@@ -98,18 +140,6 @@ public class MemoListActivity extends ActivityBase {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "Settings.getDefaultFactor():" + settings.getDefaultFactor());
-        Log.i(TAG,"Setting.getFontType():"+settings.getFontType());
-        Log.i(TAG,"Setting.getZoomFactor():"+settings.getZoomFactor());
-        Log.i(TAG,"Setting.getBackgroundType():"+settings.getBackgroundType());
-        Log.i(TAG,"Setting.getAlarmType():"+settings.getAlarmType());
-        Log.i(TAG,"Setting.getListType():"+settings.getListType());
-
-
-    }
 
     public void buttonNewMemo_OnClick(View v)
     {
@@ -117,4 +147,8 @@ public class MemoListActivity extends ActivityBase {
         startActivity(i);
     }
 
+    public void buttonTrash_OnClick(View v)
+    {
+        startActivity(new Intent(this,TrashActivity.class));
+    }
 }
