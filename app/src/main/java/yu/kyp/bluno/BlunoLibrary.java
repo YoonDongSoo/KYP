@@ -248,6 +248,8 @@ public abstract  class BlunoLibrary extends Activity {
 			((Activity) mainContext).finish();
 			return;
 		}
+
+
 	}
 
     boolean initiate()

@@ -20,8 +20,7 @@
             android:layout_alignParentTop="false"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:onClick="buttonSave_OnClick" />
+            android:layout_centerVertical="true" />
 
         <TextView
             android:layout_width="wrap_content"

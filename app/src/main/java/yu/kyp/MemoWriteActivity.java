@@ -6,11 +6,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -20,10 +22,12 @@ import android.widget.Toast;
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
+import yu.kyp.image.Thumbnail;
 
 public class MemoWriteActivity extends BlunoLibrary {
 
     private static final String TAG = MemoWriteActivity.class.getSimpleName();
+    private static final int REQUEST_DRAW_TEXT = 2;
     private StringBuffer strBuffer = new StringBuffer();
     private NoteManager noteManager = null;
     private static HorizontalScrollView Scroll_Horizontal;
@@ -64,7 +68,9 @@ public class MemoWriteActivity extends BlunoLibrary {
     boolean scrollSelected = false;
     boolean dragSelected = false;
     boolean textSelected  = false;
-
+    float x = 0;
+    float y = 0;
+    boolean text_flag = true;
 
     /**
      * 노트 객체
@@ -145,7 +151,8 @@ public class MemoWriteActivity extends BlunoLibrary {
         scrollBtn = (Button) findViewById(R.id.buttonScroll);
 
 
-        final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
+        //final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
+        final FrameLayout boardLayout = (FrameLayout) findViewById(R.id.boardLayout);
 
 
         paintboard = new PaintBoard(this);
@@ -198,6 +205,8 @@ public class MemoWriteActivity extends BlunoLibrary {
                             buttonSetting_OnClick(v);
                         case R.id.buttonPicture:
                             buttonPicture_OnClick(v);
+                        case R.id.buttonSave:
+                            buttonSave_OnClick(v);
                     }
 
                 }
@@ -207,6 +216,29 @@ public class MemoWriteActivity extends BlunoLibrary {
             e.printStackTrace();
         }
     }
+
+
+    public void buttonSave_OnClick(View v) {
+        // DB에 저장
+        saveNote();
+    }
+
+    /**
+     * 노트를 DB에 저장한다.
+     * 변경된 사항이 없으면 저장하지 않는다.
+     */
+    private void saveNote() {
+        // 변경된 사항이 없으면 DB에 저장하지 않는다.
+        if(paintboard.undo.size()<=1)
+            return;
+
+        if(note.TITLE==null || note.TITLE.equals("")==true)
+            note.TITLE = "제목 없음";
+        note.NOTE_DATA = paintboard.undo.getLast();
+        note.thumbnail = new Thumbnail(note.NOTE_DATA);
+        noteManager.saveNoteData(note);
+    }
+
 //            penBtn.setOnClickListener(new View.OnClickListener() {
 //                public void onClick(View v) {
 //                    PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
@@ -437,36 +469,11 @@ public class MemoWriteActivity extends BlunoLibrary {
     {
         textSelected = !textSelected;
         if (textSelected) {
-//            setContentView(R.layout.text_popup);
-
-//            Context mContext = getApplicationContext();
-//            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
-//
-//            View layout = inflater.inflate(R.layout.text_popup, (ViewGroup) findViewById(R.id.popup));
-//            final AlertDialog.Builder aDialog = new AlertDialog.Builder(this);
-//
-//            aDialog.setTitle("");
-//            aDialog.setView(layout);
-//
-//            final AlertDialog ad = aDialog.create();
-//            ad.show();
-
-
-//            //팝업의 확인 버튼이 눌렸을 때
-//            textOKBtn.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//                    registerForContextMenu(textOKBtn);
-//                    openContextMenu(textOKBtn);
-//                    finish();
-//                }
-//
-//            });
             penBtn.setEnabled(false);
             eraserBtn.setEnabled(false);
             undoBtn.setEnabled(false);
             alarmBtn.setEnabled(false);
             scrollBtn.setEnabled(false);
-
 
             penBtn.invalidate();
             eraserBtn.invalidate();
@@ -474,23 +481,40 @@ public class MemoWriteActivity extends BlunoLibrary {
             alarmBtn.invalidate();
             scrollBtn.invalidate();
 
-
-
             //화면이 터치 되었을때
             paintboard.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    final float x = event.getX();
-                    final float y = event.getY();
+                    x = event.getX();
+                    y = event.getY();
+
+//                    Intent i = MemoWriteActivity.this.getIntent();
+//                    boolean flag = i.getBooleanExtra("flag",false);
 
                     Toast.makeText(MemoWriteActivity.this, x + "," + y, Toast.LENGTH_SHORT).show();
 
-                    Intent intent = new Intent(getApplicationContext(), TextDialog.class);
-                    intent.putExtra("x",x);
-                    intent.putExtra("y",y);
-                    startActivity(intent);
+                    if(text_flag == true) {
+                        Intent intent = new Intent(getApplicationContext(), TextDialog.class);
+                        intent.putExtra("x", x);
+                        intent.putExtra("y", y);
+                        //startActivity(intent);
+                        startActivityForResult(intent, REQUEST_DRAW_TEXT);
+                        text_flag = false;
+                    }
 
                     return true;
+                }
+                //back키를 눌렀을 때
+                public boolean onKeyDown(int keyCode, KeyEvent event){
+                    boolean endBack = false;
+                    if(keyCode == KeyEvent.KEYCODE_BACK){
+                        if(!endBack) {
+                            finish();
+                            endBack = true;
+                        }
+                    }
+                    return true;
+
                 }
             });
         }
@@ -516,6 +540,7 @@ public class MemoWriteActivity extends BlunoLibrary {
 
             paintboard.updatePaintProperty(mColor, mSize);
             displayPaintProperty();
+            text_flag = true;
         }
     }
 
@@ -799,6 +824,35 @@ public class MemoWriteActivity extends BlunoLibrary {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         onActivityResultProcess(requestCode, resultCode, data);					//onActivityResult Process by BlunoLibrary
         super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==REQUEST_DRAW_TEXT)
+        {
+//            Bundle bundle = getIntent().getExtras();
+//            if(bundle != null){
+//                String text = bundle.getString("text","").toString();
+//                float x = data.getFloatExtra("x",0.0f);
+//                float y = data.getFloatExtra("y",0.0f);
+//                Log.i(TAG,"text:"+text);
+//                paintboard.drawText(text,x,y);
+//            }
+
+
+            int isCancel = data.getIntExtra("isCancel",0);
+            if(isCancel==0) {
+                // ok버튼 눌렀을 때.
+                String text = data.getStringExtra("text").toString();
+                float x = data.getFloatExtra("x", 0.0f);
+                float y = data.getFloatExtra("y", 0.0f);
+                Log.i(TAG, "text:" + text);
+                paintboard.drawText(text, x, y);
+                text_flag = true;
+            }
+            else
+            {
+                // 취소 버튼 눌렀을 때
+                Log.i(TAG,"취소 버튼 눌렀네~");
+                text_flag = true;
+            }
+        }
     }
 }
 

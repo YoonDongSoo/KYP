@@ -33,7 +33,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/cancle"
+                android:id="@+id/cancel"
                 android:text="취소" />
         </LinearLayout>
 

@@ -38,6 +38,7 @@ public class PaintBoard extends View {
     //추가
 
     private boolean mEraserMode = false;
+    private boolean mTextMode = false;
     /**
      * Undo data
      */
@@ -299,6 +300,7 @@ public class PaintBoard extends View {
      */
     public PaintBoard(Context context) {
         super(context);
+        int scaledSize = getResources().getDimensionPixelSize(R.dimen.font_size);
 
         // create a new paint object
         mPaint = new Paint();
@@ -309,7 +311,7 @@ public class PaintBoard extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(mStrokeWidth);
         mPaint.setDither(DITHER_FLAG);      //이미지보다 장비의 표현력이 떨어질때 이미지 색상을 낮추어 출력
-
+        mPaint.setTextSize(scaledSize);
 
         lastX = -1;
         lastY = -1;
@@ -362,11 +364,24 @@ public class PaintBoard extends View {
      * @param x
      * @param y
      */
-    public void printText(float x, float y, String str){
-        mPaint = new Paint();
-        Canvas canvas = new Canvas();
-        canvasWrite = canvas;
+    public void drawText(String str,float x, float y){
+//        super.onDraw(canvas);
+
+//        Log.i("onDraw","");
+//        Log.d("!!!!!!!!!!","ondraw");
+
+        //canvasBackground.drawBitmap(mBitmap, 0, 0, null);
+        //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        mPaint.setStyle(Paint.Style.FILL);
+        canvasWrite.drawColor(Color.TRANSPARENT);
+//
+////        Rect rt = new Rect();
+////        mPaint.getTextBounds(str,0,str.length(),rt);
+////        rt.set((int) x, (int) y + rt.top, (int) x + rt.width(), (int) y + rt.bottom);
+////        canvasWrite.drawRect(rt,ptRound);
         canvasWrite.drawText(str,x,y,mPaint);
+        mPaint.setStyle(Paint.Style.STROKE);
+//        mTextMode = true;
     }
 
     /***
@@ -541,6 +556,7 @@ public class PaintBoard extends View {
             canvas.drawPath(mPath, mPaint);
         //비트맵을 화면에 그린다.
         canvas.drawBitmap(mBitmap, 0, 0, null);
+
 
 
     }
