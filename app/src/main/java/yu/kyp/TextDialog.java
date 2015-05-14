@@ -35,7 +35,7 @@ public class TextDialog extends Activity{
 
         textEdit = (EditText) findViewById(R.id.textEdit);
         Ok = (Button) findViewById(R.id.Ok);
-        Cancle = (Button) findViewById(R.id.Cancle);
+        Cancle = (Button) findViewById(R.id.cancle);
         paintboard = new PaintBoard(this);
 
         //확인 버튼을 눌렀을 때
