@@ -387,10 +387,13 @@ public class PaintBoard extends View {
         //지우개 모드를 true로 바꾼다.
         mEraserMode=true;
 
+        //setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR)) -> 검은색 펜
+        // 을 이용하여 지우개와 동일한 기능을 사용할 수 있다.
         mPaint.setXfermode(null);
         mPaint.setAlpha(0);
         mPaint.setXfermode(new PorterDuffXfermode(
                 PorterDuff.Mode.CLEAR));
+        //지우개 크기 적용
         mPaint.setStrokeWidth(size);
         mPaint.setAntiAlias(true);
         mPaint.setStrokeWidth(size);
@@ -414,7 +417,15 @@ public class PaintBoard extends View {
         drawBackground(canvasBackground);
 
         //비트맵 생성(Config.ARGB_8888: 투명값 지정)
-        Bitmap img = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        // 2015-05-04 윤동수: 저장된 이미지 불러오기
+        // 저장된 이미지가 없으면 새로 생성
+        Bitmap img = null;
+        if(undo.size()>0)
+            img = undo.getLast().copy(Bitmap.Config.ARGB_8888, true);
+        else
+            img = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
         /*비트맵에 직접 그림을 그리거나 다른 이미지를 그릴려고 하면 새로운 canvas를 만들어야 canvas에
         그리는 모든 작업이 bitmap에 반영된다.*/
         //캔버스 생성

@@ -1,5 +1,9 @@
 package yu.kyp.common;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -51,13 +55,32 @@ public class Utils {
         return rand.nextInt(max) + min;
     }
 
-    public static int getTest()
-    {
-        return 0;
-    }
+    /**
+     * bitmap을 byte배열로 변환한다
+     * @param bitmap
+     * @return
+     * bitmap이 null이면 null을 리턴한다.
+     */
+   public static byte[] getBytes(Bitmap bitmap)
+   {
+       if(bitmap==null)
+           return null;
+       ByteArrayOutputStream stream = new ByteArrayOutputStream();
+       bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+       return stream.toByteArray();
+   }
 
-    public static int getTest1()
-    {
-        return 0;
+
+    /**
+     * byte배열의 이미지를 bitmap으로 변환한다.
+     * @param image
+     * @return
+     * image가 null이면 null을 리턴한다.
+     */
+    public static Bitmap getImage(byte[] image) {
+        if(image==null)
+            return null;
+        else
+            return BitmapFactory.decodeByteArray(image, 0, image.length);
     }
 }

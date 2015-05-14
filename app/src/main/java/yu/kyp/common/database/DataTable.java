@@ -1,6 +1,7 @@
 package yu.kyp.common.database;
 
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class DataTable
     // 행
     //final private ArrayList<String[]> rows;
     // 행 데이터
-    final private String[][] data;
+    final private DBData[][] data;
     // 행 갯수
     final private int rowsCount;
     // 위치
@@ -44,25 +45,32 @@ public class DataTable
             }
 
             // 행정보 세팅
-            ArrayList<String[]> rows = new ArrayList<String[]>();
+            ArrayList<DBData[]> rows = new ArrayList<DBData[]>();
             while (c.moveToNext())
             {
-                String[] row = new String[colCount];
+                DBData[] row = new DBData[colCount];
                 for (int i = 0 ; i < colCount ; i++)
                 {
-                    row[i] = c.getString(i);
+                    if(c.getType(i)==Cursor.FIELD_TYPE_BLOB)
+                    {
+                        row[i] = new DBData(c.getBlob(i));
+                    }
+                    else
+                    {
+                        row[i] = new DBData(c.getString(i));
+                    }
                 }
                 rows.add(row);
             }
             rowsCount = rows.size();
 
-            data = (String[][])rows.toArray(new String[rows.size()][]);
+            data = (DBData[][])rows.toArray(new DBData[rows.size()][]);
         }
         else
         {
             this.cols = new HashMap<String, Integer>();
             //this.rows = new ArrayList<String[]>();
-            this.data = new String[0][0];
+            this.data = new DBData[0][0];
             this.colsCount = 0;
             this.rowsCount = 0;
         }
@@ -143,7 +151,7 @@ public class DataTable
     {
         try
         {
-            return this.data[pos][colIdx];
+            return this.data[pos][colIdx].getString();
         }
         catch (Exception e)
         {
@@ -173,7 +181,7 @@ public class DataTable
     {
         try
         {
-            String val = this.data[pos][colIdx];
+            String val = this.data[pos][colIdx].getString();
             return val != null && val.equals("1");
         }
         catch (Exception e)
@@ -190,7 +198,7 @@ public class DataTable
     {
         try
         {
-            String val = this.data[pos][colIdx];
+            String val = this.data[pos][colIdx].getString();
             if (val != null)
             {
                 if (val.equals("1"))
@@ -228,7 +236,7 @@ public class DataTable
      */
     public int getInt(int colIdx) throws Exception
     {
-        return Integer.parseInt(this.data[pos][colIdx]);
+        return Integer.parseInt(this.data[pos][colIdx].getString());
     }
 
     /**
@@ -238,7 +246,7 @@ public class DataTable
     {
         try
         {
-            return Integer.parseInt(this.data[pos][colIdx]);
+            return Integer.parseInt(this.data[pos][colIdx].getString());
         }
         catch (Exception e)
         {
@@ -274,7 +282,7 @@ public class DataTable
      */
     public Integer getInteger(int columnIndex)
     {
-        String intVal = this.data[pos][columnIndex];
+        String intVal = this.data[pos][columnIndex].getString();
         if (intVal != null && !intVal.equals(""))
         {
             return new Integer(intVal);
@@ -303,7 +311,7 @@ public class DataTable
     /**
      * @설명 모든데이터를 String[][]형식으로 반환
      */
-    public String[][] rowsToStringArrayTable()
+    public DBData[][] rowsToStringArrayTable()
     {
         return data;
     }
@@ -319,7 +327,7 @@ public class DataTable
 
         for (int i = 0 ; i < rowsCount ; i++)
         {
-            rv[i] = this.data[i][colIdx];
+            rv[i] = this.data[i][colIdx].getString();
         }
 
         return rv;
@@ -343,7 +351,7 @@ public class DataTable
 
         for (int i = 0 ; i < rowsCount ; i++)
         {
-            rv[i] = Integer.parseInt(this.data[i][colIdx]);
+            rv[i] = Integer.parseInt(this.data[i][colIdx].getString());
         }
 
         return rv;
@@ -413,7 +421,7 @@ public class DataTable
         {
             if (i >= limit) { break; }
             line = "";
-            String row[] = data[i];
+            DBData row[] = data[i];
             for (String name : names)
             {
                 line += "∬ " + row[cols.get(name)] + " ";
@@ -436,6 +444,14 @@ public class DataTable
 
     public float getFloat(int colIdx)
     {
-        return Float.parseFloat(this.data[pos][colIdx]);
+        return Float.parseFloat(this.data[pos][colIdx].getString());
+    }
+
+    public byte[] getBlob(String colName) {
+        return getBlog(this.getIdxCols(colName));
+    }
+
+    private byte[] getBlog(int colIdx) {
+        return this.data[pos][colIdx].getBytes();
     }
 }
