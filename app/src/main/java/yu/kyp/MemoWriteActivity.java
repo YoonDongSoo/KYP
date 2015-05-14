@@ -15,6 +15,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
@@ -482,6 +483,7 @@ public class MemoWriteActivity extends BlunoLibrary {
                     final float x = event.getX();
                     final float y = event.getY();
 
+                    Toast.makeText(MemoWriteActivity.this, x + "," + y, Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(getApplicationContext(), TextDialog.class);
                     intent.putExtra("x",x);
