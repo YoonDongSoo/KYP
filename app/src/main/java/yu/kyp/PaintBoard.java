@@ -38,6 +38,7 @@ public class PaintBoard extends View {
     //추가
 
     private boolean mEraserMode = false;
+    private boolean mTextMode = false;
     /**
      * Undo data
      */
@@ -119,6 +120,8 @@ public class PaintBoard extends View {
      * 이 함수 안에서 view의 크기를 구해서 입력해둔다.
      * @param hasWindowFocus
      */
+
+    TextDialog textdialog;
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
@@ -259,6 +262,9 @@ public class PaintBoard extends View {
 
 
 
+
+
+
     class Stroke{
         //int stroke_no;
         int color;
@@ -296,6 +302,7 @@ public class PaintBoard extends View {
      */
     public PaintBoard(Context context) {
         super(context);
+        int scaledSize = getResources().getDimensionPixelSize(R.dimen.font_size);
 
         // create a new paint object
         mPaint = new Paint();
@@ -306,7 +313,8 @@ public class PaintBoard extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(mStrokeWidth);
         mPaint.setDither(DITHER_FLAG);      //이미지보다 장비의 표현력이 떨어질때 이미지 색상을 낮추어 출력
-
+        mPaint.setTextSize(scaledSize);
+//        textdialog = new TextDialog();
 
         lastX = -1;
         lastY = -1;
@@ -345,13 +353,13 @@ public class PaintBoard extends View {
         //캔버스의 배경색 설정
         canvas.drawColor(Color.WHITE);
 
-       // if (canvas != null) {
+        // if (canvas != null) {
         //    canvas.drawColor(Color.BLACK);                       //캔버스의 배경색 설정
-       // }
+        // }
         canvas.drawColor(Color.WHITE);
-       //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 
-       // canvas.drawBitmap(bitmap,0,0,null);
+        // canvas.drawBitmap(bitmap,0,0,null);
     }
 
     /**
@@ -359,11 +367,32 @@ public class PaintBoard extends View {
      * @param x
      * @param y
      */
-    public void printText(float x, float y, String str){
-        mPaint = new Paint();
-        Canvas canvas = new Canvas();
-        canvasWrite = canvas;
+    public void drawText(String str,float x, float y){
+//        super.onDraw(canvas);
+
+//        Log.i("onDraw","");
+//        Log.d("!!!!!!!!!!","ondraw");
+
+        //canvasBackground.drawBitmap(mBitmap, 0, 0, null);
+        //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setColor(Color.BLACK);
+        canvasWrite.drawColor(Color.TRANSPARENT);
+//
+////        Rect rt = new Rect();
+////        mPaint.getTextBounds(str,0,str.length(),rt);
+////        rt.set((int) x, (int) y + rt.top, (int) x + rt.width(), (int) y + rt.bottom);
+////        canvasWrite.drawRect(rt,ptRound);
         canvasWrite.drawText(str,x,y,mPaint);
+        mPaint.setStyle(Paint.Style.STROKE);
+//        mTextMode = true;
+
+        // undo 목록에 넣기
+        Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas();
+        canvas.setBitmap(img);
+        canvas.drawBitmap(mBitmap, 0, 0, null);
+        undo.addList(img);
     }
 
     /***
@@ -376,7 +405,8 @@ public class PaintBoard extends View {
         //지우개 모드를 false로 변경
         mEraserMode = false;
         mPaint.setXfermode(null);
-        mPaint.setAlpha(0xFF);
+//        mPaint.setAlpha(0xFF);
+        mPaint.setAlpha(20);
 
         //전달받은 색상과 크기 적용
         mPaint.setColor(color);
@@ -540,6 +570,7 @@ public class PaintBoard extends View {
         canvas.drawBitmap(mBitmap, 0, 0, null);
 
 
+
     }
 
     /**
@@ -561,8 +592,8 @@ public class PaintBoard extends View {
 
                 //화면을 갱신한다.
                 if (rect != null) {
-                invalidate(rect);
-            }
+                    invalidate(rect);
+                }
                /* this.getParent().requestDisallowInterceptTouchEvent(true);
                 touchUp(event,false);
                 invalidate();*/
@@ -666,7 +697,7 @@ public class PaintBoard extends View {
 //        temp_y = y;
 
 
-       // s.listPoint.add(new PointData(x, y));
+        // s.listPoint.add(new PointData(x, y));
 
 
         lastX = x;
@@ -843,5 +874,17 @@ public class PaintBoard extends View {
             return false;
         }
     }
+
+//        @Override
+//    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
+//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+//        int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
+//        int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
+//        int height = textdialog.setTextInfo(this.getText)
+//
+//        if(parentHeight == 0){
+//            parentHeight = height;
+//        }
+//    }
 
 }
