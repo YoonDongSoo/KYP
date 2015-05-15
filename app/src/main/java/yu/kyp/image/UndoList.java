@@ -38,7 +38,9 @@ public class UndoList extends ArrayList<Bitmap> {
             return null;
 
         Bitmap bmp = get(size()-1);
-        Log.d(TAG, "SIZE:" + size());
+        Log.d("!!!", "SIZE:" + size());
+        Log.d("!!!", "bmpsize:" + bmp.getWidth());
+        Log.d("!!!", "bmpSIZE:" + bmp.getHeight());
         return bmp;
     }
 
@@ -49,7 +51,11 @@ public class UndoList extends ArrayList<Bitmap> {
      */
     public void addList(Bitmap bitmap)
     {
+        Log.v("!!!","에드리스트 들어옴?");
         add(bitmap);
+        int w = bitmap.getWidth();
+        Log.d("!!!","에드리스트사이즈" +bitmap.getWidth());
+        Log.d("!!!","에드리스트사이즈" +bitmap.getHeight());
 
         // 최대개수(MAX_UNDOS)보다 많으면 앞에서 부터 삭제한다.
 //        while (size() >= MAX_UNDOS){
