@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -838,12 +839,24 @@ public class MemoWriteActivity extends BlunoLibrary {
 
             int isCancel = data.getIntExtra("isCancel",0);
             if(isCancel==0) {
+                int count = 0;
+                DisplayMetrics outMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+
+                float density = outMetrics.density;
+
                 // ok버튼 눌렀을 때.
-                String text = data.getStringExtra("text").toString();
+                String text[] = data.getStringExtra("text").toString().split("\n");
                 float x = data.getFloatExtra("x", 0.0f);
                 float y = data.getFloatExtra("y", 0.0f);
                 Log.i(TAG, "text:" + text);
-                paintboard.drawText(text, x, y);
+
+
+                for(count = 0; count<text.length; count++) {
+                    //drawText를 위해 y의 위치를 옮겨줘야함(하지않을 경우 같은 자리에 써짐)
+                    y += 60.0f;
+                    paintboard.drawText(text[count], x, y);
+                }
                 text_flag = true;
             }
             else

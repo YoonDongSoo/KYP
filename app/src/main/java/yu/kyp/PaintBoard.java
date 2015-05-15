@@ -120,6 +120,8 @@ public class PaintBoard extends View {
      * 이 함수 안에서 view의 크기를 구해서 입력해둔다.
      * @param hasWindowFocus
      */
+
+    TextDialog textdialog;
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
@@ -312,6 +314,7 @@ public class PaintBoard extends View {
         mPaint.setStrokeWidth(mStrokeWidth);
         mPaint.setDither(DITHER_FLAG);      //이미지보다 장비의 표현력이 떨어질때 이미지 색상을 낮추어 출력
         mPaint.setTextSize(scaledSize);
+        textdialog = new TextDialog();
 
         lastX = -1;
         lastY = -1;
@@ -862,5 +865,17 @@ public class PaintBoard extends View {
             return false;
         }
     }
+
+//        @Override
+//    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
+//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+//        int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
+//        int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
+//        int height = textdialog.setTextInfo(this.getText)
+//
+//        if(parentHeight == 0){
+//            parentHeight = height;
+//        }
+//    }
 
 }
