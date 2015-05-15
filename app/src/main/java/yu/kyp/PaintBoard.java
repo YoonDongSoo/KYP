@@ -314,7 +314,7 @@ public class PaintBoard extends View {
         mPaint.setStrokeWidth(mStrokeWidth);
         mPaint.setDither(DITHER_FLAG);      //이미지보다 장비의 표현력이 떨어질때 이미지 색상을 낮추어 출력
         mPaint.setTextSize(scaledSize);
-        textdialog = new TextDialog();
+//        textdialog = new TextDialog();
 
         lastX = -1;
         lastY = -1;
@@ -376,6 +376,7 @@ public class PaintBoard extends View {
         //canvasBackground.drawBitmap(mBitmap, 0, 0, null);
         //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setColor(Color.BLACK);
         canvasWrite.drawColor(Color.TRANSPARENT);
 //
 ////        Rect rt = new Rect();
@@ -385,6 +386,13 @@ public class PaintBoard extends View {
         canvasWrite.drawText(str,x,y,mPaint);
         mPaint.setStyle(Paint.Style.STROKE);
 //        mTextMode = true;
+
+        // undo 목록에 넣기
+        Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas();
+        canvas.setBitmap(img);
+        canvas.drawBitmap(mBitmap, 0, 0, null);
+        undo.addList(img);
     }
 
     /***
@@ -397,7 +405,8 @@ public class PaintBoard extends View {
         //지우개 모드를 false로 변경
         mEraserMode = false;
         mPaint.setXfermode(null);
-        mPaint.setAlpha(0xFF);
+//        mPaint.setAlpha(0xFF);
+        mPaint.setAlpha(20);
 
         //전달받은 색상과 크기 적용
         mPaint.setColor(color);

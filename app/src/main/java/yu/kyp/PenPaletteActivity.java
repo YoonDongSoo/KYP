@@ -17,6 +17,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 
+import java.util.ArrayList;
+
 /**
  * 선굵기를 선택하는 대화상자용 액티비티
  *
@@ -32,11 +34,17 @@ public class PenPaletteActivity extends Activity {
     Button selectBtn;
     PenDataAdapter penadapter;
     ColorDataAdapter coloradapter;
+    RecentColorAdapter recentcoloradapter;
     Paint mPaint;
+    GridView recent_color_grid;
+    MemoWriteActivity memowriteactivity;
+    ArrayList<Integer> recent_color_list = new ArrayList<Integer>();
+
 
     public static OnPenSelectedListener penlistener;
     public static OnColorSelectedListener colorlistener;
     public static OnCompleteSelectedListener completelistener;
+    public static OnRecentColorSelectedListener recentcolorlistener;
 
     public ColorPickerDialog.OnColorChangedListener colorChangedListener = new ColorPickerDialog.OnColorChangedListener() {
         @Override
@@ -65,6 +73,11 @@ public class PenPaletteActivity extends Activity {
         public void onCompleteSelected();
     }
 
+    public interface OnRecentColorSelectedListener{
+        public void onRecentColorSelected(int color);
+    }
+
+
     /**
      * 펜 색상과 두께 선택을 위한 팔레트
      * @param savedInstanceState
@@ -73,6 +86,9 @@ public class PenPaletteActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pendialog);
+
+        memowriteactivity = new MemoWriteActivity();
+
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
@@ -92,6 +108,8 @@ public class PenPaletteActivity extends Activity {
         colorgrid = (GridView) findViewById(R.id.colorGrid);
         //사이즈 그리드
         sizegrid = (GridView) findViewById(R.id.sizeGrid);
+        //최근 색상 그리드
+        recent_color_grid = (GridView) findViewById(R.id.recent_color_grid);
 
         othersBtn = (Button) findViewById(R.id.othersBtn);
         selectBtn = (Button) findViewById(R.id.selectBtn);
@@ -116,6 +134,15 @@ public class PenPaletteActivity extends Activity {
         sizegrid.setAdapter(penadapter);
         sizegrid.setNumColumns(penadapter.getNumColumns());
 
+        //최근사용컬러어댑터와 연결
+        recentcoloradapter = new RecentColorAdapter(this);
+        recent_color_grid.setAdapter(recentcoloradapter);
+        recent_color_grid.setNumColumns(recentcoloradapter.getNumColumns());
+
+
+        recent_color_list = memowriteactivity.color_save;
+        recentcoloradapter.recent_color_arraylist = recent_color_list;
+        Log.i("@@@@onCreate@@@@@@@@", "어레이갯수" + recent_color_list.size());
 //        closeBtn.setOnClickListener(new OnClickListener() {
 //            public void onClick(View v) {
 //
@@ -308,6 +335,7 @@ class ColorDataAdapter extends BaseAdapter {
      * Application Context
      */
     Context mContext;
+    ArrayList<Integer> for_recent_color = new ArrayList<Integer>();
 
     /**
      * Colors defined
@@ -387,6 +415,7 @@ class ColorDataAdapter extends BaseAdapter {
         // calculate position
         int rowIndex = position / rowCount;
         int columnIndex = position % rowCount;
+        int i=0;
         //Log.d("ColorDataAdapter", "Index : " + rowIndex + ", " + columnIndex);
 
         //펜 색상을 나타낼 그리드뷰 생성
@@ -395,7 +424,7 @@ class ColorDataAdapter extends BaseAdapter {
                 GridView.LayoutParams.MATCH_PARENT);
 
         // create a Button with the color
-        Button aItem = new Button(mContext);
+        final Button aItem = new Button(mContext);
         aItem.setText(" ");
         aItem.setLayoutParams(params);
         aItem.setPadding(4, 4, 4, 4);
@@ -412,9 +441,157 @@ class ColorDataAdapter extends BaseAdapter {
                 }
 
 //                ((PenPaletteDialog)mContext).finish();
+
+                //선택한 값을 어레이 리스트에 add
+                for_recent_color.add(((Integer) v.getTag()).intValue());
+                Log.i("aItem","출력 : " + for_recent_color.get(for_recent_color.size()-1));
+
+                if(for_recent_color.size() >=8){
+                    for_recent_color.remove(0);
+                }
+
             }
         });
 
+
+        //선택한 것을 리턴
+        return aItem;
+    }
+}
+
+/**
+ * Adapter for Recent Color Data
+ */
+class RecentColorAdapter extends BaseAdapter{
+//    ColorDataAdapter coloradapter;
+    PenPaletteActivity penpaletteActivity;
+
+    Context mContext;
+    ArrayList<Integer> recent_color_arraylist = new ArrayList<Integer>();
+
+
+    public static final int[] recent_colors = new int[7];
+//    public static final int[] recent_colors = new int[7];
+
+    int rowCount;
+    int columnCount;
+
+    public RecentColorAdapter(Context context) {
+        super();
+
+        penpaletteActivity = new PenPaletteActivity();
+
+//        coloradapter  = new ColorDataAdapter(ColorDataAdapter.this);
+
+        int i=0;
+
+
+
+
+        mContext = context;
+
+        //1*7 그리드
+        rowCount = 1;
+        columnCount = 7;
+
+    }
+
+    /**
+     * 최근 사용한 색상을 보여주는 그리드뷰에서
+     * 선택한 부분의 column 값을 리턴
+     * @return
+     */
+    public int getNumColumns() {
+        return columnCount;
+    }
+
+    /**
+     * 최근 사용한 색상을 보여주는 그리드뷰에서
+     * 색상 갯수를 리턴
+     * @return
+     */
+    public int getCount() {
+        return rowCount * columnCount;
+    }
+
+    /**
+     * 최근 사용한 색상을 보여주는 그리드뷰에서
+     * 색상의 포지션을 리턴
+     * @param position
+     * @return
+     */
+    public Object getItem(int position) {
+        return recent_colors[position];
+    }
+
+    /**
+     * 최근 사용한 색상을 보여주는 그리드뷰에서
+     * 선택된 값을 확인
+     * @param position
+     * @return
+     */
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    /**
+     * 최근 사용한 색상을 선택하는 그리드뷰를
+     * 만드는 함수
+     * @param position
+     * @param view
+     * @param group
+     * @return
+     */
+    public View getView(int position, View view, ViewGroup group) {
+        int i=0;
+        if(recent_color_arraylist.size() != 0) {
+            if(recent_color_arraylist.size() >= 8){
+                recent_color_arraylist.remove(0);
+            }
+            Log.i("******최근색상그리드뷰*****","" + recent_color_arraylist.size());
+            for (i = recent_color_arraylist.size()-1; i >=0 ; i--) {
+                recent_colors[(recent_color_arraylist.size()-1)-i] = recent_color_arraylist.get(i);
+            }
+            for(i=recent_color_arraylist.size(); i<7; i++){
+                recent_colors[i] = 0xffffffff;
+            }
+        }
+        Log.i("******최근색상그리드뷰*****","***");
+
+        //Log.d("PenDataAdapter", "getView(" + position + ") called.");
+
+        // calculate position
+        int rowIndex = position / rowCount;
+        int columnIndex = position % rowCount;
+        //Log.d("PenDataAdapter", "Index : " + rowIndex + ", " + columnIndex);
+
+        //최근 사용한 색을 나타낼 그리드뷰 생성
+        GridView.LayoutParams params = new GridView.LayoutParams(
+                GridView.LayoutParams.MATCH_PARENT,
+                GridView.LayoutParams.MATCH_PARENT);
+
+        // create a Button with the color
+        Button aItem = new Button(mContext);
+        aItem.setText(" ");
+        aItem.setLayoutParams(params);
+        aItem.setPadding(4, 4, 4, 4);
+        aItem.setBackgroundColor(recent_colors[position]);
+        aItem.setHeight(64);
+        aItem.setTag(recent_colors[position]);
+
+        //최근 사용한 색을 나타내는 그리드뷰에서
+        //하나의 값을 선택(클릭)하였을 때
+        aItem.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if (PenPaletteActivity.recentcolorlistener != null) {
+                    PenPaletteActivity.recentcolorlistener.onRecentColorSelected(((Integer)v.getTag()).intValue());
+//                    Log.i("pen thickness","clicked");
+                }
+
+//                ((PenPaletteDialog)mContext).finish();
+            }
+        });
+        //Log.d("aItem ","getView(" +aItem+") called");
 
         //선택한 것을 리턴
         return aItem;

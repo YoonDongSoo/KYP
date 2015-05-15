@@ -14,11 +14,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
@@ -38,10 +41,13 @@ public class MemoWriteActivity extends BlunoLibrary {
     protected static int currentY = 0;
 
     PaintBoard paintboard;
+    static RecentColorAdapter recentcoloradapter;
     LinearLayout addedLayout;
     Button colorLegendBtn;
     TextView sizeLegendTxt;
     LinearLayout popuplayout;
+    static GridView recent_color_grid;
+
 
     //    Button pictureBtn;
     Button textBtn;
@@ -72,6 +78,8 @@ public class MemoWriteActivity extends BlunoLibrary {
     float x = 0;
     float y = 0;
     boolean text_flag = true;
+
+    static ArrayList<Integer> color_save = new ArrayList<Integer>();
 
     /**
      * 노트 객체
@@ -150,14 +158,14 @@ public class MemoWriteActivity extends BlunoLibrary {
         colorBtn = (Button) findViewById(R.id.buttoncolor);
         sizetextview = (TextView) findViewById(R.id.textviewsize);
         scrollBtn = (Button) findViewById(R.id.buttonScroll);
-
+        recent_color_grid = (GridView) findViewById(R.id.recent_color_grid);
 
         //final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
         final FrameLayout boardLayout = (FrameLayout) findViewById(R.id.boardLayout);
 
 
         paintboard = new PaintBoard(this);
-
+        recentcoloradapter = new RecentColorAdapter(this);
 
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -183,7 +191,12 @@ public class MemoWriteActivity extends BlunoLibrary {
             Intent i = getIntent();
             int noteNo = i.getIntExtra("NOTE_NO", 0);
             if (noteNo > 0) {
-                Note note = noteManager.getNote(noteNo);
+                note = noteManager.getNote(noteNo);
+                paintboard.undo.addList(note.NOTE_DATA);;
+            }
+            else
+            {
+                note = new Note();
             }
 
             View.OnClickListener buttonListener = new View.OnClickListener() {
@@ -350,18 +363,6 @@ public class MemoWriteActivity extends BlunoLibrary {
         Scroll_Vertical.scrollBy(0, y);
     }
 
-//    public void showIME(View view) {
-//        Log.i(TAG , "showIME() is called");
-//        CharSequence initText = null;
-//
-//        initText = mTextView.getText();
-//        mEditText.setText(initText); // TextView의 초기 Text를 EditText로 보이게 하자.
-//
-//        InputMethodManager mInputMethod = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-//        Log.e(TAG , "mInputMethod  = " + mInputMethod);
-//
-//        mInputMethod.showSoftInput(view, InputMethodManager.SHOW_FORCED);
-//    }
 
     public int getChosenColor() {
         return mColor;
@@ -381,9 +382,16 @@ public class MemoWriteActivity extends BlunoLibrary {
         //addedLayout.invalidate();
     }
 
-    public static void temp(){
-
-    }
+//    public static void displayRecentColor(){
+//        int i=0;
+//
+//        if(color_save.size() != 0) {
+//            Log.i("displayRecentColor","출력 " + color_save.size());
+//            for (i = 0; i < color_save.size(); i++) {
+//                recentcoloradapter.recent_color_arraylist = color_save;
+//            }
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -628,6 +636,29 @@ public class MemoWriteActivity extends BlunoLibrary {
             public void onColorSelected(int color) {
                 mColor = color;
                 oldColor = mColor;
+
+                //최근 사용한 색상을 저장
+                color_save.add(mColor);
+                Toast.makeText(MemoWriteActivity.this, "색상" + mColor, Toast.LENGTH_SHORT).show();
+
+//                recentcoloradapter.recent_color_list = color_save;
+//                displayRecentColor();
+
+                //선택되어진 색상을 적용한다.
+                paintboard.updatePaintProperty(mColor, mSize);
+                //화면의 좌측 상단에 선택한 색상을 표시한다.
+                displayPaintProperty();
+            }
+        };
+        //최근 사용한 색 선택 팔레트를 눌렀을 때
+        PenPaletteActivity.recentcolorlistener = new PenPaletteActivity.OnRecentColorSelectedListener() {
+            public void onRecentColorSelected(int color){
+                mColor = color;
+                oldColor = mColor;
+
+                //최근 사용한 색상을 저장
+                color_save.add(mColor);
+
                 //선택되어진 색상을 적용한다.
                 paintboard.updatePaintProperty(mColor, mSize);
                 //화면의 좌측 상단에 선택한 색상을 표시한다.
@@ -639,6 +670,12 @@ public class MemoWriteActivity extends BlunoLibrary {
             public void onCompleteSelected() {
                 mColor = oldColor;
                 mSize = oldSize;
+
+//                //최근 사용한 색상을 저장
+//                color_save.add(mColor);
+//                Toast.makeText(MemoWriteActivity.this, "색상" + mColor, Toast.LENGTH_SHORT).show();
+//                displayRecentColor();
+
                 //색상과 굵기를 적용한다.
                 paintboard.updatePaintProperty(mColor, mSize);
                 //화면의 좌측상단에 선택한 색상과 굵기를 표시한다.
@@ -818,6 +855,9 @@ public class MemoWriteActivity extends BlunoLibrary {
     protected void onDestroy() {
         super.onDestroy();
         onDestroyProcess();
+        // 노트를 디비에 저장하고
+        // undo리스트를 삭제.
+        saveNote();
         paintboard.undo.clearList();
     }
 

@@ -38,7 +38,7 @@ public class TextDialog extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text_popup);
 
-//        this.setTitle("텍스트 입력");
+        this.setTitle("텍스트 입력");
 
         mPaint = new Paint();
 //        canvas = new Canvas();

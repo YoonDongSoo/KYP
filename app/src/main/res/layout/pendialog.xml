@@ -4,6 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="색상 선택"
+        android:textSize="@dimen/font_size"
+        android:layout_margin="10dp"
+        />
     <GridView
         android:id="@+id/colorGrid"
         android:layout_width="wrap_content"
@@ -11,9 +18,29 @@
         android:layout_gravity="center"
         android:layout_margin="10dp"
         />
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="두께 선택"
+        android:textSize="@dimen/font_size"
+        android:layout_margin="10dp"
+        />
     <GridView
         android:id="@+id/sizeGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="최근 사용한 색상"
+        android:textSize="@dimen/font_size"
+        android:layout_margin="10dp"
+        />
+    <GridView
+        android:id="@+id/recent_color_grid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
