@@ -45,7 +45,7 @@ public class TextDialog extends Activity{
 //
         final EditText textEdit = (EditText) findViewById(R.id.textEdit);
         Button Ok = (Button) findViewById(R.id.Ok);
-        Button Cancle = (Button) findViewById(R.id.cancle);
+        Button Cancel = (Button) findViewById(R.id.cancel);
 
 
 
@@ -85,7 +85,7 @@ public class TextDialog extends Activity{
         });
 
         //취소 버튼을 눌렀을 때
-        Cancle.setOnClickListener(new View.OnClickListener(){
+        Cancel.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 String str = "";
 

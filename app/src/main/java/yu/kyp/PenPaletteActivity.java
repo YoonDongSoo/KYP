@@ -66,7 +66,7 @@ public class PenPaletteActivity extends Activity {
         public void onColorSelected(int color);
 
     }
-    //    public interface OnCacleSelectedListener{
+//    public interface OnCacleSelectedListener{
 //        public void onCancleSelected();
 //    }
     public interface OnCompleteSelectedListener{
@@ -463,7 +463,7 @@ class ColorDataAdapter extends BaseAdapter {
  * Adapter for Recent Color Data
  */
 class RecentColorAdapter extends BaseAdapter{
-    //    ColorDataAdapter coloradapter;
+//    ColorDataAdapter coloradapter;
     PenPaletteActivity penpaletteActivity;
 
     Context mContext;
