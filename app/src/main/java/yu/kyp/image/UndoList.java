@@ -1,6 +1,8 @@
 package yu.kyp.image;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -11,6 +13,9 @@ import java.util.ArrayList;
 public class UndoList extends ArrayList<Bitmap> {
     private static final int MAX_UNDOS = 5;
     private static final String TAG = UndoList.class.getSimpleName();
+    private static final int SIZE_WIDTH = 0;
+    private static final int SIZE_HEIGHT = 0;
+
 
 
     /**
@@ -45,10 +50,20 @@ public class UndoList extends ArrayList<Bitmap> {
     /**
      * Bitmap을 undo 목록에 추가한다.
      * 최대 MAX_UNDOS 까지 저장된다.
+     * SIZE_WIDTH, SIZE_HEIGHT로 자동 변환되어서 저장된다.
      * @param bitmap
      */
     public void addList(Bitmap bitmap)
     {
+
+        // =================================
+        // 2015-05-16 윤동수 - 테스트
+        // SIZE_WIDTH, SIZE_HEIGHT로 자동 변환되어서 저장된다.
+//        Bitmap newbmp = Bitmap.createBitmap(SIZE_WIDTH,SIZE_HEIGHT,Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(newbmp);
+//        Rect dest =  new Rect(0,0,1000,1000);
+//        canvas.drawBitmap(bitmap,null,dest,null);
+
         add(bitmap);
 
         // 최대개수(MAX_UNDOS)보다 많으면 앞에서 부터 삭제한다.

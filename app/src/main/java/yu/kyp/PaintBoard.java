@@ -10,6 +10,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.os.Debug;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -52,14 +53,15 @@ public class PaintBoard extends View {
     public static int maxUndos = 11;
     private int index=0;
     /**
-     * Canvas instance
+     * canvasWrite에 적용된 Bitmap
+     * canvasWrite에 그리져는 모든 것은 이 Bitmap에 저장된다.
      */
     Canvas canvasWrite;
     Canvas canvasBackground;
     /**
      * Bitmap for double buffering(즐겨찾기 참고할 것)
      */
-    Bitmap mBitmap;
+    Bitmap mBitmapWrite;
 
     /**
      * Paint instance
@@ -210,7 +212,9 @@ public class PaintBoard extends View {
 
         //마지막에 저장된 비트맵을 불러와 확대/축소하고 비트맵을 다시 그려준다.
         Bitmap bitmap = undo.getLast();
-        canvasWrite.drawBitmap(bitmap, new Rect(0 ,0,(int)width, (int)height), new Rect(x1, y1, x2, y2), null/*mPaint*/);
+        //canvasWrite.drawBitmap(bitmap, new Rect(0 ,0,(int)width, (int)height), new Rect(x1, y1, x2, y2), null/*mPaint*/);
+        canvasWrite.drawBitmap(bitmap, null, new Rect(x1, y1, x2, y2), null/*mPaint*/);
+        Log.i(TAG,"width:"+(x2-x1)+" height:"+(y2-y1) );
         canvasWrite.drawLine(0, (bottom - 0) / 2, right, (bottom - 0) / 2, paintLine);
         canvasWrite.drawLine(right / 2, 0, right / 2, bottom, paintLine);
         //canvasWrite.drawRect(globalX, globalY, globalX+scalewidth, globalY+scaleheight, paintLine);   // 사각형
@@ -373,8 +377,8 @@ public class PaintBoard extends View {
 //        Log.i("onDraw","");
 //        Log.d("!!!!!!!!!!","ondraw");
 
-        //canvasBackground.drawBitmap(mBitmap, 0, 0, null);
-        //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        //canvasBackground.drawBitmap(mBitmapWrite, 0, 0, null);
+        //canvas.drawBitmap(mBitmapWrite, 0, 0, mBitmapPaint);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(Color.BLACK);
         canvasWrite.drawColor(Color.TRANSPARENT);
@@ -388,10 +392,10 @@ public class PaintBoard extends View {
 //        mTextMode = true;
 
         // undo 목록에 넣기
-        Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap img = Bitmap.createBitmap(mBitmapWrite.getWidth(), mBitmapWrite.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas();
         canvas.setBitmap(img);
-        canvas.drawBitmap(mBitmap, 0, 0, null);
+        canvas.drawBitmap(mBitmapWrite, 0, 0, null);
         undo.addList(img);
     }
 
@@ -447,8 +451,8 @@ public class PaintBoard extends View {
     {
         //비트맵이 존재하면 비트맵 이미지를 해제
         //(메모리 최적화를 위해 사용)
-        if(mBitmap != null){
-            mBitmap.recycle();
+        if(mBitmapWrite != null){
+            mBitmapWrite.recycle();
         }
         //배경 canvas를 생성한다.
         canvasBackground = new Canvas();
@@ -459,20 +463,15 @@ public class PaintBoard extends View {
 
         // 2015-05-04 윤동수: 저장된 이미지 불러오기
         // 저장된 이미지가 없으면 새로 생성
-        Bitmap img = null;
         if(undo.size()>0)
-            img = undo.getLast().copy(Bitmap.Config.ARGB_8888, true);
+            mBitmapWrite = undo.getLast().copy(Bitmap.Config.ARGB_8888, true);
         else
-            img = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            mBitmapWrite = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         /*비트맵에 직접 그림을 그리거나 다른 이미지를 그릴려고 하면 새로운 canvas를 만들어야 canvas에
         그리는 모든 작업이 bitmap에 반영된다.*/
         //캔버스 생성
-        Canvas canvas = new Canvas();
-        //캔버스에 비트맵 이미지 적용
-        canvas.setBitmap(img);
-
-        mBitmap = img;
+        Canvas canvas = new Canvas(mBitmapWrite);
         canvasWrite = canvas;
 
 
@@ -509,9 +508,9 @@ public class PaintBoard extends View {
      */
     public void setImageSize(int width, int height, Bitmap newImage)
     {
-        if (mBitmap != null){
-            if (width < mBitmap.getWidth()) width = mBitmap.getWidth();
-            if (height < mBitmap.getHeight()) height = mBitmap.getHeight();
+        if (mBitmapWrite != null){
+            if (width < mBitmapWrite.getWidth()) width = mBitmapWrite.getWidth();
+            if (height < mBitmapWrite.getHeight()) height = mBitmapWrite.getHeight();
         }
 
         if (width < 1 || height < 1) return;
@@ -526,12 +525,12 @@ public class PaintBoard extends View {
             canvas.setBitmap(newImage);
         }
 
-        if (mBitmap != null) {
-            mBitmap.recycle();
+        if (mBitmapWrite != null) {
+            mBitmapWrite.recycle();
             canvasWrite.restore();
         }
 
-        mBitmap = img;
+        mBitmapWrite = img;
         canvasWrite = canvas;
 
         undo.clearList();
@@ -557,8 +556,13 @@ public class PaintBoard extends View {
 //        Log.i("onDraw","");
         Log.d("!!!!!!!!!!","ondraw");
 
-        //canvasBackground.drawBitmap(mBitmap, 0, 0, null);
-        //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        // 2015-05-16 윤동수
+        // 1. 먼저 background를 캔버스에 그리고
+        // 2. 메모를 캔버스에 그린다.
+
+
+        //canvasBackground.drawBitmap(mBitmapWrite, 0, 0, null);
+        //canvas.drawBitmap(mBitmapWrite, 0, 0, mBitmapPaint);
         canvas.drawColor(Color.WHITE);
 
 
@@ -567,7 +571,7 @@ public class PaintBoard extends View {
         if(!mEraserMode)
             canvas.drawPath(mPath, mPaint);
         //비트맵을 화면에 그린다.
-        canvas.drawBitmap(mBitmap, 0, 0, null);
+        canvas.drawBitmap(mBitmapWrite, 0, 0, null);
 
 
 
@@ -602,10 +606,10 @@ public class PaintBoard extends View {
                 mPath.rewind();
 
                 // undo 목록에 넣기
-                Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Bitmap img = Bitmap.createBitmap(mBitmapWrite.getWidth(), mBitmapWrite.getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas();
                 canvas.setBitmap(img);
-                canvas.drawBitmap(mBitmap, 0, 0, null);
+                canvas.drawBitmap(mBitmapWrite, 0, 0, null);
                 undo.addList(img);
 
                 return true;
@@ -613,7 +617,7 @@ public class PaintBoard extends View {
             case MotionEvent.ACTION_DOWN:
 //                Log.i("draw", "actiondown called.");
 
-                if (mBitmap == null){
+                if (mBitmapWrite == null){
                     ;
                 }
                 //scrollview에 영향을 안받고 draw 기능 적용
@@ -637,10 +641,10 @@ public class PaintBoard extends View {
                 if(undo.size()==0)
                 {
                     // undo 목록에 넣기
-                    img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                    img = Bitmap.createBitmap(mBitmapWrite.getWidth(), mBitmapWrite.getHeight(), Bitmap.Config.ARGB_8888);
                     canvas = new Canvas();
                     canvas.setBitmap(img);
-                    canvas.drawBitmap(mBitmap, 0, 0, null);
+                    canvas.drawBitmap(mBitmapWrite, 0, 0, null);
                     undo.addList(img);
                 }
 
@@ -866,7 +870,7 @@ public class PaintBoard extends View {
      */
     public boolean Save(OutputStream outstream) {
         try {
-            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outstream);
+            mBitmapWrite.compress(Bitmap.CompressFormat.JPEG, 100, outstream);
             invalidate();
 
             return true;
