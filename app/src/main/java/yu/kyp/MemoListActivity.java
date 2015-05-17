@@ -29,7 +29,7 @@ public class MemoListActivity extends ActivityBase {
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent i = new Intent(context,MemoWriteActivity.class);
+            Intent i = new Intent(context,MemoWriteActivity2.class);
             i.putExtra("NOTE_NO",(int)id);
             startActivity(i);
         }
@@ -143,7 +143,7 @@ public class MemoListActivity extends ActivityBase {
 
     public void buttonNewMemo_OnClick(View v)
     {
-        Intent i = new Intent(context,MemoWriteActivity.class);
+        Intent i = new Intent(context,MemoWriteActivity2.class);
         startActivity(i);
     }
 
