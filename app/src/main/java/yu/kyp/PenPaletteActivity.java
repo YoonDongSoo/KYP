@@ -3,19 +3,22 @@ package yu.kyp;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.SeekBar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -28,23 +31,37 @@ import java.util.ArrayList;
 public class PenPaletteActivity extends Activity {
 
     private static final String TAG = ColorPickerDialog.class.getSimpleName();
+    private static final int REQUEST_PEN_SIZE = 3;
+    private static final int REQUEST_ENABLE_BT = 1;
+    private static final int REQUEST_CURRENT_SIZE = 4;
+    private static SharedPreferences sp;
+    private Context mainContext=this;
+
     GridView colorgrid;
     GridView sizegrid;
+    GridView neonPen;
     Button othersBtn;
     Button selectBtn;
+    SeekBar sizeSeekBar;
     PenDataAdapter penadapter;
     ColorDataAdapter coloradapter;
     RecentColorAdapter recentcoloradapter;
+    NeonPenDataAdapter neonpenadapter;
     Paint mPaint;
     GridView recent_color_grid;
     MemoWriteActivity memowriteactivity;
     ArrayList<Integer> recent_color_list = new ArrayList<Integer>();
+    static int current_size;
+    static int progress_state = 0;
+    static int p_size_value = 0;
 
 
     public static OnPenSelectedListener penlistener;
     public static OnColorSelectedListener colorlistener;
     public static OnCompleteSelectedListener completelistener;
     public static OnRecentColorSelectedListener recentcolorlistener;
+    //    public static OnCancelSelectedListener cancellistner;
+    public static OnNeonColorSelectedListener neoncolorlistener;
 
     public ColorPickerDialog.OnColorChangedListener colorChangedListener = new ColorPickerDialog.OnColorChangedListener() {
         @Override
@@ -66,7 +83,7 @@ public class PenPaletteActivity extends Activity {
         public void onColorSelected(int color);
 
     }
-//    public interface OnCacleSelectedListener{
+    //    public interface OnCacleSelectedListener{
 //        public void onCancleSelected();
 //    }
     public interface OnCompleteSelectedListener{
@@ -75,6 +92,9 @@ public class PenPaletteActivity extends Activity {
 
     public interface OnRecentColorSelectedListener{
         public void onRecentColorSelected(int color);
+    }
+    public interface OnNeonColorSelectedListener{
+        public void onNeonColorSelected(int color);
     }
 
 
@@ -107,9 +127,53 @@ public class PenPaletteActivity extends Activity {
         //색상 그리드
         colorgrid = (GridView) findViewById(R.id.colorGrid);
         //사이즈 그리드
-        sizegrid = (GridView) findViewById(R.id.sizeGrid);
+//        sizegrid = (GridView) findViewById(R.id.sizeGrid);
         //최근 색상 그리드
         recent_color_grid = (GridView) findViewById(R.id.recent_color_grid);
+        //형광펜 그리드
+        neonPen = (GridView) findViewById(R.id.neonPen);
+        //사이즈 시크바
+        sizeSeekBar = (SeekBar) findViewById(R.id.sizeSeekBar);
+
+        sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
+        p_size_value = sp.getInt("p_size_value",0);
+        Toast.makeText(PenPaletteActivity.this,"펜팔레트에서의 사이즈" + p_size_value,Toast.LENGTH_SHORT).show();
+        if(p_size_value != 2) {
+            sizeSeekBar.setProgress(p_size_value);
+        }
+
+        //시크바가 움직이지 않았을 경우
+        Intent i = new Intent();
+        progress_state = 0;
+        i.putExtra("p_size",progress_state);
+        setResult(REQUEST_PEN_SIZE,i);
+
+        //시크바가 터치되었을 경우
+        sizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+                // Seekbar의 움직임이 멈춘다면 실행될 사항
+                // seekbar는 해당 Seekbar를 의미함.
+                Intent i = new Intent();
+//                int current_progress = sizeSeekBar.getProgress();
+                progress_state = sizeSeekBar.getProgress();
+                i.putExtra("p_size",progress_state);
+
+                Toast.makeText(PenPaletteActivity.this,"seekbar: " + sizeSeekBar.getProgress(), Toast.LENGTH_LONG).show();
+
+                setResult(REQUEST_PEN_SIZE,i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // TODO Auto-generated method stub
+            }
+        });
 
         othersBtn = (Button) findViewById(R.id.othersBtn);
         selectBtn = (Button) findViewById(R.id.selectBtn);
@@ -124,21 +188,29 @@ public class PenPaletteActivity extends Activity {
         colorgrid.setAdapter(coloradapter);
         colorgrid.setNumColumns(coloradapter.getNumColumns());
 
-        sizegrid.setColumnWidth(14);
-        sizegrid.setBackgroundColor(Color.GRAY);
-        sizegrid.setVerticalSpacing(4);
-        sizegrid.setHorizontalSpacing(4);
+        //사이즈
+        sizeSeekBar.setMax(50);
+
+
+//        sizegrid.setColumnWidth(14);
+//        sizegrid.setBackgroundColor(Color.GRAY);
+//        sizegrid.setVerticalSpacing(4);
+//        sizegrid.setHorizontalSpacing(4);
 
         //펜데이터어댑터와 연결
-        penadapter = new PenDataAdapter(this);
-        sizegrid.setAdapter(penadapter);
-        sizegrid.setNumColumns(penadapter.getNumColumns());
+//        penadapter = new PenDataAdapter(this);
+//        sizegrid.setAdapter(penadapter);
+//        sizegrid.setNumColumns(penadapter.getNumColumns());
 
         //최근사용컬러어댑터와 연결
         recentcoloradapter = new RecentColorAdapter(this);
         recent_color_grid.setAdapter(recentcoloradapter);
         recent_color_grid.setNumColumns(recentcoloradapter.getNumColumns());
 
+        //형광펜 어댑터와 연결
+        neonpenadapter = new NeonPenDataAdapter(this);
+        neonPen.setAdapter(neonpenadapter);
+        neonPen.setNumColumns(neonpenadapter.getNumColumns());
 
         recent_color_list = memowriteactivity.color_save;
         recentcoloradapter.recent_color_arraylist = recent_color_list;
@@ -177,152 +249,52 @@ public class PenPaletteActivity extends Activity {
 //        System.out.println("color : " + color);
 //        mPaint.setColor(color);
 //    }
+
 }
+
+
 
 /**
  * Adapter for Pen Data
  *
  * @author Mike
  */
-class PenDataAdapter extends BaseAdapter {
+class PenDataAdapter implements SeekBar.OnSeekBarChangeListener{
     /**
      * Application Context
      */
     Context mContext;
-    int temp_size;
-
-
-    /**
-     * Pens defined
-     * 펜의 사이즈 선택을 위한 Int형 사이즈 배열 선언
-     */
-    public static final int [] pens = new int[] {
-            1,2,3,4,5,
-            6,7,8,9,10,
-            11,13,15,17,20
-    };
-
-    int rowCount;
-    int columnCount;
-
+    SharedPreferences sp;
+    String OPT_SEEKBAR_KEY = "setting";
+    int OPT_SEEKBAR_DEF = 30;
+    int LAYOUT_PADDING = 10;
+    int currentvalue;
 
     public PenDataAdapter(Context context) {
         super();
 
         mContext = context;
-
-        //3*5 그리드
-        rowCount = 3;
-        columnCount = 5;
+        sp = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        // TODO Auto-generated method stub
+    }
+    public void onStartTrackingTouch(SeekBar seekBar) {
+        // TODO Auto-generated method stub
+    }
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        // TODO Auto-generated method stub
+        Log.i("시크바","" + seekBar.getProgress());
 
     }
+//    public View onCreate(){
+//
+//    }
+//
 
-    /**
-     * 펜 사이즈를 선택하는 그리드뷰에서
-     * 선택한 부분의 column 값을 리턴
-     * @return
-     */
-    public int getNumColumns() {
-        return columnCount;
-    }
-
-    /**
-     * 펜 사이즈를 선택하는 그리드뷰에서
-     * 펜 사이즈의 갯수를 리턴
-     * @return
-     */
-    public int getCount() {
-        return rowCount * columnCount;
-    }
-
-    /**
-     * 펜 사이즈를 선택하는 그리드뷰에서
-     * 펜 사이즈의 포지션을 리턴
-     * @param position
-     * @return
-     */
-    public Object getItem(int position) {
-        return pens[position];
-    }
-
-    /**
-     * 펜 사이즈를 선택하는 그리드뷰에서
-     * 선택된 값을 확인
-     * @param position
-     * @return
-     */
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    /**
-     * 펜 사이즈를 선택하는 그리드뷰를
-     * 만드는 함수
-     * @param position
-     * @param view
-     * @param group
-     * @return
-     */
-    public View getView(int position, View view, ViewGroup group) {
-
-        //Log.d("PenDataAdapter", "getView(" + position + ") called.");
-
-        // calculate position
-        int rowIndex = position / rowCount;
-        int columnIndex = position % rowCount;
-        //Log.d("PenDataAdapter", "Index : " + rowIndex + ", " + columnIndex);
-
-        //펜 사이즈를 나타낼 그리드뷰 생성
-        GridView.LayoutParams params = new GridView.LayoutParams(
-                GridView.LayoutParams.MATCH_PARENT,
-                GridView.LayoutParams.MATCH_PARENT);
-
-        //펜 사이즈를 나타낼 가로, 세로 높이 지정
-        int areaWidth = 10;
-        int areaHeight = 20;
-
-        Bitmap penBitmap = Bitmap.createBitmap(areaWidth, areaHeight, Bitmap.Config.ARGB_8888);
-        Canvas penCanvas = new Canvas();
-        penCanvas.setBitmap(penBitmap);
-
-        Paint mPaint = new Paint();
-        //펜 사이즈 선택 그리드뷰의 배경 색
-        mPaint.setColor(Color.WHITE);
-        penCanvas.drawRect(0, 0, areaWidth, areaHeight, mPaint);
-
-        mPaint.setColor(Color.BLACK);
-        mPaint.setStrokeWidth((float)pens[position]);
-        penCanvas.drawLine(0, areaHeight/2, areaWidth-1, areaHeight/2, mPaint);
-        BitmapDrawable penDrawable;
-        penDrawable = new BitmapDrawable(mContext.getResources(), penBitmap);
-
-        // create a Button with the color
-        Button aItem = new Button(mContext);
-        aItem.setText(" ");
-        aItem.setLayoutParams(params);
-        aItem.setPadding(4, 4, 4, 4);
-        aItem.setBackgroundDrawable(penDrawable);
-        aItem.setHeight(64);
-        aItem.setTag(pens[position]);
-
-        //펜 사이즈 그리드뷰에서
-        //하나의 값을 선택(클릭)하였을 때
-        aItem.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (PenPaletteActivity.penlistener != null) {
-                    PenPaletteActivity.penlistener.onPenSelected(((Integer)v.getTag()).intValue());
-//                    Log.i("pen thickness","clicked");
-                }
-
-//                ((PenPaletteDialog)mContext).finish();
-            }
-        });
-        //Log.d("aItem ","getView(" +aItem+") called");
-
-        //선택한 것을 리턴
-        return aItem;
-    }
 }
+
+
 
 /**
  * Adapter for Color Data
@@ -460,10 +432,137 @@ class ColorDataAdapter extends BaseAdapter {
 }
 
 /**
+ * Adapter for Color Data
+ *
+ * @author Mike
+ */
+class NeonPenDataAdapter extends BaseAdapter {
+
+    /**
+     * Application Context
+     */
+    Context mContext;
+
+    /**
+     * Colors defined
+     */
+
+    //형광펜의 색상 선택을 위한 Int형 색상 배열 생성
+    public static final int [] neoncolors = new int[] {
+            0xffe8ff2a,0xffff4242,0xffff9500,0xff00b4ff,0xffff099c,0xff7fff24,0xffaa26fc
+    };
+
+    int rowCount;
+    int columnCount;
+
+
+    public NeonPenDataAdapter(Context context) {
+        super();
+
+        mContext = context;
+
+        // create test data
+        rowCount = 1;
+        columnCount = 7;
+
+    }
+
+    /**
+     * 형광펜 색상을 선택하는 그리드뷰에서
+     * 선택한 부분의 column 값을 리턴
+     * @return
+     */
+    public int getNumColumns() {
+        return columnCount;
+    }
+
+    /**
+     * 형광펜 색상을 선택하는 그리드뷰에서
+     * 펜 색상의 갯수를 리턴
+     * @return
+     */
+    public int getCount() {
+        return rowCount * columnCount;
+    }
+
+    /**
+     * 형광펜 색상을 선택하는 그리드뷰에서
+     * 펜 색상의 포지션을 리턴
+     * @param position
+     * @return
+     */
+    public Object getItem(int position) {
+        return neoncolors[position];
+    }
+
+    /**
+     * 형광펜 색상을 선택하는 그리드뷰에서
+     * 선택된 값을 확인
+     * @param position
+     * @return
+     */
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    /**
+     * 형광펜 색상을 선택하는 그리드뷰를
+     * 만드는 함수
+     * @param position
+     * @param view
+     * @param group
+     * @return
+     */
+    public View getView(int position, View view, ViewGroup group) {
+        //Log.d("ColorDataAdapter", "getView(" + position + ") called.");
+
+        // calculate position
+        int rowIndex = position / rowCount;
+        int columnIndex = position % rowCount;
+        int i=0;
+        //Log.d("ColorDataAdapter", "Index : " + rowIndex + ", " + columnIndex);
+
+        //펜 색상을 나타낼 그리드뷰 생성
+        GridView.LayoutParams params = new GridView.LayoutParams(
+                GridView.LayoutParams.MATCH_PARENT,
+                GridView.LayoutParams.MATCH_PARENT);
+
+        // create a Button with the color
+        final Button aItem = new Button(mContext);
+        aItem.setText(" ");
+        aItem.setAlpha(30);
+        aItem.setLayoutParams(params);
+        aItem.setPadding(4, 4, 4, 4);
+        aItem.setBackgroundColor(neoncolors[position]);
+        aItem.setHeight(64);
+        aItem.setTag(neoncolors[position]);
+
+        //형광펜 색상 그리드뷰에서
+        //하나의 값을 선택(클릭)하였을 때
+        aItem.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if (PenPaletteActivity.neoncolorlistener != null) {
+                    PenPaletteActivity.neoncolorlistener.onNeonColorSelected(((Integer) v.getTag()).intValue());
+                }
+
+//                ((PenPaletteDialog)mContext).finish();
+
+
+            }
+        });
+
+
+        //선택한 것을 리턴
+        return aItem;
+    }
+}
+
+
+/**
  * Adapter for Recent Color Data
  */
 class RecentColorAdapter extends BaseAdapter{
-//    ColorDataAdapter coloradapter;
+    //    ColorDataAdapter coloradapter;
     PenPaletteActivity penpaletteActivity;
 
     Context mContext;
@@ -471,7 +570,6 @@ class RecentColorAdapter extends BaseAdapter{
 
 
     public static final int[] recent_colors = new int[7];
-//    public static final int[] recent_colors = new int[7];
 
     int rowCount;
     int columnCount;
@@ -480,14 +578,6 @@ class RecentColorAdapter extends BaseAdapter{
         super();
 
         penpaletteActivity = new PenPaletteActivity();
-
-//        coloradapter  = new ColorDataAdapter(ColorDataAdapter.this);
-
-        int i=0;
-
-
-
-
         mContext = context;
 
         //1*7 그리드
@@ -588,7 +678,6 @@ class RecentColorAdapter extends BaseAdapter{
 //                    Log.i("pen thickness","clicked");
                 }
 
-//                ((PenPaletteDialog)mContext).finish();
             }
         });
         //Log.d("aItem ","getView(" +aItem+") called");
@@ -596,4 +685,19 @@ class RecentColorAdapter extends BaseAdapter{
         //선택한 것을 리턴
         return aItem;
     }
+
+//    @Override
+//    public void onBackPressed() {
+//
+//        super.onBackPressed();
+//
+//    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event){
+//        switch(keyCode){
+//            case KeyEvent.KEYCODE_BACK:
+//                break;
+//        }
+//        finish();
+//    }
 }

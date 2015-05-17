@@ -1,18 +1,13 @@
 package yu.kyp;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.GridView;
+import android.widget.SeekBar;
+import android.widget.Toast;
 
 
 /**
@@ -20,10 +15,12 @@ import android.widget.GridView;
  *
  */
 public class EraserPaletteActivity extends Activity {
-
-    GridView grid;
     Button closeBtn;
-    EraserDataAdapter adapter;
+    private static SharedPreferences sp2;
+    SeekBar eraserSeekBar;
+    static int e_size_value = 0;
+    private static final int REQUEST_ERASER_SIZE = 4;
+    static int progress_state = 0;
 
     public static OnEraserSelectedListener listener;
 
@@ -43,20 +40,51 @@ public class EraserPaletteActivity extends Activity {
 
         this.setTitle("지우개굵기 선택");
 
-        //지우개를 위한 그리드 그리드
-        grid = (GridView) findViewById(R.id.colorGrid);
         //취소버튼
         closeBtn = (Button) findViewById(R.id.closeBtn);
+        //지우개 사이즈 선택 시크바
+        eraserSeekBar = (SeekBar) findViewById(R.id.eraserSeekBar);
+        eraserSeekBar.setMax(50);
 
-        grid.setColumnWidth(14);
-        grid.setBackgroundColor(Color.GRAY);
-        grid.setVerticalSpacing(4);
-        grid.setHorizontalSpacing(4);
+        sp2 = getSharedPreferences("currnt_e_size",MODE_PRIVATE);
+        e_size_value = sp2.getInt("e_size_value",0);
+        Toast.makeText(EraserPaletteActivity.this, "지우개에서의 사이즈" + e_size_value, Toast.LENGTH_SHORT).show();
+        if(e_size_value != 2) {
+            eraserSeekBar.setProgress(e_size_value);
+        }
 
-        //지우개데이터어댑터와 연결
-        adapter = new EraserDataAdapter(this);
-        grid.setAdapter(adapter);
-        grid.setNumColumns(adapter.getNumColumns());
+        //시크바가 움직이지 않았을 경우
+        Intent i = new Intent();
+        progress_state = 0;
+        i.putExtra("e_size",progress_state);
+        setResult(REQUEST_ERASER_SIZE,i);
+
+        //시크바가 터치되었을 경우
+        eraserSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+                // Seekbar의 움직임이 멈춘다면 실행될 사항
+                // seekbar는 해당 Seekbar를 의미함.
+                Intent i = new Intent();
+//                int current_progress = sizeSeekBar.getProgress();
+                progress_state = eraserSeekBar.getProgress();
+                i.putExtra("e_size",progress_state);
+
+                Toast.makeText(EraserPaletteActivity.this,"seekbar: " + eraserSeekBar.getProgress(), Toast.LENGTH_SHORT).show();
+
+                setResult(REQUEST_ERASER_SIZE,i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // TODO Auto-generated method stub
+            }
+        });
 
         //닫기 버튼을 눌렀을 때
         closeBtn.setOnClickListener(new View.OnClickListener() {
@@ -69,145 +97,6 @@ public class EraserPaletteActivity extends Activity {
 
     }
 
-}
-
-/**
- * Adapter for Pen Data
- */
-class EraserDataAdapter extends BaseAdapter {
-
-    /**
-     * Application Context
-     */
-    Context mContext;
-
-    /**
-     * Erasers defined
-     * 지우개 사이즈 선택을 위한 Int형 사이즈 배열 선언
-     */
-    public static final int[] erasers = new int[]{
-            3, 6, 9, 12, 15,
-            18, 21, 24, 27, 30,
-            33, 36, 39, 42, 45
-    };
-
-    int rowCount;
-    int columnCount;
-
-
-    public EraserDataAdapter(Context context) {
-        super();
-
-        mContext = context;
-
-        //3*5 그리드
-        rowCount = 3;
-        columnCount = 5;
-
-    }
-
-    /**
-     * 지우개 굵기를 선택하는 그리드뷰에서
-     * 선택한 부분의 column 값을 리턴
-     * @return
-     */
-    public int getNumColumns() {
-        return columnCount;
-    }
-
-    /**
-     * 지우개 굵기를 선택하는 그리드뷰에서
-     * 지우개 사이즈 갯수를 리턴
-     * @return
-     */
-    public int getCount() {
-        return rowCount * columnCount;
-    }
-
-    /**
-     * 지우개 굵기를 선택하는 그리드뷰에서
-     * 지우개 굵기의 포지션을 리턴
-     * @param position
-     * @return
-     */
-    public Object getItem(int position) {
-        return erasers[position];
-    }
-
-    /**
-     * 지우개 굵기를 선택하는 그리드뷰에서
-     * 선택된 값을 확인
-     * @param position
-     * @return
-     */
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    /**
-     * 지우개 굵기를 선택하는 그리드뷰를
-     * 만드는 함수
-     * @param position
-     * @param view
-     * @param group
-     * @return
-     */
-    public View getView(int position, View view, ViewGroup group) {
-        //Log.d("EraserDataAdapter", "getView(" + position + ") called.");
-
-        // calculate position
-        int rowIndex = position / rowCount;
-        int columnIndex = position % rowCount;
-        // Log.d("EraserDataAdapter", "Index : " + rowIndex + ", " + columnIndex);
-
-        //지우개 굵기를 나타낼 그리드뷰 생성
-        GridView.LayoutParams params = new GridView.LayoutParams(
-                GridView.LayoutParams.MATCH_PARENT,
-                GridView.LayoutParams.MATCH_PARENT);
-
-        //지우개 굵기를 나타낼 가로, 세로 높이 지정
-        int areaWidth = 10;
-        int areaHeight = 50;
-
-        Bitmap eraserBitmap = Bitmap.createBitmap(areaWidth, areaHeight, Bitmap.Config.ARGB_8888);
-        Canvas eraserCanvas = new Canvas();
-        eraserCanvas.setBitmap(eraserBitmap);
-
-        Paint mPaint = new Paint();
-        //지우개 굵기 선택 그리드뷰의 배경 색
-        mPaint.setColor(Color.WHITE);
-        eraserCanvas.drawRect(0, 0, areaWidth, areaHeight, mPaint);
-
-        mPaint.setColor(Color.BLACK);
-        mPaint.setStrokeWidth((float) erasers[position]);
-        eraserCanvas.drawLine(0, areaHeight / 2, areaWidth - 1, areaHeight / 2, mPaint);
-        BitmapDrawable eraserDrawable;
-        eraserDrawable = new BitmapDrawable(mContext.getResources(), eraserBitmap);
-
-        // create a Button with the color
-        Button aItem = new Button(mContext);
-        aItem.setText(" ");
-        aItem.setLayoutParams(params);
-        aItem.setPadding(4, 4, 4, 4);
-        aItem.setBackgroundDrawable(eraserDrawable);
-        aItem.setHeight(64);
-        aItem.setTag(erasers[position]);
-
-        //지우개 사이즈 그리드뷰에서
-        //하나의 값을 선택(클릭)하였을 때
-        aItem.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (EraserPaletteActivity.listener != null) {
-                    EraserPaletteActivity.listener.onEraserSelected(((Integer) v.getTag()).intValue());
-                }
-
-                ((EraserPaletteActivity) mContext).finish();
-            }
-        });
-
-        //선택한 것을 리턴
-        return aItem;
-    }
 }
 
 

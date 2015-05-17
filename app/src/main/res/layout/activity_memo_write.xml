@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="@android:color/holo_blue_dark"
+        android:background="#AACEBFE0"
         android:padding="10dp"
         android:id="@+id/top_relative">
 
@@ -109,7 +109,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="@android:color/holo_blue_dark"
+        android:background="#AACEBFE0"
         android:padding="10dp"
         android:id="@+id/bottom_linear">
         <Button

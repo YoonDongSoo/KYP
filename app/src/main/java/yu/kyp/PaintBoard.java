@@ -582,6 +582,7 @@ public class PaintBoard extends View {
         switch (action) {
             //손을 떼었을 때
             case MotionEvent.ACTION_UP:
+
 //                Log.i("draw", "actionup called.");
                 changed = true;
 
@@ -611,6 +612,7 @@ public class PaintBoard extends View {
                 return true;
             //화면에 손을 댔을 때
             case MotionEvent.ACTION_DOWN:
+
 //                Log.i("draw", "actiondown called.");
 
                 if (mBitmap == null){
@@ -658,6 +660,7 @@ public class PaintBoard extends View {
                 return true;
             //움직일 때
             case MotionEvent.ACTION_MOVE:
+
 //                Log.i("draw", "actionmove called.");
                 //scrollview에 영향을 안받고 draw 기능 적용
                 this.getParent().requestDisallowInterceptTouchEvent(true);
@@ -690,6 +693,7 @@ public class PaintBoard extends View {
         float x = event.getX();
         float y = event.getY();
         int i;
+
 
         //s = new Stroke();
 
@@ -739,6 +743,7 @@ public class PaintBoard extends View {
     }
 
     private Rect touchUp(MotionEvent event, boolean cancel) {
+
         Rect rect = processMove(event);
         return rect;
 //        int i,j;
@@ -773,6 +778,7 @@ public class PaintBoard extends View {
      */
     private Rect processMove(MotionEvent event) {            /******************************/
 
+        mPaint.setAlpha(40);
 //        final float x = event.getX();
 //        final float y = event.getY();
 //        PointData p = new PointData(x, y);
