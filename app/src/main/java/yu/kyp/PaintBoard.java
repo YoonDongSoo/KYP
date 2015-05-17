@@ -405,8 +405,8 @@ public class PaintBoard extends View {
         //지우개 모드를 false로 변경
         mEraserMode = false;
         mPaint.setXfermode(null);
-//        mPaint.setAlpha(0xFF);
-        mPaint.setAlpha(20);
+        mPaint.setAlpha(0xFF);
+//        mPaint.setAlpha(20);
 
         //전달받은 색상과 크기 적용
         mPaint.setColor(color);
@@ -628,6 +628,8 @@ public class PaintBoard extends View {
                 }
 
 
+                mPaint.setAlpha(40);
+
                 Log.i("!!!", "push 됨?");
 
                /* this.getParent().requestDisallowInterceptTouchEvent(true);
@@ -658,6 +660,8 @@ public class PaintBoard extends View {
                 return true;
             //움직일 때
             case MotionEvent.ACTION_MOVE:
+                mPaint.setAlpha(40);
+
 //                Log.i("draw", "actionmove called.");
                 //scrollview에 영향을 안받고 draw 기능 적용
                 this.getParent().requestDisallowInterceptTouchEvent(true);

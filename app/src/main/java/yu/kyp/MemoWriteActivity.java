@@ -18,6 +18,7 @@ import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ public class MemoWriteActivity extends BlunoLibrary {
 
     private static final String TAG = MemoWriteActivity.class.getSimpleName();
     private static final int REQUEST_DRAW_TEXT = 2;
+    private static final int REQUEST_PEN_SIZE = 3;
     private StringBuffer strBuffer = new StringBuffer();
     private NoteManager noteManager = null;
     private static HorizontalScrollView Scroll_Horizontal;
@@ -46,6 +48,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     Button colorLegendBtn;
     TextView sizeLegendTxt;
     LinearLayout popuplayout;
+    SeekBar sizeSeekBar;
     static GridView recent_color_grid;
 
 
@@ -64,6 +67,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     Button textOKBtn;
     Button textCacleBtn;
     Canvas canvas;
+    Button cancelBtn;
 
     int mColor = 0xff000000;
     int mSize = 2;
@@ -159,6 +163,9 @@ public class MemoWriteActivity extends BlunoLibrary {
         sizetextview = (TextView) findViewById(R.id.textviewsize);
         scrollBtn = (Button) findViewById(R.id.buttonScroll);
         recent_color_grid = (GridView) findViewById(R.id.recent_color_grid);
+        cancelBtn = (Button) findViewById(R.id.cancelBtn);
+        sizeSeekBar = (SeekBar) findViewById(R.id.sizeSeekBar);
+//        sizeSeekBar.setMax(100);
 
         //final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
         final FrameLayout boardLayout = (FrameLayout) findViewById(R.id.boardLayout);
@@ -620,17 +627,18 @@ public class MemoWriteActivity extends BlunoLibrary {
      */
     public void buttonPen_OnClick(View v)
     {
-        //펜 굵기 선택 팔레트를 눌렀을 때
-        PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
-            public void onPenSelected(int size) {
-                mSize = size;
-                oldSize = mSize;
-                //선택되어진 굵기를 적용한다.
-                paintboard.updatePaintProperty(mColor, mSize);
-                //화면 좌측 상단에 선택한 굵기를 표시한다.
-                displayPaintProperty();
-            }
-        };
+//        PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
+//            public void onPenSelected(int size) {
+//                mSize = size;
+//                oldSize = mSize;
+//
+//                //선택되어진 색상을 적용한다.
+//                paintboard.updatePaintProperty(mColor, mSize);
+//                //화면의 좌측 상단에 선택한 색상을 표시한다.
+//                displayPaintProperty();
+//            }
+//        };
+
         //펜 색상 선택 팔레트를 눌렀을 때
         PenPaletteActivity.colorlistener = new PenPaletteActivity.OnColorSelectedListener() {
             public void onColorSelected(int color) {
@@ -658,6 +666,18 @@ public class MemoWriteActivity extends BlunoLibrary {
 
                 //최근 사용한 색상을 저장
                 color_save.add(mColor);
+
+                //선택되어진 색상을 적용한다.
+                paintboard.updatePaintProperty(mColor, mSize);
+                //화면의 좌측 상단에 선택한 색상을 표시한다.
+                displayPaintProperty();
+            }
+        };
+        PenPaletteActivity.neoncolorlistener = new PenPaletteActivity.OnNeonColorSelectedListener() {
+            @Override
+            public void onNeonColorSelected(int color) {
+                mColor = color;
+                oldColor = mColor;
 
                 //선택되어진 색상을 적용한다.
                 paintboard.updatePaintProperty(mColor, mSize);
@@ -906,6 +926,20 @@ public class MemoWriteActivity extends BlunoLibrary {
                 text_flag = true;
             }
         }
+        if(requestCode == REQUEST_PEN_SIZE){
+            int pen_size = data.getIntExtra("size",0);
+            Log.i("펜의 사이즈","" + pen_size);
+            mSize = pen_size;
+            oldSize = mSize;
+            Toast.makeText(MemoWriteActivity.this,"펜 사이즈 넘어왔네~", Toast.LENGTH_LONG).show();
+
+            paintboard.updatePaintProperty(mColor, pen_size);
+            //화면의 좌측 상단에 선택한 색상을 표시한다.
+            displayPaintProperty();
+        }
     }
+
+
+
 }
 
