@@ -353,13 +353,13 @@ public class PaintBoard extends View {
         //캔버스의 배경색 설정
         canvas.drawColor(Color.WHITE);
 
-       // if (canvas != null) {
+        // if (canvas != null) {
         //    canvas.drawColor(Color.BLACK);                       //캔버스의 배경색 설정
-       // }
+        // }
         canvas.drawColor(Color.WHITE);
-       //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 
-       // canvas.drawBitmap(bitmap,0,0,null);
+        // canvas.drawBitmap(bitmap,0,0,null);
     }
 
     /**
@@ -593,8 +593,8 @@ public class PaintBoard extends View {
 
                 //화면을 갱신한다.
                 if (rect != null) {
-                invalidate(rect);
-            }
+                    invalidate(rect);
+                }
                /* this.getParent().requestDisallowInterceptTouchEvent(true);
                 touchUp(event,false);
                 invalidate();*/
@@ -701,7 +701,7 @@ public class PaintBoard extends View {
 //        temp_y = y;
 
 
-       // s.listPoint.add(new PointData(x, y));
+        // s.listPoint.add(new PointData(x, y));
 
 
         lastX = x;
