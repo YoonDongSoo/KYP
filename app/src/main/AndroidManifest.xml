@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -51,6 +52,12 @@
         <activity
             android:name=".test.ZoomActivity"
             android:label="@string/title_activity_zoom" >
+        </activity>
+
+        <activity
+            android:name=".TextDialog"
+            android:theme="@android:style/Theme.Dialog"
+            android:label="">
         </activity>
         <activity
             android:name=".TrashActivity"

@@ -1,25 +1,27 @@
 package yu.kyp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
@@ -29,6 +31,7 @@ import yu.kyp.image.Thumbnail;
 public class MemoWriteActivity extends BlunoLibrary {
 
     private static final String TAG = MemoWriteActivity.class.getSimpleName();
+    private static final int REQUEST_DRAW_TEXT = 2;
     private StringBuffer strBuffer = new StringBuffer();
     private NoteManager noteManager = null;
     private static HorizontalScrollView Scroll_Horizontal;
@@ -38,13 +41,13 @@ public class MemoWriteActivity extends BlunoLibrary {
     protected static int currentY = 0;
 
     PaintBoard paintboard;
+    static RecentColorAdapter recentcoloradapter;
     LinearLayout addedLayout;
     Button colorLegendBtn;
     TextView sizeLegendTxt;
-    TextView mTextView;
-    EditText mEditText;
-    FrameLayout subLayout1;
-    FrameLayout subLayout2;
+    LinearLayout popuplayout;
+    static GridView recent_color_grid;
+
 
     //    Button pictureBtn;
     Button textBtn;
@@ -58,6 +61,8 @@ public class MemoWriteActivity extends BlunoLibrary {
     Button colorBtn;
     TextView sizetextview;
     Button scrollBtn;
+    Button textOKBtn;
+    Button textCacleBtn;
     Canvas canvas;
 
     int mColor = 0xff000000;
@@ -70,7 +75,11 @@ public class MemoWriteActivity extends BlunoLibrary {
     boolean scrollSelected = false;
     boolean dragSelected = false;
     boolean textSelected  = false;
+    float x = 0;
+    float y = 0;
+    boolean text_flag = true;
 
+    static ArrayList<Integer> color_save = new ArrayList<Integer>();
 
     /**
      * 노트 객체
@@ -149,53 +158,24 @@ public class MemoWriteActivity extends BlunoLibrary {
         colorBtn = (Button) findViewById(R.id.buttoncolor);
         sizetextview = (TextView) findViewById(R.id.textviewsize);
         scrollBtn = (Button) findViewById(R.id.buttonScroll);
+        recent_color_grid = (GridView) findViewById(R.id.recent_color_grid);
 
-//        //main layout
-//        ViewGroup.LayoutParams layoutParamsMain =
-//                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-//                        ViewGroup.LayoutParams.MATCH_PARENT);
+        //final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
+        final FrameLayout boardLayout = (FrameLayout) findViewById(R.id.boardLayout);
 
-        //sub layout1
-        FrameLayout.LayoutParams layoutParamsSub1 =
-                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT);
-
-        //sub layout2
-        FrameLayout.LayoutParams layoutParamsSub2 =
-                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT);
-
-        final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
-
-//        RelativeLayout subLayout = new RelativeLayout(this);
-//        subLayout.setOrientation(LinearLayout.VERTICAL);
 
         paintboard = new PaintBoard(this);
+        recentcoloradapter = new RecentColorAdapter(this);
 
-        // Text 입력을 위한 EditText와 Text를 보여줄 TextView
-//        mTextView = new TextView(this);
-//        mEditText = new EditText(this);
 
-        FrameLayout.LayoutParams layoutParamsSub =
-                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT);
-
-        subLayout1 = new FrameLayout(this);
-        subLayout2 = new FrameLayout(this);
-        mTextView = new TextView(this);
-        mEditText = new EditText(this);
-
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                1000,
-                1200);                  //스크롤을 위한 캔버스의 크기 조절 부분
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                800,
+                1000);                  //스크롤을 위한 캔버스의 크기 조절 부분
 
         paintboard.setLayoutParams(params);
         paintboard.setPadding(2, 2, 2, 2);
 
-
-
-        subLayout2.addView(paintboard);                 //BestPaintActivity add
-//        boardLayout.addView(subLayout2,params);
+        boardLayout.addView(paintboard);                 //BestPaintActivity add
 
         sizetextview.setText("Size:" + mSize + "      ");      //버튼 오른쪽에 현재 펜의 사이즈 표시
         sizetextview.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
@@ -204,33 +184,6 @@ public class MemoWriteActivity extends BlunoLibrary {
         colorBtn.setText(" ");
         colorBtn.setHeight(20);
         colorBtn.setBackgroundColor(mColor);            //현재 색깔을 나타냄
-
-
-//        mainLayout.addView(mImageView, layoutParamsMain);
-
-
-//        subLayout.addView(mTextView, layoutParamsSub);
-//        subLayout.addView(mEditText, layoutParamsSub);
-//
-//        boardLayout.addView(subLayout,layoutParamsSub);
-
-//        mEditText.setRawInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-
-//        mEditText.addTextChangedListener(this);
-
-//                subLayout.addView(mTextView, layoutParamsSub);
-//        subLayout.addView(mEditText, layoutParamsSub);
-//        boardLayout.addView(subLayout,layoutParamsSub);
-
-
-//        subLayout1.addView(mTextView, layoutParamsSub);
-        subLayout1.addView(mEditText, layoutParamsSub);
-        subLayout1.setVisibility(View.GONE);
-
-        subLayout2.addView(subLayout1,layoutParamsSub);
-
-        boardLayout.addView(subLayout2,params);
-
 
         StringBuilder sb = new StringBuilder();
         try {
@@ -274,9 +227,10 @@ public class MemoWriteActivity extends BlunoLibrary {
 
             };
         }catch (Exception e) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         }
+    }
+
 
     public void buttonSave_OnClick(View v) {
         // DB에 저장
@@ -299,6 +253,99 @@ public class MemoWriteActivity extends BlunoLibrary {
         noteManager.saveNoteData(note);
     }
 
+//            penBtn.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
+//                        public void onPenSelected(int size) {
+//                            mSize = size;
+//                            oldSize = mSize;
+//                            paintboard.updatePaintProperty(mColor, mSize);
+//                            displayPaintProperty();
+//                        }
+//                    };
+//                    PenPaletteActivity.colorlistener = new PenPaletteActivity.OnColorSelectedListener() {
+//                        public void onColorSelected(int color) {
+//                            mColor = color;
+//                            oldColor = mColor;
+//                            paintboard.updatePaintProperty(mColor, mSize);
+//                            displayPaintProperty();
+//                        }
+//                    };
+//                    PenPaletteActivity.completelistener = new PenPaletteActivity.OnCompleteSelectedListener() {
+//                        public void onCompleteSelected() {
+//                            mColor = oldColor;
+//                            mSize = oldSize;
+//                            paintboard.updatePaintProperty(mColor, mSize);
+//                            displayPaintProperty();
+//                        }
+//                    };
+//                    Log.d("!!!!!!!!!!","펜 선택 color 값"+mColor);
+//                    Log.d("!!!!!!!!!!","펜 선택 size 값"+mSize);
+//                    Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
+//                    startActivity(intent);
+//                }
+//            });
+//            eraserBtn.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//
+//                    eraserSelected = !eraserSelected;
+//
+//                    if (eraserSelected) {
+//
+//                        penBtn.setEnabled(false);
+//                        undoBtn.setEnabled(false);
+//
+//                       // penBtn.invalidate();
+//                       // undoBtn.invalidate();
+//
+//                        oldColor = mColor;
+//                        oldSize = mSize;
+//
+//                        //mColor = Color.WHITE;
+//
+//                        EraserPaletteActivity.listener = new EraserPaletteActivity.OnEraserSelectedListener() {
+//                            public void onEraserSelected(int size) {
+//                                mSize = size;
+//                                paintboard.setEraserPaint(mSize);
+//                                displayPaintProperty();
+//                            }
+//                        };
+//                        penBtn.invalidate();
+//                        undoBtn.invalidate();
+//
+//
+//                        Intent intent = new Intent(getApplicationContext(), EraserPaletteActivity.class);
+//
+//                        startActivity(intent);
+//
+//                    }
+//                    else {
+//
+//                        penBtn.setEnabled(true);
+//                        undoBtn.setEnabled(true);
+//
+//                        penBtn.invalidate();
+//                        undoBtn.invalidate();
+//
+//                        mColor = oldColor;
+//                        mSize = oldSize;
+//                        Log.d("!!!!!!!!!!","color 값"+mColor);
+//                        Log.d("!!!!!!!!!!","size 값"+mSize);
+//
+//                        paintboard.updatePaintProperty(mColor, mSize);
+//                        displayPaintProperty();
+//                    }
+//                }
+//            });
+//
+//            undoBtn.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    paintboard.undo();
+//
+//                }
+//            });
+
+
 //        TextView textPointData = (TextView)findViewById(R.id.textViewPointData);
 //        textPointData.setMovementMethod(new ScrollingMovementMethod());
 //        textPointData.setText(sb.toString());
@@ -316,22 +363,6 @@ public class MemoWriteActivity extends BlunoLibrary {
         Scroll_Vertical.scrollBy(0, y);
     }
 
-    /**
-     * 키보드를 보이게 함
-     * @param view
-     */
-    public void showIME(View view) {
-        Log.i(TAG , "showIME() is called");
-        CharSequence initText = null;
-
-        initText = mTextView.getText();
-        mEditText.setText(initText); // TextView의 초기 Text를 EditText로 보이게 하자.
-
-        InputMethodManager mInputMethod = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-        Log.e(TAG , "mInputMethod  = " + mInputMethod);
-
-        mInputMethod.showSoftInput(view, InputMethodManager.SHOW_FORCED);
-    }
 
     public int getChosenColor() {
         return mColor;
@@ -351,9 +382,16 @@ public class MemoWriteActivity extends BlunoLibrary {
         //addedLayout.invalidate();
     }
 
-    public static void temp(){
-
-    }
+//    public static void displayRecentColor(){
+//        int i=0;
+//
+//        if(color_save.size() != 0) {
+//            Log.i("displayRecentColor","출력 " + color_save.size());
+//            for (i = 0; i < color_save.size(); i++) {
+//                recentcoloradapter.recent_color_arraylist = color_save;
+//            }
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -429,7 +467,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     public void buttonBack_OnClick(View v)
     {
         // 확대 테스트
-//        paintboard.zoomInBitmap();
+        paintboard.zoomInBitmap();
     }
 
     /**
@@ -438,129 +476,69 @@ public class MemoWriteActivity extends BlunoLibrary {
      */
     public void buttonText_OnClick(View v)
     {
-
-        // 축소 테스트
-        //Toast.makeText(this,"텍스트",Toast.LENGTH_SHORT).show();
-//        paintboard.zoomOutBitmap();
-
-//        final TextView mTextView;
-//        final EditText mEditText;
-//
-//        final LinearLayout boardLayout = (LinearLayout) findViewById(R.id.boardLayout);
-//
-//        //sub layout2
-//        final LinearLayout.LayoutParams layoutParamsSub =
-//                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-//                        LinearLayout.LayoutParams.WRAP_CONTENT);
-//
-//        final LinearLayout subLayout = new LinearLayout(this);
-//
-//        mTextView = new TextView(this);
-//        mEditText = new EditText(this);
-//
-//        mTextView.clearComposingText();
-
         textSelected = !textSelected;
-        if(textSelected) {
-
-
+        if (textSelected) {
             penBtn.setEnabled(false);
             eraserBtn.setEnabled(false);
-            alarmBtn.setEnabled(false);
             undoBtn.setEnabled(false);
+            alarmBtn.setEnabled(false);
             scrollBtn.setEnabled(false);
 
-            undoBtn.invalidate();
             penBtn.invalidate();
             eraserBtn.invalidate();
+            undoBtn.invalidate();
             alarmBtn.invalidate();
             scrollBtn.invalidate();
 
-//            canvas.setLayout
-
-//            mTextView.clearComposingText();
-            mEditText.setRawInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-            mEditText.clearComposingText();
-            mEditText.setSelection(0);
-//            mTextView.setRawInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-
-            subLayout1.setBackgroundColor(Color.WHITE);
-            subLayout1.setVisibility(View.VISIBLE);
-//            subLayout2.setVisibility(View.INVISIBLE);
-
-
+            //화면이 터치 되었을때
             paintboard.setOnTouchListener(new View.OnTouchListener() {
-
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    Scroll_Vertical.requestDisallowInterceptTouchEvent(true);
-                    Scroll_Horizontal.requestDisallowInterceptTouchEvent(true);
-                    mTextView.setOnTouchListener(this);
-                    mEditText.setOnTouchListener(this);
+                    x = event.getX();
+                    y = event.getY();
 
-//                    layoutParamsSub.setMargins(0, 0, 0, 0);
+//                    Intent i = MemoWriteActivity.this.getIntent();
+//                    boolean flag = i.getBooleanExtra("flag",false);
 
+                    Toast.makeText(MemoWriteActivity.this, x + "," + y, Toast.LENGTH_SHORT).show();
 
-//                    TextWatcher mTextWatcher = new TextWatcher() {
-//                        @Override
-//                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                            // TODO Auto-generated method stub
-//                            Log.i(TAG, "onTextChanged() is called");
-//                            Log.e(TAG, "String = " + s);
-//
-////                            mTextView.clearComposingText();
-////                            mTextView.setText(s);
-//                        }
-//
-//                        @Override
-//                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                            // TODO Auto-generated method stub
-//                            Log.i(TAG, "beforeTextChanged() is called");
-//                            Log.e(TAG, "String = " + s);
-//                        }
-//
-//                        @Override
-//                        public void afterTextChanged(Editable s) {
-//                            // TODO Auto-generated method stub
-//                            Log.i(TAG, "afterTextChanged() is called");
-//                            Log.e(TAG, "String = " + s);
-//                        }
-//                    };
-//                    mEditText.addTextChangedListener(mTextWatcher);
+                    if(text_flag == true) {
+                        Intent intent = new Intent(getApplicationContext(), TextDialog.class);
+                        intent.putExtra("x", x);
+                        intent.putExtra("y", y);
+                        //startActivity(intent);
+                        startActivityForResult(intent, REQUEST_DRAW_TEXT);
+                        text_flag = false;
+                    }
 
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            break;
-
-                        case MotionEvent.ACTION_MOVE:
-                            break;
-
-                        case MotionEvent.ACTION_UP:
-                            // Touch Up 동작에서 IME를 보여주자.
-                            showIME(v);
-
-                            break;
+                    return true;
+                }
+                //back키를 눌렀을 때
+                public boolean onKeyDown(int keyCode, KeyEvent event){
+                    boolean endBack = false;
+                    if(keyCode == KeyEvent.KEYCODE_BACK){
+                        if(!endBack) {
+                            finish();
+                            endBack = true;
+                        }
                     }
                     return true;
+
                 }
             });
         }
-        else
-        {
+        else{
             penBtn.setEnabled(true);
             eraserBtn.setEnabled(true);
+            undoBtn.setEnabled(true);
             alarmBtn.setEnabled(true);
             scrollBtn.setEnabled(true);
-            undoBtn.setEnabled(true);
 
             penBtn.invalidate();
             eraserBtn.invalidate();
+            undoBtn.invalidate();
             alarmBtn.invalidate();
             scrollBtn.invalidate();
-            undoBtn.invalidate();
-
-            subLayout1.setVisibility(View.INVISIBLE);
-            subLayout2.setVisibility(View.VISIBLE);
 
             paintboard.setOnTouchListener(new View.OnTouchListener() {
                 @Override
@@ -571,6 +549,7 @@ public class MemoWriteActivity extends BlunoLibrary {
 
             paintboard.updatePaintProperty(mColor, mSize);
             displayPaintProperty();
+            text_flag = true;
         }
     }
 
@@ -657,6 +636,29 @@ public class MemoWriteActivity extends BlunoLibrary {
             public void onColorSelected(int color) {
                 mColor = color;
                 oldColor = mColor;
+
+                //최근 사용한 색상을 저장
+                color_save.add(mColor);
+                Toast.makeText(MemoWriteActivity.this, "색상" + mColor, Toast.LENGTH_SHORT).show();
+
+//                recentcoloradapter.recent_color_list = color_save;
+//                displayRecentColor();
+
+                //선택되어진 색상을 적용한다.
+                paintboard.updatePaintProperty(mColor, mSize);
+                //화면의 좌측 상단에 선택한 색상을 표시한다.
+                displayPaintProperty();
+            }
+        };
+        //최근 사용한 색 선택 팔레트를 눌렀을 때
+        PenPaletteActivity.recentcolorlistener = new PenPaletteActivity.OnRecentColorSelectedListener() {
+            public void onRecentColorSelected(int color){
+                mColor = color;
+                oldColor = mColor;
+
+                //최근 사용한 색상을 저장
+                color_save.add(mColor);
+
                 //선택되어진 색상을 적용한다.
                 paintboard.updatePaintProperty(mColor, mSize);
                 //화면의 좌측 상단에 선택한 색상을 표시한다.
@@ -668,6 +670,12 @@ public class MemoWriteActivity extends BlunoLibrary {
             public void onCompleteSelected() {
                 mColor = oldColor;
                 mSize = oldSize;
+
+//                //최근 사용한 색상을 저장
+//                color_save.add(mColor);
+//                Toast.makeText(MemoWriteActivity.this, "색상" + mColor, Toast.LENGTH_SHORT).show();
+//                displayRecentColor();
+
                 //색상과 굵기를 적용한다.
                 paintboard.updatePaintProperty(mColor, mSize);
                 //화면의 좌측상단에 선택한 색상과 굵기를 표시한다.
@@ -724,14 +732,12 @@ public class MemoWriteActivity extends BlunoLibrary {
         //스크롤 버튼이 눌렸을 경우
         //스크롤 버튼을 제외한 나머지 버튼들을 비활성화인 false 상태로 만듦
         if (scrollSelected) {
-
             Log.i("scrollBtn", "clicked.");
             colorBtn.setEnabled(false);
             penBtn.setEnabled(false);
             eraserBtn.setEnabled(false);
             undoBtn.setEnabled(false);
             alarmBtn.setEnabled(false);
-            textBtn.setEnabled(false);
 //            scrollBtn.setEnabled(false);
 
             colorBtn.invalidate();
@@ -739,7 +745,6 @@ public class MemoWriteActivity extends BlunoLibrary {
             eraserBtn.invalidate();
             undoBtn.invalidate();
             alarmBtn.invalidate();
-            textBtn.invalidate();
 //                        scrollBtn.invalidate();
 
             paintboard.setOnTouchListener(new View.OnTouchListener() {
@@ -800,36 +805,33 @@ public class MemoWriteActivity extends BlunoLibrary {
         //스크롤 이외의 버튼을 활성화인 true를 해줌
         else {
             Log.i("scrollBtn", "unclicked.");
-
-                penBtn.setEnabled(true);
-                eraserBtn.setEnabled(true);
-                undoBtn.setEnabled(true);
-                alarmBtn.setEnabled(true);
-                textBtn.setEnabled(true);
+            colorBtn.setEnabled(true);
+            penBtn.setEnabled(true);
+            eraserBtn.setEnabled(true);
+            undoBtn.setEnabled(true);
+            alarmBtn.setEnabled(true);
 //                        scrollBtn.setEnabled(true);
 
-                colorBtn.invalidate();
-                penBtn.invalidate();
-                eraserBtn.invalidate();
-                undoBtn.invalidate();
-                alarmBtn.invalidate();
-                textBtn.invalidate();
+            colorBtn.invalidate();
+            penBtn.invalidate();
+            eraserBtn.invalidate();
+            undoBtn.invalidate();
+            alarmBtn.invalidate();
 //                        scrollBtn.invalidate();
 
-                paintboard.setOnTouchListener(new View.OnTouchListener() {
+            paintboard.setOnTouchListener(new View.OnTouchListener() {
 
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return false;
-                    }
-                });
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return false;
+                }
+            });
 
-                paintboard.updatePaintProperty(mColor, mSize);
-                displayPaintProperty();
-            }
+            paintboard.updatePaintProperty(mColor, mSize);
+            displayPaintProperty();
+        }
 
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -863,6 +865,47 @@ public class MemoWriteActivity extends BlunoLibrary {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         onActivityResultProcess(requestCode, resultCode, data);					//onActivityResult Process by BlunoLibrary
         super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==REQUEST_DRAW_TEXT)
+        {
+//            Bundle bundle = getIntent().getExtras();
+//            if(bundle != null){
+//                String text = bundle.getString("text","").toString();
+//                float x = data.getFloatExtra("x",0.0f);
+//                float y = data.getFloatExtra("y",0.0f);
+//                Log.i(TAG,"text:"+text);
+//                paintboard.drawText(text,x,y);
+//            }
+
+
+            int isCancel = data.getIntExtra("isCancel",0);
+            if(isCancel==0) {
+                int count = 0;
+                DisplayMetrics outMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+
+                float density = outMetrics.density;
+
+                // ok버튼 눌렀을 때.
+                String text[] = data.getStringExtra("text").toString().split("\n");
+                float x = data.getFloatExtra("x", 0.0f);
+                float y = data.getFloatExtra("y", 0.0f);
+                Log.i(TAG, "text:" + text);
+
+
+                for(count = 0; count<text.length; count++) {
+                    //drawText를 위해 y의 위치를 옮겨줘야함(하지않을 경우 같은 자리에 써짐)
+                    y += 60.0f;
+                    paintboard.drawText(text[count], x, y);
+                }
+                text_flag = true;
+            }
+            else
+            {
+                // 취소 버튼 눌렀을 때
+                Log.i(TAG,"취소 버튼 눌렀네~");
+                text_flag = true;
+            }
+        }
     }
 }
 

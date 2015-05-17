@@ -28,6 +28,7 @@ public class ColorPickerDialog extends Dialog {
         private final int[] mColors;
         private OnColorChangedListener mListener;
 
+        //그라디언트에서 사용될 색상 값 설정
         ColorPickerView(Context c, OnColorChangedListener l, int color) {
             super(c);
             mListener = l;
@@ -39,26 +40,39 @@ public class ColorPickerDialog extends Dialog {
             //위의 색상들을 사용해 원형 그라디언트 생성성
            Shader s = new SweepGradient(0, 0, mColors, null);
 
-            //테두리 원
-            mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);      //중간색 설정
+            /**
+             * 테두리 원 세팅 부분
+             */
+            //ANTI_ALIAS_FLAG으로 곡선을 부드럽게 처리
+            mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            //그라디언트를 지정
             mPaint.setShader(s);
-            mPaint.setStyle(Paint.Style.STROKE);        //테두리
+            //외곽선만 그리게 함
+            mPaint.setStyle(Paint.Style.STROKE);
+            //외곽선의 두께는 80
             mPaint.setStrokeWidth(80);
 
-            //중앙의 현재 색상을 표시하는 원원
-            mCenterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);        //중간색 설정
+            /**
+             * 중앙의 현재 색상을 표시하는 원
+             */
+            //ANTI_ALIAS_FLAG으로 곡선을 부드럽게 처리
+            mCenterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            //원의 색상 지정
             mCenterPaint.setColor(color);
+            //두께는 5
             mCenterPaint.setStrokeWidth(5);
         }
 
         private boolean mTrackingCenter;
         private boolean mHighlightCenter;
 
+        //원형 컬러피커를 위한 원을 그리는 부분
         @Override
         protected void onDraw(Canvas canvas) {
             float r = CENTER_X - mPaint.getStrokeWidth()*0.5f;
 
             //(0,0) 좌표값을 (CENTER_X, CENTER_X)로 바꿈
+            //원점을 화면의 중앙점으로 잡음
             canvas.translate(CENTER_X, CENTER_X);
 
             //new RectF(-r, -r, r, r)에  mPaint 객체를 사용하여
