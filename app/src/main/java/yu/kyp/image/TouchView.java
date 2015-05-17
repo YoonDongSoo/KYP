@@ -18,12 +18,10 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
@@ -40,7 +38,7 @@ import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
-public class TouchImageView extends ImageView {
+public class TouchView extends View {
 
     private static final String DEBUG = "DEBUG";
 
@@ -64,24 +62,8 @@ public class TouchImageView extends ImageView {
     // saved prior to the screen rotating.
     //
     private Matrix matrix, prevMatrix;
-    private Canvas canvasWrite;
-
-    public void setPaintTouchListener() {
-        paintOnTouchListener = new PaintOnTouchListener();
-        scrollOnTouchListener = null;
-        setOnTouchListener(paintOnTouchListener);
-    }
-
-    public void setScrollTouchListener()
-    {
-        paintOnTouchListener = null;
-        scrollOnTouchListener = new PrivateOnTouchListener();
-        setOnTouchListener(scrollOnTouchListener);
-    }
-
-    public void setWriteCanvas(Canvas canvas) {
-        canvasWrite = canvas;
-    }
+    private Bitmap mBitmap = null;
+    private Drawable mDrawable = null;
 
     private static enum State { NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM };
     private State state;
@@ -95,7 +77,7 @@ public class TouchImageView extends ImageView {
     private Context context;
     private Fling fling;
 
-    private ScaleType mScaleType;
+    private ImageView.ScaleType mScaleType;
 
     private boolean imageRenderedAtLeastOnce;
     private boolean onDrawReady;
@@ -117,20 +99,18 @@ public class TouchImageView extends ImageView {
     private GestureDetector.OnDoubleTapListener doubleTapListener = null;
     private OnTouchListener userTouchListener = null;
     private OnTouchImageViewListener touchImageViewListener = null;
-    private PaintOnTouchListener paintOnTouchListener = null;
-    private PrivateOnTouchListener scrollOnTouchListener = null;
 
-    public TouchImageView(Context context) {
+    public TouchView(Context context) {
         super(context);
         sharedConstructing(context);
     }
 
-    public TouchImageView(Context context, AttributeSet attrs) {
+    public TouchView(Context context, AttributeSet attrs) {
         super(context, attrs);
         sharedConstructing(context);
     }
 
-    public TouchImageView(Context context, AttributeSet attrs, int defStyle) {
+    public TouchView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         sharedConstructing(context);
     }
@@ -145,14 +125,14 @@ public class TouchImageView extends ImageView {
         m = new float[9];
         normalizedScale = 1;
         if (mScaleType == null) {
-            mScaleType = ScaleType.FIT_CENTER;
+            mScaleType = ImageView.ScaleType.FIT_CENTER;
         }
         minScale = 1;
         maxScale = 3;
         superMinScale = SUPER_MIN_MULTIPLIER * minScale;
         superMaxScale = SUPER_MAX_MULTIPLIER * maxScale;
         setImageMatrix(matrix);
-        setScaleType(ScaleType.MATRIX);
+        setScaleType(ImageView.ScaleType.MATRIX);
         setState(State.NONE);
         onDrawReady = false;
         super.setOnTouchListener(new PrivateOnTouchListener());
@@ -160,8 +140,9 @@ public class TouchImageView extends ImageView {
 
     @Override
     public void setOnTouchListener(View.OnTouchListener l) {
-        //userTouchListener = l;
+        // 윤동수 수정
         super.setOnTouchListener(l);
+        //userTouchListener = l;
     }
 
     public void setOnTouchImageViewListener(OnTouchImageViewListener l) {
@@ -172,19 +153,33 @@ public class TouchImageView extends ImageView {
         doubleTapListener = l;
     }
 
-    @Override
+    public void setImageBitmap(Bitmap bm) {
+        mBitmap = bm.copy(Bitmap.Config.ARGB_8888,true);
+        setImageDrawable(new BitmapDrawable(context.getResources(), bm));
+        
+        //super.setImageBitmap(bm);
+        savePreviousImageValues();
+        fitImageToView();
+    }
+
+    private void setImageDrawable(BitmapDrawable d) {
+        if (mDrawable != null) {
+            mDrawable.setCallback(null);
+            unscheduleDrawable(mDrawable);
+        }
+
+        mDrawable = d;
+    }
+
+
+    /*@Override
     public void setImageResource(int resId) {
         super.setImageResource(resId);
         savePreviousImageValues();
         fitImageToView();
     }
 
-    @Override
-    public void setImageBitmap(Bitmap bm) {
-        super.setImageBitmap(bm);
-        savePreviousImageValues();
-        fitImageToView();
-    }
+
 
     @Override
     public void setImageDrawable(Drawable drawable) {
@@ -198,15 +193,17 @@ public class TouchImageView extends ImageView {
         super.setImageURI(uri);
         savePreviousImageValues();
         fitImageToView();
-    }
+    }*/
 
-    @Override
-    public void setScaleType(ScaleType type) {
-        if (type == ScaleType.FIT_START || type == ScaleType.FIT_END) {
+    public void setScaleType(ImageView.ScaleType type) {
+        if (type == ImageView.ScaleType.FIT_START || type == ImageView.ScaleType.FIT_END) {
             throw new UnsupportedOperationException("TouchImageView does not support FIT_START or FIT_END");
         }
-        if (type == ScaleType.MATRIX) {
-            super.setScaleType(ScaleType.MATRIX);
+        // 윤동수 추가
+        mScaleType = type;
+
+        if (type == ImageView.ScaleType.MATRIX) {
+            //super.setScaleType(ImageView.ScaleType.MATRIX);
 
         } else {
             mScaleType = type;
@@ -220,8 +217,7 @@ public class TouchImageView extends ImageView {
         }
     }
 
-    @Override
-    public ScaleType getScaleType() {
+    public ImageView.ScaleType getScaleType() {
         return mScaleType;
     }
 
@@ -238,7 +234,7 @@ public class TouchImageView extends ImageView {
      * @return rect representing zoomed image
      */
     public RectF getZoomedRect() {
-        if (mScaleType == ScaleType.FIT_XY) {
+        if (mScaleType == ImageView.ScaleType.FIT_XY) {
             throw new UnsupportedOperationException("getZoomedRect() not supported with FIT_XY");
         }
         PointF topLeft = transformCoordTouchToBitmap(0, 0, true);
@@ -300,22 +296,13 @@ public class TouchImageView extends ImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if(scrollOnTouchListener!=null)
-        {
-            onDrawReady = true;
-            imageRenderedAtLeastOnce = true;
-            if (delayedZoomVariables != null) {
-                setZoom(delayedZoomVariables.scale, delayedZoomVariables.focusX, delayedZoomVariables.focusY, delayedZoomVariables.scaleType);
-                delayedZoomVariables = null;
-            }
+        onDrawReady = true;
+        imageRenderedAtLeastOnce = true;
+        if (delayedZoomVariables != null) {
+            setZoom(delayedZoomVariables.scale, delayedZoomVariables.focusX, delayedZoomVariables.focusY, delayedZoomVariables.scaleType);
+            delayedZoomVariables = null;
         }
         super.onDraw(canvas);
-
-        if(paintOnTouchListener!=null) {
-            canvasWrite.drawPath(paintOnTouchListener.mPath, paintOnTouchListener.mPaint);
-            //canvas.drawPath(paintOnTouchListener.mPath, paintOnTouchListener.mPaint);
-
-        }
     }
 
     @Override
@@ -406,7 +393,7 @@ public class TouchImageView extends ImageView {
      * @param focusY
      * @param scaleType
      */
-    public void setZoom(float scale, float focusX, float focusY, ScaleType scaleType) {
+    public void setZoom(float scale, float focusX, float focusY, ImageView.ScaleType scaleType) {
         //
         // setZoom can be called before the image is on the screen, but at this point,
         // image and view sizes have not yet been calculated in onMeasure. Thus, we should
@@ -434,7 +421,7 @@ public class TouchImageView extends ImageView {
      * Set zoom parameters equal to another TouchImageView. Including scale, position,
      * and ScaleType.
      */
-    public void setZoom(TouchImageView img) {
+    public void setZoom(TouchView img) {
         PointF center = img.getScrollPosition();
         setZoom(img.getCurrentZoom(), center.x, center.y, img.getScaleType());
     }
@@ -592,32 +579,32 @@ public class TouchImageView extends ImageView {
         float scaleX = (float) viewWidth / drawableWidth;
         float scaleY = (float) viewHeight / drawableHeight;
 
-        switch (mScaleType) {
-            case CENTER:
-                scaleX = scaleY = 1;
-                break;
-
-            case CENTER_CROP:
-                scaleX = scaleY = Math.max(scaleX, scaleY);
-                break;
-
-            case CENTER_INSIDE:
-                scaleX = scaleY = Math.min(1, Math.min(scaleX, scaleY));
-
-            case FIT_CENTER:
-                scaleX = scaleY = Math.min(scaleX, scaleY);
-                break;
-
-            case FIT_XY:
-                break;
-
-            default:
-                //
-                // FIT_START and FIT_END not supported
-                //
-                throw new UnsupportedOperationException("TouchImageView does not support FIT_START or FIT_END");
-
-        }
+//        switch (mScaleType) {
+//            case CENTER:
+//                scaleX = scaleY = 1;
+//                break;
+//
+//            case CENTER_CROP:
+//                scaleX = scaleY = Math.max(scaleX, scaleY);
+//                break;
+//
+//            case CENTER_INSIDE:
+//                scaleX = scaleY = Math.min(1, Math.min(scaleX, scaleY));
+//
+//            case FIT_CENTER:
+//                scaleX = scaleY = Math.min(scaleX, scaleY);
+//                break;
+//
+//            case FIT_XY:
+//                break;
+//
+//            default:
+//                //
+//                // FIT_START and FIT_END not supported
+//                //
+//                throw new UnsupportedOperationException("TouchImageView does not support FIT_START or FIT_END");
+//
+//        }
 
         //
         // Center the image
@@ -679,6 +666,24 @@ public class TouchImageView extends ImageView {
         }
         fixTrans();
         setImageMatrix(matrix);
+    }
+
+    private void setImageMatrix(Matrix matrix) {
+
+        // collaps null and identity to just null
+        if (matrix != null && matrix.isIdentity()) {
+            matrix = null;
+        }
+
+        // don't invalidate unless we're actually changing our matrix
+        if (matrix == null && !this.matrix.isIdentity() ||
+                matrix != null && !this.matrix.equals(matrix)) {
+            this.matrix.set(matrix);
+            //configureBounds();
+            invalidate();
+        }
+
+
     }
 
     /**
@@ -845,7 +850,7 @@ public class TouchImageView extends ImageView {
      * @author Ortiz
      *
      */
-    private class PrivateOnTouchListener implements OnTouchListener {
+    public class PrivateOnTouchListener implements OnTouchListener {
 
         //
         // Remember last point position for dragging
@@ -891,9 +896,9 @@ public class TouchImageView extends ImageView {
             //
             // User-defined OnTouchListener
             //
-            if(userTouchListener != null) {
+            /*if(userTouchListener != null) {
                 userTouchListener.onTouch(v, event);
-            }
+            }*/
 
             //
             // OnTouchImageViewListener is set: TouchImageView dragged by user.
@@ -1109,6 +1114,12 @@ public class TouchImageView extends ImageView {
         return new PointF(finalX , finalY);
     }
 
+
+    private Bitmap getBitmap()
+    {
+        return mBitmap;
+    }
+
     /**
      * Inverse of transformCoordTouchToBitmap. This function will transform the coordinates in the
      * drawable's coordinate system to the view's coordinate system.
@@ -1125,6 +1136,10 @@ public class TouchImageView extends ImageView {
         float finalX = m[Matrix.MTRANS_X] + getImageWidth() * px;
         float finalY = m[Matrix.MTRANS_Y] + getImageHeight() * py;
         return new PointF(finalX , finalY);
+    }
+
+    private Drawable getDrawable() {
+        return mDrawable;
     }
 
     /**
@@ -1289,9 +1304,9 @@ public class TouchImageView extends ImageView {
         public float scale;
         public float focusX;
         public float focusY;
-        public ScaleType scaleType;
+        public ImageView.ScaleType scaleType;
 
-        public ZoomVariables(float scale, float focusX, float focusY, ScaleType scaleType) {
+        public ZoomVariables(float scale, float focusX, float focusY, ImageView.ScaleType scaleType) {
             this.scale = scale;
             this.focusX = focusX;
             this.focusY = focusY;

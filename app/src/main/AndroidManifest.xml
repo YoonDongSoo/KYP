@@ -33,6 +33,10 @@
             android:label="@string/title_activity_memo_write" >
         </activity>
         <activity
+            android:name=".MemoWriteActivity2"
+            android:label="@string/title_activity_memo_write_activity2" >
+        </activity>
+        <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>

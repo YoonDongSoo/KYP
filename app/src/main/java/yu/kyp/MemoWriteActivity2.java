@@ -1,11 +1,17 @@
 package yu.kyp;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.TextView;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
@@ -22,23 +28,64 @@ public class MemoWriteActivity2 extends BlunoLibrary {
      * 노트 객체
      */
     private Note note;
+    private Bitmap bitmapWrite = null;
+    private TouchImageView touchViewPaint = null;
+    private Canvas canvasWrite = null;
+    Button textBtn;
+    Button penBtn;
+    Button eraserBtn;
+    Button alarmBtn;
+    Button undoBtn;
+    Button saveBtn;
+    Button settingBtn;
+    Button backBtn;
+    Button colorBtn;
+    Button scrollBtn;
+    private boolean scrollSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e(TAG,"onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_write_activity2);
 
-        // 1. 인스턴스 생성
+        // 1. 기본 변수
         noteManager = new NoteManager(this);
+        textBtn = (Button) findViewById(R.id.buttonText);
+        penBtn = (Button) findViewById(R.id.buttonPen);
+        eraserBtn = (Button) findViewById(R.id.buttonEraser);
+        alarmBtn = (Button) findViewById(R.id.buttonAlarm);
+        undoBtn = (Button) findViewById(R.id.buttonUndo);
+        saveBtn = (Button) findViewById(R.id.buttonSave);
+        settingBtn = (Button) findViewById(R.id.buttonSetting);
+        backBtn = (Button) findViewById(R.id.buttonBack);
+        colorBtn = (Button) findViewById(R.id.buttoncolor);
+        scrollBtn = (Button) findViewById(R.id.buttonScroll);
 
-        // 2. Find View
-        TouchImageView touchViewPaint =  (TouchImageView)findViewById(R.id.touchViewPaint);
-        touchViewPaint.setImageBitmap(note.NOTE_DATA);
-
-        // 3. 기본값 불러오기
+        // 2. 노트데이터 불러오기
         getNoteData();
+        bitmapWrite = note.NOTE_DATA.copy(Bitmap.Config.ARGB_8888,true);
 
+        // 3. TouchImageView 설정
+        touchViewPaint =  (TouchImageView)findViewById(R.id.touchViewPaint);
+        touchViewPaint.setImageBitmap(bitmapWrite);
+        touchViewPaint.setPaintTouchListener();
+        canvasWrite = new Canvas(bitmapWrite);
+        touchViewPaint.setWriteCanvas(canvasWrite);
+    }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        Log.e(TAG,"onWindowFocusChanged");
+        super.onWindowFocusChanged(hasFocus);
+        int top = touchViewPaint.getTop();
+        int bottom = touchViewPaint.getBottom();
+        int left = touchViewPaint.getLeft();
+        int right = touchViewPaint.getRight();
+        int width = touchViewPaint.getWidth();
+        int height = touchViewPaint.getHeight();
+        if(bitmapWrite==null)
+            bitmapWrite = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
     }
 
     private void getNoteData() {
@@ -133,5 +180,56 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         {
             paintboard.zoomResetBitmap();
         }*/
+    }
+
+    public void buttonScroll_OnClick(View v)
+    {
+        scrollSelected=!scrollSelected;
+
+        //스크롤 버튼이 눌렸을 경우
+        //스크롤 버튼을 제외한 나머지 버튼들을 비활성화인 false 상태로 만듦
+        if (scrollSelected) {
+            Log.i("scrollBtn", "clicked.");
+            colorBtn.setEnabled(false);
+            penBtn.setEnabled(false);
+            eraserBtn.setEnabled(false);
+            undoBtn.setEnabled(false);
+            alarmBtn.setEnabled(false);
+//            scrollBtn.setEnabled(false);
+
+            colorBtn.invalidate();
+            penBtn.invalidate();
+            eraserBtn.invalidate();
+            undoBtn.invalidate();
+            alarmBtn.invalidate();
+//                        scrollBtn.invalidate();
+            touchViewPaint.setScrollTouchListener();
+
+        }
+
+        //스크롤 버튼이 한번 더 눌렸을 경우
+        //스크롤 이외의 버튼을 활성화인 true를 해줌
+        else {
+            Log.i("scrollBtn", "unclicked.");
+            colorBtn.setEnabled(true);
+            penBtn.setEnabled(true);
+            eraserBtn.setEnabled(true);
+            undoBtn.setEnabled(true);
+            alarmBtn.setEnabled(true);
+//                        scrollBtn.setEnabled(true);
+
+            colorBtn.invalidate();
+            penBtn.invalidate();
+            eraserBtn.invalidate();
+            undoBtn.invalidate();
+            alarmBtn.invalidate();
+//                        scrollBtn.invalidate();
+
+            // 손글씨용 터치리스너 붙이기
+            touchViewPaint.setPaintTouchListener();
+
+            /*paintboard.updatePaintProperty(mColor, mSize);
+            displayPaintProperty();*/
+        }
     }
 }

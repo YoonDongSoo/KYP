@@ -10,14 +10,18 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.os.Debug;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.ImageView;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import yu.kyp.image.TouchView;
 import yu.kyp.image.UndoList;
 
 /**
@@ -27,7 +31,7 @@ import yu.kyp.image.UndoList;
  * @author Mike
  *
  */
-public class PaintBoard extends View {
+public class PaintBoard extends TouchView {
 
 
     private static final String TAG = PaintBoard.class.getSimpleName();
@@ -115,6 +119,8 @@ public class PaintBoard extends View {
     private float touchx, touchy;
     private float globalX, globalY;
     private float scalewidth, scaleheight;
+    private ScaleGestureDetector mScaleDetector;
+    private GestureDetector mGestureDetector;
 
     /**
      * View의 크기는 onResume에서 구하면 안된다.
@@ -123,7 +129,8 @@ public class PaintBoard extends View {
      * @param hasWindowFocus
      */
 
-    TextDialog textdialog;
+    private Context context;
+
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
@@ -134,6 +141,7 @@ public class PaintBoard extends View {
 
         width = right-left;
         height = bottom-top;
+        newImage((int)width,(int)height);
     }
 
     /**
@@ -214,7 +222,7 @@ public class PaintBoard extends View {
         Bitmap bitmap = undo.getLast();
         //canvasWrite.drawBitmap(bitmap, new Rect(0 ,0,(int)width, (int)height), new Rect(x1, y1, x2, y2), null/*mPaint*/);
         canvasWrite.drawBitmap(bitmap, null, new Rect(x1, y1, x2, y2), null/*mPaint*/);
-        Log.i(TAG,"width:"+(x2-x1)+" height:"+(y2-y1) );
+        Log.i(TAG, "width:" + (x2 - x1) + " height:" + (y2 - y1));
         canvasWrite.drawLine(0, (bottom - 0) / 2, right, (bottom - 0) / 2, paintLine);
         canvasWrite.drawLine(right / 2, 0, right / 2, bottom, paintLine);
         //canvasWrite.drawRect(globalX, globalY, globalX+scalewidth, globalY+scaleheight, paintLine);   // 사각형
@@ -261,12 +269,23 @@ public class PaintBoard extends View {
         canvasWrite.drawLine(0, (bottom - top) / 2, right, (bottom - top) / 2, paintLine);
         canvasWrite.drawLine(right / 2, 0, right / 2, bottom, paintLine);
 
+
         invalidate();
     }
 
+    /**
+     * 손글씨용 Touch리스너 붙이기.
+     */
+    public void setPaintTouchListener() {
+        this.setOnTouchListener(new PaintOnTouchListener());
+    }
 
-
-
+    /**
+     * 줌,스크롤용 Touch리스너 붙이긴
+     */
+    public void setScrollTouchListener() {
+        this.setOnTouchListener(new PrivateOnTouchListener());
+    }
 
 
     class Stroke{
@@ -306,6 +325,31 @@ public class PaintBoard extends View {
      */
     public PaintBoard(Context context) {
         super(context);
+        sharedContructing(context);
+    }
+
+    public PaintBoard(Context context, AttributeSet attrs)
+    {
+        super(context,attrs);
+        sharedContructing(context);
+    }
+
+    public PaintBoard(Context context, AttributeSet attrs, int defStyleAttr)
+    {
+        super(context,attrs,defStyleAttr);
+        sharedContructing(context);
+    }
+
+    /**
+     * 생성자에서 공용으로 사용하는 메소드
+     * @param context
+     */
+    private void sharedContructing(Context context) {
+        //=====================================================
+        // 1. 기본 변수 설정
+        this.context = context;
+        //mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
+        //mGestureDetector = new GestureDetector(context, new GestureListener());
         int scaledSize = getResources().getDimensionPixelSize(R.dimen.font_size);
 
         // create a new paint object
@@ -324,8 +368,13 @@ public class PaintBoard extends View {
         lastY = -1;
 
         //Log.i("GoodPaintBoard", "initialized.");
-    }
 
+
+        //=====================================================
+        // 2.터치 리스터 설정
+        setOnTouchListener(new PaintOnTouchListener());
+
+    }
 
     /**
      * Undo
@@ -449,6 +498,7 @@ public class PaintBoard extends View {
      */
     public void newImage(int width, int height)
     {
+        Log.e(TAG,"newImage");
         //비트맵이 존재하면 비트맵 이미지를 해제
         //(메모리 최적화를 위해 사용)
         if(mBitmapWrite != null){
@@ -477,8 +527,11 @@ public class PaintBoard extends View {
 
 
         changed = false;
+        // 윤동수 테스트
+        //setScaleType(ImageView.ScaleType.FIT_CENTER);
+        setImageBitmap(mBitmapWrite);
 
-        Log.i("!!!!!!!!!!", "newImage");
+
         invalidate();
 
 
@@ -553,6 +606,8 @@ public class PaintBoard extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+
+
 //        Log.i("onDraw","");
         Log.d("!!!!!!!!!!","ondraw");
 
@@ -571,116 +626,22 @@ public class PaintBoard extends View {
         if(!mEraserMode)
             canvas.drawPath(mPath, mPaint);
         //비트맵을 화면에 그린다.
-        canvas.drawBitmap(mBitmapWrite, 0, 0, null);
-
+        //canvas.drawBitmap(mBitmapWrite, 0, 0, null);
+        canvas.drawBitmap(mBitmapWrite,getMatrix(),null);
 
 
     }
 
-    /**
-     * Handles touch event, UP, DOWN and MOVE(for drawing)
-     */
-    public boolean  onTouchEvent(MotionEvent event) {
-        int action = event.getAction();
-
-        switch (action) {
-            //손을 떼었을 때
-            case MotionEvent.ACTION_UP:
-//                Log.i("draw", "actionup called.");
-                changed = true;
-
-                this.getParent().requestDisallowInterceptTouchEvent(false);
-                //touchUp 메소드 호출
-                Rect rect = touchUp(event, false);
-                //s = null;   // Stroke 인스턴스 삭제
-
-                //화면을 갱신한다.
-                if (rect != null) {
-                invalidate(rect);
-            }
-               /* this.getParent().requestDisallowInterceptTouchEvent(true);
-                touchUp(event,false);
-                invalidate();*/
-
-                //Path 객체 초기화
-                mPath.rewind();
-
-                // undo 목록에 넣기
-                Bitmap img = Bitmap.createBitmap(mBitmapWrite.getWidth(), mBitmapWrite.getHeight(), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas();
-                canvas.setBitmap(img);
-                canvas.drawBitmap(mBitmapWrite, 0, 0, null);
-                undo.addList(img);
-
-                return true;
-            //화면에 손을 댔을 때
-            case MotionEvent.ACTION_DOWN:
-//                Log.i("draw", "actiondown called.");
-
-                if (mBitmapWrite == null){
-                    ;
-                }
-                //scrollview에 영향을 안받고 draw 기능 적용
-                this.getParent().requestDisallowInterceptTouchEvent(true);
-                //touchDown()메소드 호출
-                rect = touchDown(event);
-
-
-                //화면을 갱신한다.
-                if (rect != null) {
-                    invalidate(rect);
-                }
-
-
-                Log.i("!!!", "push 됨?");
-
-               /* this.getParent().requestDisallowInterceptTouchEvent(true);
-                touchDown(event);
-                invalidate();*/
-
-                if(undo.size()==0)
-                {
-                    // undo 목록에 넣기
-                    img = Bitmap.createBitmap(mBitmapWrite.getWidth(), mBitmapWrite.getHeight(), Bitmap.Config.ARGB_8888);
-                    canvas = new Canvas();
-                    canvas.setBitmap(img);
-                    canvas.drawBitmap(mBitmapWrite, 0, 0, null);
-                    undo.addList(img);
-                }
-
-                //===================================
-                //터치 관련 처리
-                //===================================
-                //좌표값 저장
-                x = event.getRawX();
-                y = event.getRawY();
-                //터치 상태
-                istouched = true;
-                touchx = x; touchy =y;
-                String msg = "터치를 입력받음 : " + x + " / " + y;
-                Log.d(TAG,msg);
-                return true;
-            //움직일 때
-            case MotionEvent.ACTION_MOVE:
-//                Log.i("draw", "actionmove called.");
-                //scrollview에 영향을 안받고 draw 기능 적용
-                this.getParent().requestDisallowInterceptTouchEvent(true);
-                //touchMove() 메소드 호출
-                rect = touchMove(event);
-
-                //화면을 갱신한다.
-                if (rect != null) {
-                    invalidate(rect);
-                }
-               /* this.getParent().requestDisallowInterceptTouchEvent(true);
-                touchMove(event);
-                invalidate();*/
-
-                return true;
-        }
-
-        return false;
-    }
+    // 2015-05-17 윤동수 수정
+    // PaintOnTouchLIstener 클래스로 옮겼다.
+    // this.setOnTouchListener(new PaintOnTouchListener() )
+//    /**
+//     * Handles touch event, UP, DOWN and MOVE(for drawing)
+//    public boolean  onTouchEvent(MotionEvent event) {
+//
+//
+//        return false;
+//    }*/
 
 
 
@@ -878,6 +839,110 @@ public class PaintBoard extends View {
             return false;
         }
     }
+
+    private class PaintOnTouchListener implements OnTouchListener {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            int action = event.getAction();
+
+            switch (action) {
+                //손을 떼었을 때
+                case MotionEvent.ACTION_UP:
+//                Log.i("draw", "actionup called.");
+                    changed = true;
+                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                    //touchUp 메소드 호출
+                    Rect rect = touchUp(event, false);
+                    //s = null;   // Stroke 인스턴스 삭제
+
+                    //화면을 갱신한다.
+                    if (rect != null) {
+                        invalidate(rect);
+                    }
+               /* this.getParent().requestDisallowInterceptTouchEvent(true);
+                touchUp(event,false);
+                invalidate();*/
+
+                    //Path 객체 초기화
+                    mPath.rewind();
+
+                    // undo 목록에 넣기
+                    Bitmap img = Bitmap.createBitmap(mBitmapWrite.getWidth(), mBitmapWrite.getHeight(), Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas();
+                    canvas.setBitmap(img);
+                    canvas.drawBitmap(mBitmapWrite, 0, 0, null);
+                    undo.addList(img);
+
+                    return true;
+                //화면에 손을 댔을 때
+                case MotionEvent.ACTION_DOWN:
+//                Log.i("draw", "actiondown called.");
+
+                    if (mBitmapWrite == null){
+                        ;
+                    }
+                    //scrollview에 영향을 안받고 draw 기능 적용
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    //touchDown()메소드 호출
+                    rect = touchDown(event);
+
+
+                    //화면을 갱신한다.
+                    if (rect != null) {
+                        invalidate(rect);
+                    }
+
+
+                    Log.i("!!!", "push 됨?");
+
+               /* this.getParent().requestDisallowInterceptTouchEvent(true);
+                touchDown(event);
+                invalidate();*/
+
+                    if(undo.size()==0)
+                    {
+                        // undo 목록에 넣기
+                        img = Bitmap.createBitmap(mBitmapWrite.getWidth(), mBitmapWrite.getHeight(), Bitmap.Config.ARGB_8888);
+                        canvas = new Canvas();
+                        canvas.setBitmap(img);
+                        canvas.drawBitmap(mBitmapWrite, 0, 0, null);
+                        undo.addList(img);
+                    }
+
+                    //===================================
+                    //터치 관련 처리
+                    //===================================
+                    //좌표값 저장
+                    x = event.getRawX();
+                    y = event.getRawY();
+                    //터치 상태
+                    istouched = true;
+                    touchx = x; touchy =y;
+                    String msg = "터치를 입력받음 : " + x + " / " + y;
+                    Log.d(TAG,msg);
+                    return true;
+                //움직일 때
+                case MotionEvent.ACTION_MOVE:
+//                Log.i("draw", "actionmove called.");
+                    //scrollview에 영향을 안받고 draw 기능 적용
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    //touchMove() 메소드 호출
+                    rect = touchMove(event);
+
+                    //화면을 갱신한다.
+                    if (rect != null) {
+                        invalidate(rect);
+                    }
+               /* this.getParent().requestDisallowInterceptTouchEvent(true);
+                touchMove(event);
+                invalidate();*/
+
+                    return true;
+            }
+            return false;
+        }
+    }
+
 
 //        @Override
 //    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec){

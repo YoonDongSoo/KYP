@@ -6,11 +6,144 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="yu.kyp.MemoWriteActivity2">
 
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/holo_blue_dark"
+        android:padding="10dp"
+        android:id="@+id/top_relative">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="저장"
+            android:id="@+id/buttonSave"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="LMT 메모장"
+            android:id="@+id/textView16"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="설정"
+            android:id="@+id/buttonSetting"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/top_relative"
+        android:id="@+id/for_sizeNcolor"
+        android:background="#ffffff"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textviewsize"
+
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttoncolor" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/top_relative"
+        android:id="@+id/relativeSubmenu">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="그림"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/buttonPicture" />
+
+    </RelativeLayout>
+
+
     <view
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         class="yu.kyp.image.TouchImageView"
         android:id="@+id/touchViewPaint"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/relativeSubmenu"
+        android:layout_above="@+id/bottom_linear"
+        android:padding="2dp" />
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/holo_blue_dark"
+        android:padding="10dp"
+        android:id="@+id/bottom_linear">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="←"
+            android:id="@+id/buttonBack"
+            android:layout_weight="1" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="T"
+            android:id="@+id/buttonText"
+            android:layout_weight="1" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="펜"
+            android:id="@+id/buttonPen"
+            android:layout_weight="1"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="지우"
+            android:id="@+id/buttonEraser"
+            android:layout_weight="1"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="알람"
+            android:id="@+id/buttonAlarm"
+            android:layout_weight="1" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="und"
+            android:id="@+id/buttonUndo"
+            android:layout_weight="1"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="scr"
+            android:id="@+id/buttonScroll"
+            android:layout_weight="1"
+            android:onClick="buttonScroll_OnClick"/>
+    </LinearLayout>
+
 </RelativeLayout>

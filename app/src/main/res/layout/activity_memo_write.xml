@@ -67,7 +67,8 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/top_relative">
+        android:layout_below="@+id/top_relative"
+        android:id="@+id/relativeSubmenu">
 
         <Button
             android:layout_width="wrap_content"
@@ -80,28 +81,14 @@
         </RelativeLayout>
 
 
-
-    <HorizontalScrollView
-        android:id="@+id/horScrollView"
-        android:layout_below="@id/for_sizeNcolor"
+    <view
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        >
-        <ScrollView
-            android:id="@+id/scrollView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
-            <FrameLayout
-                android:id="@+id/boardLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                >
-            </FrameLayout>
-        </ScrollView>
-    </HorizontalScrollView>
+        class="yu.kyp.PaintBoard"
+        android:id="@+id/paintBoard"
+        android:layout_below="@+id/relativeSubmenu"
+        android:layout_above="@+id/bottom_linear"
+        android:padding="2dp" />
 
     <LinearLayout
         android:orientation="horizontal"
