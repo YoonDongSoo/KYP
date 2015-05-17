@@ -31,12 +31,20 @@ public class PenPaletteActivity extends Activity {
 
     private static final String TAG = ColorPickerDialog.class.getSimpleName();
     private static final int REQUEST_PEN_SIZE = 3;
+    private static final int REQUEST_ENABLE_BT = 1;
+    private static final int REQUEST_CURRENT_SIZE = 4;
+    private static final int REQUEST_ALPHA = 5;
+    private static SharedPreferences sp;
+    private static SharedPreferences for_alpha;
+    private Context mainContext=this;
+
     GridView colorgrid;
     GridView sizegrid;
     GridView neonPen;
     Button othersBtn;
     Button selectBtn;
     SeekBar sizeSeekBar;
+    SeekBar alphaSeekBar;
     PenDataAdapter penadapter;
     ColorDataAdapter coloradapter;
     RecentColorAdapter recentcoloradapter;
@@ -44,16 +52,19 @@ public class PenPaletteActivity extends Activity {
     Paint mPaint;
     GridView recent_color_grid;
     MemoWriteActivity memowriteactivity;
+    PaintBoard paintBoard;
     ArrayList<Integer> recent_color_list = new ArrayList<Integer>();
-
-
+    static int current_size;
+    static int progress_state = 0;          //펜사이즈
+    static int progress_state2 = 0;         //알파값
+    static int p_size_value = 0;
 
 
     public static OnPenSelectedListener penlistener;
     public static OnColorSelectedListener colorlistener;
     public static OnCompleteSelectedListener completelistener;
     public static OnRecentColorSelectedListener recentcolorlistener;
-//    public static OnCancelSelectedListener cancellistner;
+    //    public static OnCancelSelectedListener cancellistner;
     public static OnNeonColorSelectedListener neoncolorlistener;
 
     public ColorPickerDialog.OnColorChangedListener colorChangedListener = new ColorPickerDialog.OnColorChangedListener() {
@@ -101,7 +112,7 @@ public class PenPaletteActivity extends Activity {
         setContentView(R.layout.pendialog);
 
         memowriteactivity = new MemoWriteActivity();
-
+        paintBoard = new PaintBoard(this);
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
@@ -127,6 +138,28 @@ public class PenPaletteActivity extends Activity {
         neonPen = (GridView) findViewById(R.id.neonPen);
         //사이즈 시크바
         sizeSeekBar = (SeekBar) findViewById(R.id.sizeSeekBar);
+        //투명도 시크바
+        alphaSeekBar = (SeekBar) findViewById(R.id.alphaSeekBar);
+
+        sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
+        p_size_value = sp.getInt("p_size_value",0);
+        Toast.makeText(PenPaletteActivity.this,"펜팔레트에서의 사이즈" + p_size_value,Toast.LENGTH_SHORT).show();
+        if(p_size_value != 2) {
+            sizeSeekBar.setProgress(p_size_value);
+        }
+
+        //펜 사이즈 시크바가 움직이지 않았을 경우(터치가 아예 안되었을 경우)
+        Intent i = new Intent();
+        progress_state = 0;
+        i.putExtra("p_size",progress_state);
+        setResult(REQUEST_PEN_SIZE,i);
+
+        Intent i2 = new Intent();
+        progress_state2 = 255;
+        i2.putExtra("alpha_size",progress_state2);
+        setResult(REQUEST_ALPHA,i2);
+
+        //펜 사이즈 시크바가 터치되었을 경우
         sizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -134,7 +167,9 @@ public class PenPaletteActivity extends Activity {
                 // Seekbar의 움직임이 멈춘다면 실행될 사항
                 // seekbar는 해당 Seekbar를 의미함.
                 Intent i = new Intent();
-                i.putExtra("size",sizeSeekBar.getProgress());
+//                int current_progress = sizeSeekBar.getProgress();
+                progress_state = sizeSeekBar.getProgress();
+                i.putExtra("p_size",progress_state);
 
                 Toast.makeText(PenPaletteActivity.this,"seekbar: " + sizeSeekBar.getProgress(), Toast.LENGTH_LONG).show();
 
@@ -151,9 +186,40 @@ public class PenPaletteActivity extends Activity {
             }
         });
 
+        //투명도 시크바가 터치되었을 경우
+        alphaSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+                // Seekbar의 움직임이 멈춘다면 실행될 사항
+                // seekbar는 해당 Seekbar를 의미함.
+                progress_state2 = alphaSeekBar.getProgress();
 
+                Intent i2 = new Intent();
+                i2.putExtra("alpha_size",progress_state2);
+                setResult(REQUEST_ALPHA,i2);
 
-                othersBtn = (Button) findViewById(R.id.othersBtn);
+                Toast.makeText(PenPaletteActivity.this,"투명도 seekbar: " + alphaSeekBar.getProgress(), Toast.LENGTH_SHORT).show();
+
+                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+                SharedPreferences.Editor editor2 = for_alpha.edit();
+                editor2.putInt("alpha_value_is",progress_state2);
+                editor2.commit();
+
+                paintBoard.set_alpha(progress_state2);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        othersBtn = (Button) findViewById(R.id.othersBtn);
         selectBtn = (Button) findViewById(R.id.selectBtn);
 
         colorgrid.setColumnWidth(14);
@@ -167,7 +233,8 @@ public class PenPaletteActivity extends Activity {
         colorgrid.setNumColumns(coloradapter.getNumColumns());
 
         //사이즈
-        sizeSeekBar.setMax(100);
+        sizeSeekBar.setMax(50);
+
 
 //        sizegrid.setColumnWidth(14);
 //        sizegrid.setBackgroundColor(Color.GRAY);
@@ -226,15 +293,16 @@ public class PenPaletteActivity extends Activity {
 //        System.out.println("color : " + color);
 //        mPaint.setColor(color);
 //    }
+
 }
 
 
 
 /**
-* Adapter for Pen Data
-*
-* @author Mike
-*/
+ * Adapter for Pen Data
+ *
+ * @author Mike
+ */
 class PenDataAdapter implements SeekBar.OnSeekBarChangeListener{
     /**
      * Application Context
@@ -425,7 +493,7 @@ class NeonPenDataAdapter extends BaseAdapter {
 
     //형광펜의 색상 선택을 위한 Int형 색상 배열 생성
     public static final int [] neoncolors = new int[] {
-            0xffe8ff2a,0xffff4242,0xffff9500,0xfff20f62,0xffff099c,0xff7fff24,0xffaa26fc
+            0xffe8ff2a,0xffff4242,0xffff9500,0xff00b4ff,0xffff099c,0xff7fff24,0xffaa26fc
     };
 
     int rowCount;
@@ -661,4 +729,19 @@ class RecentColorAdapter extends BaseAdapter{
         //선택한 것을 리턴
         return aItem;
     }
+
+//    @Override
+//    public void onBackPressed() {
+//
+//        super.onBackPressed();
+//
+//    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event){
+//        switch(keyCode){
+//            case KeyEvent.KEYCODE_BACK:
+//                break;
+//        }
+//        finish();
+//    }
 }

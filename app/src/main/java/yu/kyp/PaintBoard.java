@@ -1,6 +1,7 @@
 package yu.kyp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -93,6 +94,7 @@ public class PaintBoard extends View {
 
     static int temp_color;
     static int temp_thickness;
+    static int temp_alpha = 255;
 
     private float sx = 1f;
     private float sy = 1f;
@@ -101,6 +103,8 @@ public class PaintBoard extends View {
     private float lastXF = 0f;
     private float lastYF  = 0f;
     private float top, bottom, left, right;
+
+    private static SharedPreferences for_alpha;
     /**
      * 화면 터치가 되면? 터치한 위치를 중심으로 줌인아웃
      * 화면 터기가 되지 않으면? 화면 중앙을 중심으로 줌인아웃
@@ -316,7 +320,8 @@ public class PaintBoard extends View {
         mPaint.setTextSize(scaledSize);
 //        textdialog = new TextDialog();
 
-        lastX = -1;
+
+                lastX = -1;
         lastY = -1;
 
         //Log.i("GoodPaintBoard", "initialized.");
@@ -578,28 +583,22 @@ public class PaintBoard extends View {
      */
     public boolean  onTouchEvent(MotionEvent event) {
         int action = event.getAction();
+        float touchX = event.getX();
+        float touchY = event.getY();
+
+        mPaint.setAlpha(temp_alpha);
+//        mPaint.setAlpha(255);
 
         switch (action) {
             //손을 떼었을 때
             case MotionEvent.ACTION_UP:
-//                Log.i("draw", "actionup called.");
-                changed = true;
-
                 this.getParent().requestDisallowInterceptTouchEvent(false);
-                //touchUp 메소드 호출
-                Rect rect = touchUp(event, false);
-                //s = null;   // Stroke 인스턴스 삭제
 
-                //화면을 갱신한다.
-                if (rect != null) {
-                    invalidate(rect);
-                }
-               /* this.getParent().requestDisallowInterceptTouchEvent(true);
-                touchUp(event,false);
-                invalidate();*/
+                mPath.lineTo(touchX, touchY);
+                canvasWrite.drawPath(mPath,mPaint);
 
                 //Path 객체 초기화
-                mPath.rewind();
+                mPath.reset();
 
                 // undo 목록에 넣기
                 Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
@@ -608,33 +607,14 @@ public class PaintBoard extends View {
                 canvas.drawBitmap(mBitmap, 0, 0, null);
                 undo.addList(img);
 
-                return true;
+                break;
             //화면에 손을 댔을 때
             case MotionEvent.ACTION_DOWN:
-//                Log.i("draw", "actiondown called.");
 
-                if (mBitmap == null){
-                    ;
-                }
                 //scrollview에 영향을 안받고 draw 기능 적용
                 this.getParent().requestDisallowInterceptTouchEvent(true);
-                //touchDown()메소드 호출
-                rect = touchDown(event);
 
-
-                //화면을 갱신한다.
-                if (rect != null) {
-                    invalidate(rect);
-                }
-
-
-                mPaint.setAlpha(40);
-
-                Log.i("!!!", "push 됨?");
-
-               /* this.getParent().requestDisallowInterceptTouchEvent(true);
-                touchDown(event);
-                invalidate();*/
+                mPath.moveTo(touchX, touchY);
 
                 if(undo.size()==0)
                 {
@@ -646,179 +626,144 @@ public class PaintBoard extends View {
                     undo.addList(img);
                 }
 
-                //===================================
-                //터치 관련 처리
-                //===================================
-                //좌표값 저장
-                x = event.getRawX();
-                y = event.getRawY();
-                //터치 상태
-                istouched = true;
-                touchx = x; touchy =y;
-                String msg = "터치를 입력받음 : " + x + " / " + y;
-                Log.d(TAG,msg);
-                return true;
+
+                break;
             //움직일 때
             case MotionEvent.ACTION_MOVE:
-                mPaint.setAlpha(40);
 
 //                Log.i("draw", "actionmove called.");
                 //scrollview에 영향을 안받고 draw 기능 적용
                 this.getParent().requestDisallowInterceptTouchEvent(true);
-                //touchMove() 메소드 호출
-                rect = touchMove(event);
 
-                //화면을 갱신한다.
-                if (rect != null) {
-                    invalidate(rect);
-                }
-               /* this.getParent().requestDisallowInterceptTouchEvent(true);
-                touchMove(event);
-                invalidate();*/
+                mPath.lineTo(touchX, touchY);
 
-                return true;
+
+                break;
+            default:
+                return false;
+
+
         }
-
-        return false;
+        invalidate();
+        return true;
     }
 
 
 
-    /**
-     * Process event for touch down
-     *
-     * @param event
-     * @return
-     */
-    private Rect touchDown(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
-        int i;
-
-        //s = new Stroke();
-
-//        temp_x = x;
-//        temp_y = y;
-
-
-        // s.listPoint.add(new PointData(x, y));
-
-
-        lastX = x;
-        lastY = y;
-
-        //Path 정보를 초기화
-        mPath.reset();
-
-        Rect mInvalidRect = new Rect();
-        //Path객체에 현재 좌표값 추가
-        mPath.moveTo(x, y);
-        /**********************/
-
-        final int border = mInvalidateExtraBorder;
-        //다시 그려질 영역으로 현재 이동한 좌표 추가
-        mInvalidRect.set((int) x - border, (int) y - border, (int) x + border, (int) y + border);
-
-        mCurveEndX = x;
-        mCurveEndY = y;
-
-        //Path객체를 그린다.
-        canvasWrite.drawPath(mPath, mPaint);
-
-        return mInvalidRect;
-    }
-
-
-    /**
-     * Process event for touch move
-     *
-     * @param event
-     * @return
-     */
-    private Rect touchMove(MotionEvent event) {
-
-        Rect rect = processMove(event);
-
-        return rect;
-    }
-
-    private Rect touchUp(MotionEvent event, boolean cancel) {
-        Rect rect = processMove(event);
-        return rect;
-//        int i,j;
-//        int size;
-//
-//        stroke.add(new Stroke(temp_color,temp_thickness,s.listPoint));
-//
-//            for(i=0; i<stroke.size(); i++) {
-////            Log.i("i는","? " + i);
-//
-//                size = stroke.get(i).listPoint.size();
-//                Log.i("color", ", size" + stroke.get(i).color + ", " + stroke.get(i).thickness);
-//
-////            Log.i("size는","? " + size);
-//                for (j = 0; j < size; j++) {
-////                Log.i("터치업","" + stroke.get(i).listPoint.get(j).x + ", " + stroke.get(i).listPoint.get(j).y);
-//
-//                }
-//            }
+//    /**
+//     * Process event for touch down
+//     *
+//     * @param event
+//     * @return
+//     */
+//    private Rect touchDown(MotionEvent event) {
+//        float x = event.getX();
+//        float y = event.getY();
+//        int i;
 //
 //
-////        s.listPoint.clear();
-////        stroke.clear();
-    }
-
-    /**
-     * Process Move Coordinates
-     * x,y값을 mPath에 넣어서 라인을 quadTo를 사용해서 그린다
-     * lastX,lastY값을 사용한다
-     * @param event
-     * @return
-     */
-    private Rect processMove(MotionEvent event) {            /******************************/
-
+//
+//        mPath.moveTo(x, y);
+//
+//
+//        return mInvalidRect;
+//    }
+//
+//
+//    /**
+//     * Process event for touch move
+//     *
+//     * @param event
+//     * @return
+//     */
+//    private Rect touchMove(MotionEvent event) {
+//
+//        Rect rect = processMove(event);
+//
+//        return rect;
+//    }
+//
+//    private Rect touchUp(MotionEvent event, boolean cancel) {
+//
+//        Rect rect = processMove(event);
+//        return rect;
+////        int i,j;
+////        int size;
+////
+////        stroke.add(new Stroke(temp_color,temp_thickness,s.listPoint));
+////
+////            for(i=0; i<stroke.size(); i++) {
+//////            Log.i("i는","? " + i);
+////
+////                size = stroke.get(i).listPoint.size();
+////                Log.i("color", ", size" + stroke.get(i).color + ", " + stroke.get(i).thickness);
+////
+//////            Log.i("size는","? " + size);
+////                for (j = 0; j < size; j++) {
+//////                Log.i("터치업","" + stroke.get(i).listPoint.get(j).x + ", " + stroke.get(i).listPoint.get(j).y);
+////
+////                }
+////            }
+////
+////
+//////        s.listPoint.clear();
+//////        stroke.clear();
+//    }
+//
+//    /**
+//     * Process Move Coordinates
+//     * x,y값을 mPath에 넣어서 라인을 quadTo를 사용해서 그린다
+//     * lastX,lastY값을 사용한다
+//     * @param event
+//     * @return
+//     */
+//    private Rect processMove(MotionEvent event) {            /******************************/
+//
+////        //테스트 중
+////        mPaint.setAlpha(40);
+////        final float x = event.getX();
+////        final float y = event.getY();
+////        PointData p = new PointData(x, y);
+////        s.listPoint.add(p);
+////        Rect mInvalidRect = drawPointData(p, mPath, mPaint);
+////
 //        final float x = event.getX();
 //        final float y = event.getY();
-//        PointData p = new PointData(x, y);
-//        s.listPoint.add(p);
-//        Rect mInvalidRect = drawPointData(p, mPath, mPaint);
 //
-        final float x = event.getX();
-        final float y = event.getY();
-
-        final float dx = Math.abs(x - lastX);
-        final float dy = Math.abs(y - lastY);
-
-        Rect mInvalidRect = new Rect();
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            final int border = mInvalidateExtraBorder;
-            //다시 그려질 영역으로 현재 이동한 좌표 추가
-            mInvalidRect.set((int) mCurveEndX - border, (int) mCurveEndY - border,
-                    (int) mCurveEndX + border, (int) mCurveEndY + border);
-
-            float cX = mCurveEndX = (x + lastX) / 2;
-            float cY = mCurveEndY = (y + lastY) / 2;
-
-            //Path 객체에 현재 좌표값을 곡선으로 추가
-            mPath.quadTo(lastX, lastY, cX, cY);
-
-            // union with the control point of the new curve
-            mInvalidRect.union((int) lastX - border, (int) lastY - border,
-                    (int) lastX + border, (int) lastY + border);
-
-            // union with the end point of the new curve
-            mInvalidRect.union((int) cX - border, (int) cY - border,
-                    (int) cX + border, (int) cY + border);
-
-            lastX = x;
-            lastY = y;
-
-            //Path객체를 그린다.
-            canvasWrite.drawPath(mPath, mPaint);
-        }
-
-        return mInvalidRect;
-    }
+//        final float dx = Math.abs(x - lastX);
+//        final float dy = Math.abs(y - lastY);
+//
+//        Rect mInvalidRect = new Rect();
+//        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+//            final int border = mInvalidateExtraBorder;
+//            //다시 그려질 영역으로 현재 이동한 좌표 추가
+//            mInvalidRect.set((int) mCurveEndX - border, (int) mCurveEndY - border,
+//                    (int) mCurveEndX + border, (int) mCurveEndY + border);
+//
+//            float cX = mCurveEndX = (x + lastX) / 2;
+//            float cY = mCurveEndY = (y + lastY) / 2;
+//
+//            mPaint.setAlpha(20);
+//            //Path 객체에 현재 좌표값을 곡선으로 추가
+//            mPath.quadTo(lastX, lastY, cX, cY);
+//
+//            // union with the control point of the new curve
+//            mInvalidRect.union((int) lastX - border, (int) lastY - border,
+//                    (int) lastX + border, (int) lastY + border);
+//
+//            // union with the end point of the new curve
+//            mInvalidRect.union((int) cX - border, (int) cY - border,
+//                    (int) cX + border, (int) cY + border);
+//
+//            lastX = x;
+//            lastY = y;
+//
+//            //Path객체를 그린다.
+//            canvasWrite.drawPath(mPath, mPaint);
+//        }
+//
+//        return mInvalidRect;
+//    }
 
 //    /**
 //     * x,y값을 mPath에 넣어서 라인을 quadTo를 사용해서 그린다
@@ -877,6 +822,9 @@ public class PaintBoard extends View {
         } catch (Exception e) {
             return false;
         }
+    }
+    public void set_alpha(int alpha_value){
+        temp_alpha = alpha_value;
     }
 
 //        @Override
