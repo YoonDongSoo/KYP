@@ -10,7 +10,6 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -34,7 +33,9 @@ public class PenPaletteActivity extends Activity {
     private static final int REQUEST_PEN_SIZE = 3;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_CURRENT_SIZE = 4;
+    private static final int REQUEST_ALPHA = 5;
     private static SharedPreferences sp;
+    private static SharedPreferences for_alpha;
     private Context mainContext=this;
 
     GridView colorgrid;
@@ -43,6 +44,7 @@ public class PenPaletteActivity extends Activity {
     Button othersBtn;
     Button selectBtn;
     SeekBar sizeSeekBar;
+    SeekBar alphaSeekBar;
     PenDataAdapter penadapter;
     ColorDataAdapter coloradapter;
     RecentColorAdapter recentcoloradapter;
@@ -50,9 +52,11 @@ public class PenPaletteActivity extends Activity {
     Paint mPaint;
     GridView recent_color_grid;
     MemoWriteActivity memowriteactivity;
+    PaintBoard paintBoard;
     ArrayList<Integer> recent_color_list = new ArrayList<Integer>();
     static int current_size;
-    static int progress_state = 0;
+    static int progress_state = 0;          //펜사이즈
+    static int progress_state2 = 0;         //알파값
     static int p_size_value = 0;
 
 
@@ -108,7 +112,7 @@ public class PenPaletteActivity extends Activity {
         setContentView(R.layout.pendialog);
 
         memowriteactivity = new MemoWriteActivity();
-
+        paintBoard = new PaintBoard(this);
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
@@ -134,6 +138,8 @@ public class PenPaletteActivity extends Activity {
         neonPen = (GridView) findViewById(R.id.neonPen);
         //사이즈 시크바
         sizeSeekBar = (SeekBar) findViewById(R.id.sizeSeekBar);
+        //투명도 시크바
+        alphaSeekBar = (SeekBar) findViewById(R.id.alphaSeekBar);
 
         sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
         p_size_value = sp.getInt("p_size_value",0);
@@ -142,13 +148,18 @@ public class PenPaletteActivity extends Activity {
             sizeSeekBar.setProgress(p_size_value);
         }
 
-        //시크바가 움직이지 않았을 경우
+        //펜 사이즈 시크바가 움직이지 않았을 경우(터치가 아예 안되었을 경우)
         Intent i = new Intent();
         progress_state = 0;
         i.putExtra("p_size",progress_state);
         setResult(REQUEST_PEN_SIZE,i);
 
-        //시크바가 터치되었을 경우
+        Intent i2 = new Intent();
+        progress_state2 = 255;
+        i2.putExtra("alpha_size",progress_state2);
+        setResult(REQUEST_ALPHA,i2);
+
+        //펜 사이즈 시크바가 터치되었을 경우
         sizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -163,6 +174,39 @@ public class PenPaletteActivity extends Activity {
                 Toast.makeText(PenPaletteActivity.this,"seekbar: " + sizeSeekBar.getProgress(), Toast.LENGTH_LONG).show();
 
                 setResult(REQUEST_PEN_SIZE,i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        //투명도 시크바가 터치되었을 경우
+        alphaSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+                // Seekbar의 움직임이 멈춘다면 실행될 사항
+                // seekbar는 해당 Seekbar를 의미함.
+                progress_state2 = alphaSeekBar.getProgress();
+
+                Intent i2 = new Intent();
+                i2.putExtra("alpha_size",progress_state2);
+                setResult(REQUEST_ALPHA,i2);
+
+                Toast.makeText(PenPaletteActivity.this,"투명도 seekbar: " + alphaSeekBar.getProgress(), Toast.LENGTH_SHORT).show();
+
+                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+                SharedPreferences.Editor editor2 = for_alpha.edit();
+                editor2.putInt("alpha_value_is",progress_state2);
+                editor2.commit();
+
+                paintBoard.set_alpha(progress_state2);
             }
 
             @Override

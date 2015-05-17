@@ -36,8 +36,10 @@ public class MemoWriteActivity extends BlunoLibrary {
     private static final int REQUEST_DRAW_TEXT = 2;
     private static final int REQUEST_PEN_SIZE = 3;
     private static final int REQUEST_ERASER_SIZE = 4;
+    private static final int REQUEST_ALPHA = 5;
     private static SharedPreferences sp;
     private static SharedPreferences sp2;
+    private static SharedPreferences for_alpha;
 
     private StringBuffer strBuffer = new StringBuffer();
     private NoteManager noteManager = null;
@@ -872,9 +874,12 @@ public class MemoWriteActivity extends BlunoLibrary {
                 editor.commit();
 
 
+
+
                 paintboard.updatePaintProperty(mColor, pen_size);
                 //화면의 좌측 상단에 선택한 색상을 표시한다.
                 displayPaintProperty();
+
             }
         }
         if(requestCode == REQUEST_ERASER_SIZE){
@@ -894,8 +899,16 @@ public class MemoWriteActivity extends BlunoLibrary {
                 oldColor = mColor;
 
                 paintboard.setEraserPaint(mSize);
+
                 //화면의 좌측 상단에 선택한 사이즈를 표시한다.
                 displayPaintProperty();
+            }
+        }
+        if(requestCode == REQUEST_ALPHA){
+            if(data.getIntExtra("alpha_size",0) != 0) {
+                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+                Toast.makeText(MemoWriteActivity.this, "알파값 넘어왔네~" + for_alpha.getInt("alpha_value_is",0), Toast.LENGTH_SHORT).show();
+                paintboard.set_alpha(for_alpha.getInt("alpha_value_is",0));
             }
         }
     }
