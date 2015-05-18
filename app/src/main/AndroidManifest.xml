@@ -38,10 +38,12 @@
         </activity>
         <activity
             android:name=".PenPaletteActivity"
+            android:theme="@android:style/Theme.Dialog"
             android:label="@string/pen_palette_dialog" >
         </activity>
         <activity
             android:name=".EraserPaletteActivity"
+            android:theme="@android:style/Theme.Dialog"
             android:label="" >
         </activity>
 
@@ -53,8 +55,22 @@
             android:name=".test.ZoomActivity"
             android:label="@string/title_activity_zoom" >
         </activity>
+        
 
 
+        <activity
+            android:name=".TextDialog"
+            android:label=""
+            android:theme="@android:style/Theme.Dialog">
+        </activity>
+        <activity
+            android:name=".TrashActivity"
+            android:label="@string/title_activity_trash"
+            android:parentActivityName=".common.activity.ActivityBase" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="yu.kyp.common.activity.ActivityBase" />
+        </activity>
     </application>
 
 </manifest>

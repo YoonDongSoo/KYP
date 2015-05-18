@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 import yu.kyp.image.UndoList;
 
@@ -38,6 +39,7 @@ public class PaintBoard extends View {
     //추가
 
     private boolean mEraserMode = false;
+    private boolean mTextMode = false;
     /**
      * Undo data
      */
@@ -129,6 +131,8 @@ public class PaintBoard extends View {
      * 이 함수 안에서 view의 크기를 구해서 입력해둔다.
      * @param hasWindowFocus
      */
+
+    TextDialog textdialog;
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
@@ -162,11 +166,75 @@ public class PaintBoard extends View {
         Log.i("!!!!","testh"+y);
     }
 
+    private float getFixedX(float x, float scaleX) {
+
+        return (x-(1-scaleX)*lastXF)/scaleX;
+
+    }
+    private float getFixedY(float y, float scaleY) {
+
+        return (y-(1-scaleY)*lastYF)/scaleY;
+    }
+    /**
+     * PaintBoard View를 원래상태로 리셋한다.
+     */
+    public void zoomResetBitmap() {
+        globalX=0f; globalY=top;
+        scalewidth=width; scaleheight=height;
+        istouched = false;
+
+
+        Paint paintLine = new Paint();  // 선을 긋기 위한 페인트 생성
+        paintLine.setARGB(70, 255, 0, 0);
+        paintLine.setStrokeWidth(5);  // 굵기
+
+        sx = 1f;
+        sy = 1f;
+
+        //매트릭스를 만들어 화면 중앙을 중심으로 100% 배율로 확대한다.
+        Matrix zoom = new Matrix();
+        zoom.postScale(sx, sy, right / 2, (bottom - top) / 2);
+
+        //매트릭스를 사용하여 마지막에 저장된 비트맵에 그린다.
+        Bitmap bitmap = undo.getLast();
+        drawBackground(canvasWrite);
+        canvasWrite.drawBitmap(bitmap, zoom, mPaint);
+        canvasWrite.drawLine(0, (bottom - top) / 2, right, (bottom - top) / 2, paintLine);
+        canvasWrite.drawLine(right / 2, 0, right / 2, bottom, paintLine);
+
+        invalidate();
+    }
 
 
 
+    class Stroke{
+        //int stroke_no;
+        int color;
+        int thickness;
+        ArrayList<PointData> listPoint = new ArrayList<PointData>();
+        Stroke(){};
+        Stroke(int temp_color, int temp_thickness, ArrayList<PointData> temp_pointdata){
+            color=temp_color;
+            thickness= temp_thickness;
+            listPoint = temp_pointdata;
+        }
 
+    }
+    class PointData{
+        //int point_no;
+        //int stroke_no;
+        float x;
+        float y;
+        PointData(){};
+        PointData(float temp_x,float temp_y){
+            x=temp_x;
+            y=temp_y;
+        }
+    }
 
+    ArrayList<Stroke> stroke = new ArrayList<Stroke>();
+    Stroke s = new Stroke();
+//    Path for_draw = new Path();
 
 
 
@@ -176,6 +244,7 @@ public class PaintBoard extends View {
      */
     public PaintBoard(Context context) {
         super(context);
+        int scaledSize = getResources().getDimensionPixelSize(R.dimen.font_size);
 
         // create a new paint object
         mPaint = new Paint();
@@ -186,6 +255,8 @@ public class PaintBoard extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(mStrokeWidth);
         mPaint.setDither(DITHER_FLAG);      //이미지보다 장비의 표현력이 떨어질때 이미지 색상을 낮추어 출력
+        mPaint.setTextSize(scaledSize);
+        textdialog = new TextDialog();
 
 
         lastX = -1;
@@ -193,7 +264,6 @@ public class PaintBoard extends View {
 
         //Log.i("GoodPaintBoard", "initialized.");
     }
-
 
 
     /**
@@ -226,15 +296,82 @@ public class PaintBoard extends View {
         //캔버스의 배경색 설정
         canvas.drawColor(Color.WHITE);
 
-        // if (canvas != null) {
+       // if (canvas != null) {
         //    canvas.drawColor(Color.BLACK);                       //캔버스의 배경색 설정
-        // }
+       // }
         canvas.drawColor(Color.WHITE);
-        //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+       //bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 
-        // canvas.drawBitmap(bitmap,0,0,null);
+       // canvas.drawBitmap(bitmap,0,0,null);
     }
 
+    /**
+     * print EditText's string
+     * @param x
+     * @param y
+     */
+    public void drawText(String str,float x, float y){
+//        super.onDraw(canvas);
+
+//        Log.i("onDraw","");
+//        Log.d("!!!!!!!!!!","ondraw");
+
+        //canvasBackground.drawBitmap(mBitmap, 0, 0, null);
+        //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        mPaint.setStyle(Paint.Style.FILL);
+        canvasWrite.drawColor(Color.TRANSPARENT);
+//
+////        Rect rt = new Rect();
+////        mPaint.getTextBounds(str,0,str.length(),rt);
+////        rt.set((int) x, (int) y + rt.top, (int) x + rt.width(), (int) y + rt.bottom);
+////        canvasWrite.drawRect(rt,ptRound);
+        canvasWrite.drawText(str,x,y,mPaint);
+        mPaint.setStyle(Paint.Style.STROKE);
+//        mTextMode = true;
+    }
+
+    /***
+     * Update paint properties
+     * @param color
+     * @param size
+     */
+    public void updatePaintProperty(int color, int size)
+    {
+        //지우개 모드를 false로 변경
+        mEraserMode = false;
+        mPaint.setXfermode(null);
+        mPaint.setAlpha(0xFF);
+
+        //전달받은 색상과 크기 적용
+        mPaint.setColor(color);
+        Log.v("!!!","pen color"+color);
+        mPaint.setStrokeWidth(size);
+        temp_color=color;
+        temp_thickness=size;
+        //Log.d("!!!!!!!!!!","값 나오는 중"+temp_color);
+    }
+
+    /**
+     * 지우개 기능
+     * @param size
+     */
+    public void setEraserPaint(int size) {
+        Log.d("!!!!","지우개모드들어옴");
+        //지우개 모드를 true로 바꾼다.
+        mEraserMode=true;
+
+        //setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR)) -> 검은색 펜
+        // 을 이용하여 지우개와 동일한 기능을 사용할 수 있다.
+        mPaint.setXfermode(null);
+        mPaint.setAlpha(0);
+        mPaint.setXfermode(new PorterDuffXfermode(
+                PorterDuff.Mode.CLEAR));
+        //지우개 크기 적용
+        mPaint.setStrokeWidth(size);
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeWidth(size);
+        //temp_thickness=size;
+    }
     /**
      * Create a new image
      * 배경을 위한 canvas를 제일 밑부분에 깔고 그위에 손글씨를 작성할 canvas를 생성한다.
@@ -364,227 +501,10 @@ public class PaintBoard extends View {
         if(!mEraserMode)
             canvas.drawPath(mPath, mPaint);
         //비트맵을 화면에 그린다.
-        // canvas.drawBitmap(mBitmap, 0, 0, null);
-        // if(iszoom==false) {
         canvas.drawBitmap(mBitmap, 0, 0, null);
-        Log.i("!!!", "false_ondraw");
-        Log.i("!!!", "mBitmap w"+mBitmap.getWidth());
-        Log.i("!!!", "mBitmap h"+mBitmap.getHeight());
 
-        //    }
-        //    else {
-        //        canvas.drawBitmap(resize, 0, 0, null);
-        Log.i("!!!", "true_ondraw");
-        //  }
 
     }
-    /**
-     * PaintBoard View를 25% 확대한다.
-     */
-    public void zoomInBitmap() {
-        zoomBitmap(0.25f);
-    }
-    /**
-     * PaintBoard View를 25% 축소한다.
-     */
-    public void zoomOutBitmap() {
-        zoomBitmap(-0.25f);
-    }
-
-    /**
-     * 비율을 받아 PaintBoard View를 원하는 위치에서 확대/축소한다.
-     */
-    public void zoomBitmap(float additionalFactor) {
-        iszoom =true;
-
-        // 배율이 25% 밑으로 떨어지지 않도록 처리.
-        if(sx+additionalFactor <= 0f || sy+additionalFactor<= 0f)
-            return;
-        // 배율이 100%보다 작을 때에는 이미지를 center에 놓이도록 한다.
-        if(sx+additionalFactor < 1f || sy+additionalFactor< 1f)
-        {
-            x = right/2;
-            y = bottom/2;
-
-        }
-
-        Paint paintLine = new Paint();  // 선을 긋기 위한 페인트 생성
-        paintLine.setARGB(70, 255, 0, 0);
-        paintLine.setStrokeWidth(5);  // 굵기
-
-        float[] values = new float[9];
-        int x1, y1, x2, y2;
-
-        //배율값을 계속 더해줘서 배율값만큼 계속 확대/축소가 되도록한다.
-        sx += additionalFactor;
-        sy += additionalFactor;
-
-
-        //글쓰기 화면의 canvas를 배경으로 둔다.
-        drawBackground(canvasWrite);
-        Bitmap bitmap = undo.getLast();
-
-        Log.i("!!!","undo 불러옴"+bitmap.getWidth());
-        Log.i("!!!","undo 불러옴"+bitmap.getHeight());
-        resize = Bitmap.createScaledBitmap(bitmap, (int)(width*sx),(int)(height*sy) ,true);
-
-        //터치값이 없을 경우 화면의 중앙을 중심으로 줌인/아웃
-        if(istouched==false)
-        {
-//            x= right/2;
-//            y = bottom/2;
-            x = resize.getWidth()/2;
-            y=(resize.getHeight()-top)/2;
-
-        }
-        float xF = getFixedX(x, sx - additionalFactor);
-        float yF = getFixedY(y, sy - additionalFactor);
-        Log.i("!!!","xF "+xF);
-        Log.i("!!!","yF "+yF);
-
-        // 배율이 100%보다 작을 때에는 이미지를 center에 놓이도록 한다.
-        if(sx+additionalFactor < 1f || sy+additionalFactor< 1f)
-        {
-            xF = right/2;
-            yF = bottom/2;
-        }
-
-        //터치한 위치를 중심으로 확대/축소를 하기위한 위치값 계산
-//        x1 =(int) ((1-sx)*xF);
-//        y1 = (int) (0*sy + (1-sy)*(yF));
-//        x2=(int)(width*sx +(1-sx)*xF);
-//        y2=(int)((height+0)*sy + (1-sy)*(yF));
-
-        //이미지 좌표 값
-//        globalX = x1;
-//        globalY = y1;
-//        int scalewidth = x2-x1;
-//        int scaleheight = y2-y1;
-
-        //마지막에 저장된 비트맵을 불러와 확대/축소하고 비트맵을 다시 그려준다.
-
-        //테스트
-
-        Log.i("!!!","resize width"+resize.getWidth());
-        Log.i("!!!","resize height"+resize.getHeight());
-//
-
-        x1 =(int) ((1-sx)*xF);
-        y1 = (int) (0*sy + (1-sy)*(yF));
-        x2=(int)(resize.getWidth()*sx +(1-sx)*xF);
-        y2=(int)((resize.getHeight()-top+0)*sy + (1-sy)*(yF));
-        Log.i("!!!!!!!!","x1 "+x1);
-        Log.i("!!!!!!!!","Y1 "+y1);
-        Log.i("!!!!!!!!","X2 "+x2);
-        Log.i("!!!!!!!!","Y2 "+y2);
-
-
-
-        //canvasWrite.setBitmap(resize);
-        canvasWrite.drawLine(0, (bottom - 0) / 2, right, (bottom - 0) / 2, paintLine);
-        canvasWrite.drawLine(right / 2, 0, right / 2, bottom, paintLine);
-        canvasWrite.drawRect(globalX, globalY, globalX+scalewidth, globalY+scaleheight, paintLine);   // 사각형
-        canvasWrite.drawBitmap(resize, null, new Rect(x1, y1, x2, y2), mPaint/*mPaint*/);
-        //canvasWrite.drawBitmap(resize, new Rect(0 ,0,(int)width, (int)height), new Rect(x1, y1, x2, y2), null/*mPaint*/);
-
-        //invalidate();
-
-
-        lastXF = xF;
-        lastYF = yF;
-
-        undo.addList(resize);
-//        Bitmap img = Bitmap.createBitmap((int)resize.getWidth(), (int)resize.getHeight(), Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas();
-//        canvas.setBitmap(img);
-//        canvas.drawBitmap(resize, 0, 0, null);
-        //undo.addList(resize);
-
-    }
-
-    private float getFixedX(float x, float scaleX) {
-
-        return (x-(1-scaleX)*lastXF)/scaleX;
-
-    }
-    private float getFixedY(float y, float scaleY) {
-
-        return (y-(1-scaleY)*lastYF)/scaleY;
-    }
-    /**
-     * PaintBoard View를 원래상태로 리셋한다.
-     */
-    public void zoomResetBitmap() {
-        globalX=0f; globalY=top;
-        scalewidth=width; scaleheight=height;
-        istouched = false;
-
-
-        Paint paintLine = new Paint();  // 선을 긋기 위한 페인트 생성
-        paintLine.setARGB(70, 255, 0, 0);
-        paintLine.setStrokeWidth(5);  // 굵기
-
-        sx = 1f;
-        sy = 1f;
-
-        //매트릭스를 만들어 화면 중앙을 중심으로 100% 배율로 확대한다.
-        Matrix zoom = new Matrix();
-        zoom.postScale(sx, sy, right / 2, (bottom - top) / 2);
-
-        //매트릭스를 사용하여 마지막에 저장된 비트맵에 그린다.
-        Bitmap bitmap = undo.getLast();
-        drawBackground(canvasWrite);
-        canvasWrite.drawBitmap(bitmap, zoom, mPaint);
-        canvasWrite.drawLine(0, (bottom - top) / 2, right, (bottom - top) / 2, paintLine);
-        canvasWrite.drawLine(right / 2, 0, right / 2, bottom, paintLine);
-
-        invalidate();
-    }
-
-
-    /***
-     * Update paint properties
-     * @param color
-     * @param size
-     */
-    public void updatePaintProperty(int color, int size)
-    {
-        //지우개 모드를 false로 변경
-        mEraserMode = false;
-        mPaint.setXfermode(null);
-        mPaint.setAlpha(0xFF);
-
-        //전달받은 색상과 크기 적용
-        mPaint.setColor(color);
-        Log.v("!!!","pen color"+color);
-        mPaint.setStrokeWidth(size);
-        temp_color=color;
-        temp_thickness=size;
-        //Log.d("!!!!!!!!!!","값 나오는 중"+temp_color);
-    }
-
-    /**
-     * 지우개 기능
-     * @param size
-     */
-    public void setEraserPaint(int size) {
-        Log.d("!!!!","지우개모드들어옴");
-        //지우개 모드를 true로 바꾼다.
-        mEraserMode=true;
-
-        //setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR)) -> 검은색 펜
-        // 을 이용하여 지우개와 동일한 기능을 사용할 수 있다.
-        mPaint.setXfermode(null);
-        mPaint.setAlpha(0);
-        mPaint.setXfermode(new PorterDuffXfermode(
-                PorterDuff.Mode.CLEAR));
-        //지우개 크기 적용
-        mPaint.setStrokeWidth(size);
-        mPaint.setAntiAlias(true);
-        mPaint.setStrokeWidth(size);
-        //temp_thickness=size;
-    }
-
 
     /**
      * Handles touch event, UP, DOWN and MOVE(for drawing)
@@ -605,8 +525,8 @@ public class PaintBoard extends View {
 
                 //화면을 갱신한다.
                 if (rect != null) {
-                    invalidate(rect);
-                }
+                invalidate(rect);
+            }
                /* this.getParent().requestDisallowInterceptTouchEvent(true);
                 touchUp(event,false);
                 invalidate();*/
@@ -615,21 +535,11 @@ public class PaintBoard extends View {
                 mPath.rewind();
 
                 // undo 목록에 넣기
-//                Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-//                Canvas canvas = new Canvas();
-//                canvas.setBitmap(img);
-//                canvas.drawBitmap(mBitmap, 0, 0, null);
-//                undo.addList(img);
-
-                Bitmap img;
-                Canvas canvas;
-
-                   img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                    canvas = new Canvas();
-                    canvas.setBitmap(img);
-                    canvas.drawBitmap(mBitmap, 0, 0, null);
-                    undo.addList(img);
-
+                Bitmap img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas();
+                canvas.setBitmap(img);
+                canvas.drawBitmap(mBitmap, 0, 0, null);
+                undo.addList(img);
 
                 return true;
             //화면에 손을 댔을 때
@@ -660,14 +570,11 @@ public class PaintBoard extends View {
                 if(undo.size()==0)
                 {
                     // undo 목록에 넣기
-
-
-                        img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                        canvas = new Canvas();
-                        canvas.setBitmap(img);
-                        canvas.drawBitmap(mBitmap, 0, 0, null);
-                        undo.addList(img);
-
+                    img = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                    canvas = new Canvas();
+                    canvas.setBitmap(img);
+                    canvas.drawBitmap(mBitmap, 0, 0, null);
+                    undo.addList(img);
                 }
 
                 //===================================
@@ -677,9 +584,7 @@ public class PaintBoard extends View {
                 x = event.getRawX();
                 y = event.getRawY();
                 //터치 상태
-
-                //테스트
-                //istouched = true;
+                istouched = true;
                 touchx = x; touchy =y;
                 String msg = "터치를 입력받음 : " + x + " / " + y;
                 Log.d(TAG,msg);
@@ -725,7 +630,7 @@ public class PaintBoard extends View {
 //        temp_y = y;
 
 
-        // s.listPoint.add(new PointData(x, y));
+       // s.listPoint.add(new PointData(x, y));
 
 
         lastX = x;
