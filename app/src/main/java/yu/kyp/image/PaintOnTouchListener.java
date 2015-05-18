@@ -1,8 +1,7 @@
 package yu.kyp.image;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
@@ -15,6 +14,7 @@ import android.view.View;
  */
 public class PaintOnTouchListener implements View.OnTouchListener {
 
+    private static final String TAG = PaintOnTouchListener.class.getSimpleName();
     public Path mPath = new Path();
     private float lastX = -1;
     private float lastY = -1;
@@ -42,15 +42,24 @@ public class PaintOnTouchListener implements View.OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        int action = event.getAction();
+        //======================================================
+        // 1. 스케일과 offset을 가져와서 touchX,touchY값 맞추기
+        float[] mv = new float[9];
+        Matrix matrix = ((TouchImageView)v).getImageMatrix();
+        matrix.getValues(mv);
+        float x = (event.getX()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_X]/mv[Matrix.MSCALE_Y]));
+        float y = (event.getY()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_Y]/mv[Matrix.MSCALE_Y]));
+        //Log.e(TAG,String.format("(%.0f,%.0f)->(%.0f,%.0f)",event.getX(),event.getY(),x,y));
 
-        switch (action) {
+        //======================================================
+        // 2. ACTION_UP ACTION_DOWN ACTION_MOVE 처리
+        switch (event.getAction()) {
             //손을 떼었을 때
             case MotionEvent.ACTION_UP:
                 //Log.i("draw", "actionup called.");
                 v.getParent().requestDisallowInterceptTouchEvent(false);
                 //touchUp 메소드 호출
-                Rect rect = touchUp(event, false);
+                Rect rect = touchUp(x,y, false);
                 //s = null;   // Stroke 인스턴스 삭제
 
                 //화면을 갱신한다.
@@ -79,7 +88,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
                     //scrollview에 영향을 안받고 draw 기능 적용
                     v.getParent().requestDisallowInterceptTouchEvent(true);
                     //touchDown()메소드 호출
-                    rect = touchDown(event);
+                    rect = touchDown(x,y);
 
 
                     //화면을 갱신한다.
@@ -117,7 +126,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
                     //scrollview에 영향을 안받고 draw 기능 적용
                     v.getParent().requestDisallowInterceptTouchEvent(true);
                     //touchMove() 메소드 호출
-                    rect = touchMove(event);
+                    rect = touchMove(x,y);
 
                     //화면을 갱신한다.
                     if (rect != null) {
@@ -133,12 +142,13 @@ public class PaintOnTouchListener implements View.OnTouchListener {
     /**
      * Process event for touch down
      *
-     * @param event
      * @return
      */
-    private Rect touchDown(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
+    private Rect touchDown(final float x, final float y) {
+
+
+
+
 
         lastX = x;
         lastY = y;
@@ -168,18 +178,17 @@ public class PaintOnTouchListener implements View.OnTouchListener {
     /**
      * Process event for touch move
      *
-     * @param event
      * @return
      */
-    private Rect touchMove(MotionEvent event) {
+    private Rect touchMove(final float x, final float y) {
 
-        Rect rect = processMove(event);
+        Rect rect = processMove(x,y);
 
         return rect;
     }
 
-    private Rect touchUp(MotionEvent event, boolean cancel) {
-        Rect rect = processMove(event);
+    private Rect touchUp(final float x, final float y, boolean cancel) {
+        Rect rect = processMove(x,y);
         return rect;
     }
 
@@ -187,13 +196,11 @@ public class PaintOnTouchListener implements View.OnTouchListener {
      * Process Move Coordinates
      * x,y값을 mPath에 넣어서 라인을 quadTo를 사용해서 그린다
      * lastX,lastY값을 사용한다
-     * @param event
+     *
      * @return
      */
-    private Rect processMove(MotionEvent event) {            /******************************/
+    private Rect processMove(final float x, final float y) {            /******************************/
 
-        final float x = event.getX();
-        final float y = event.getY();
 
         final float dx = Math.abs(x - lastX);
         final float dy = Math.abs(y - lastY);

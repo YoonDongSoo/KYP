@@ -308,12 +308,27 @@ public class TouchImageView extends ImageView {
                 setZoom(delayedZoomVariables.scale, delayedZoomVariables.focusX, delayedZoomVariables.focusY, delayedZoomVariables.scaleType);
                 delayedZoomVariables = null;
             }
+            //======================================================
+            // 1. 현재 위치 표시
+
+
         }
         super.onDraw(canvas);
 
         if(paintOnTouchListener!=null) {
-            canvasWrite.drawPath(paintOnTouchListener.mPath, paintOnTouchListener.mPaint);
-            //canvas.drawPath(paintOnTouchListener.mPath, paintOnTouchListener.mPaint);
+            //======================================================
+            // 1. 스케일과 offset을 가져와서 StrokeWidth 맞추기
+            Paint tempPaint = new Paint(paintOnTouchListener.mPaint);
+            float[] mv = new float[9];
+            Matrix matrix = getImageMatrix();
+            matrix.getValues(mv);
+            float stokeWidth = tempPaint.getStrokeWidth()*(1/mv[Matrix.MSCALE_Y]);
+            tempPaint.setStrokeWidth(stokeWidth);
+
+            //======================================================
+            // 2. drawPath
+            canvasWrite.drawPath(paintOnTouchListener.mPath, tempPaint);
+
 
         }
     }

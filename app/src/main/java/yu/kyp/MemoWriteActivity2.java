@@ -45,7 +45,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.e(TAG,"onCreate");
+        //(TAG,"onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_write_activity2);
 
@@ -64,19 +64,20 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
         // 2. 노트데이터 불러오기
         getNoteData();
-        bitmapWrite = note.NOTE_DATA.copy(Bitmap.Config.ARGB_8888,true);
+        bitmapWrite = note.NOTE_DATA.copy(Bitmap.Config.ARGB_8888,true);    // mutable로 copy해야 함.
 
         // 3. TouchImageView 설정
+        // 손글씨용 터치 리스너를 붙이기.
         touchViewPaint =  (TouchImageView)findViewById(R.id.touchViewPaint);
         touchViewPaint.setImageBitmap(bitmapWrite);
-        touchViewPaint.setPaintTouchListener();
+        touchViewPaint.setPaintTouchListener(); // 손글씨용 터치 리스너
         canvasWrite = new Canvas(bitmapWrite);
         touchViewPaint.setWriteCanvas(canvasWrite);
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        Log.e(TAG,"onWindowFocusChanged");
+        //Log.e(TAG,"onWindowFocusChanged");
         super.onWindowFocusChanged(hasFocus);
         int top = touchViewPaint.getTop();
         int bottom = touchViewPaint.getBottom();
@@ -84,8 +85,11 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         int right = touchViewPaint.getRight();
         int width = touchViewPaint.getWidth();
         int height = touchViewPaint.getHeight();
-        if(bitmapWrite==null)
-            bitmapWrite = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
+        if(bitmapWrite==null) {
+            bitmapWrite = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            canvasWrite = new Canvas(bitmapWrite);
+            touchViewPaint.setWriteCanvas(canvasWrite);
+        }
     }
 
     private void getNoteData() {
@@ -184,8 +188,11 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
     public void buttonScroll_OnClick(View v)
     {
+
         scrollSelected=!scrollSelected;
 
+        //=====================================================
+        // 1. 줌스크롤용 터치리스너 붙이기
         //스크롤 버튼이 눌렸을 경우
         //스크롤 버튼을 제외한 나머지 버튼들을 비활성화인 false 상태로 만듦
         if (scrollSelected) {
@@ -203,10 +210,12 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             undoBtn.invalidate();
             alarmBtn.invalidate();
 //                        scrollBtn.invalidate();
+            // 줌스크롤용 터치리스너 붙이기
             touchViewPaint.setScrollTouchListener();
 
         }
-
+        //=====================================================
+        // 2. 손글씨용 터치리스너 붙이기
         //스크롤 버튼이 한번 더 눌렸을 경우
         //스크롤 이외의 버튼을 활성화인 true를 해줌
         else {
