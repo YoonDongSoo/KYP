@@ -36,7 +36,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     private static final int REQUEST_DRAW_TEXT = 2;
     private static final int REQUEST_PEN_SIZE = 3;
     private static final int REQUEST_ERASER_SIZE = 4;
-    private static final int REQUEST_ALPHA = 5;
+    private static final int REQUEST_INPUT_TITLE = 5;
     private static SharedPreferences sp;
     private static SharedPreferences sp2;
     private static SharedPreferences for_alpha;
@@ -137,7 +137,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         Log.d(TAG,"onSerialReceived:"+theString);
         strBuffer.append(theString);
 
-        if(theString.contains("ZOM01")==true)
+        /*if(theString.contains("ZOM01")==true)
         {
             paintboard.zoomInBitmap();
         }
@@ -148,7 +148,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         else if(theString.contains("ZOM03")==true)
         {
             paintboard.zoomResetBitmap();
-        }
+        }*/
 
     }
 
@@ -202,11 +202,6 @@ public class MemoWriteActivity extends BlunoLibrary {
         colorBtn.setText(" ");
         colorBtn.setHeight(20);
         colorBtn.setBackgroundColor(mColor);            //현재 색깔을 나타냄
-
-
-
-
-
 
         StringBuilder sb = new StringBuilder();
         try {
@@ -275,104 +270,6 @@ public class MemoWriteActivity extends BlunoLibrary {
         note.thumbnail = new Thumbnail(note.NOTE_DATA);
         noteManager.saveNoteData(note);
     }
-
-//            penBtn.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//                    PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
-//                        public void onPenSelected(int size) {
-//                            mSize = size;
-//                            oldSize = mSize;
-//                            paintboard.updatePaintProperty(mColor, mSize);
-//                            displayPaintProperty();
-//                        }
-//                    };
-//                    PenPaletteActivity.colorlistener = new PenPaletteActivity.OnColorSelectedListener() {
-//                        public void onColorSelected(int color) {
-//                            mColor = color;
-//                            oldColor = mColor;
-//                            paintboard.updatePaintProperty(mColor, mSize);
-//                            displayPaintProperty();
-//                        }
-//                    };
-//                    PenPaletteActivity.completelistener = new PenPaletteActivity.OnCompleteSelectedListener() {
-//                        public void onCompleteSelected() {
-//                            mColor = oldColor;
-//                            mSize = oldSize;
-//                            paintboard.updatePaintProperty(mColor, mSize);
-//                            displayPaintProperty();
-//                        }
-//                    };
-//                    Log.d("!!!!!!!!!!","펜 선택 color 값"+mColor);
-//                    Log.d("!!!!!!!!!!","펜 선택 size 값"+mSize);
-//                    Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
-//                    startActivity(intent);
-//                }
-//            });
-//            eraserBtn.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//
-//                    eraserSelected = !eraserSelected;
-//
-//                    if (eraserSelected) {
-//
-//                        penBtn.setEnabled(false);
-//                        undoBtn.setEnabled(false);
-//
-//                       // penBtn.invalidate();
-//                       // undoBtn.invalidate();
-//
-//                        oldColor = mColor;
-//                        oldSize = mSize;
-//
-//                        //mColor = Color.WHITE;
-//
-//                        EraserPaletteActivity.listener = new EraserPaletteActivity.OnEraserSelectedListener() {
-//                            public void onEraserSelected(int size) {
-//                                mSize = size;
-//                                paintboard.setEraserPaint(mSize);
-//                                displayPaintProperty();
-//                            }
-//                        };
-//                        penBtn.invalidate();
-//                        undoBtn.invalidate();
-//
-//
-//                        Intent intent = new Intent(getApplicationContext(), EraserPaletteActivity.class);
-//
-//                        startActivity(intent);
-//
-//                    }
-//                    else {
-//
-//                        penBtn.setEnabled(true);
-//                        undoBtn.setEnabled(true);
-//
-//                        penBtn.invalidate();
-//                        undoBtn.invalidate();
-//
-//                        mColor = oldColor;
-//                        mSize = oldSize;
-//                        Log.d("!!!!!!!!!!","color 값"+mColor);
-//                        Log.d("!!!!!!!!!!","size 값"+mSize);
-//
-//                        paintboard.updatePaintProperty(mColor, mSize);
-//                        displayPaintProperty();
-//                    }
-//                }
-//            });
-//
-//            undoBtn.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//                    paintboard.undo();
-//
-//                }
-//            });
-
-
-//        TextView textPointData = (TextView)findViewById(R.id.textViewPointData);
-//        textPointData.setMovementMethod(new ScrollingMovementMethod());
-//        textPointData.setText(sb.toString());
-
 
 
     /**
@@ -659,18 +556,6 @@ public class MemoWriteActivity extends BlunoLibrary {
      */
     public void buttonPen_OnClick(View v)
     {
-//        PenPaletteActivity.penlistener = new PenPaletteActivity.OnPenSelectedListener() {
-//            public void onPenSelected(int size) {
-//                mSize = size;
-//                oldSize = mSize;
-//
-//                //선택되어진 색상을 적용한다.
-//                paintboard.updatePaintProperty(mColor, mSize);
-//                //화면의 좌측 상단에 선택한 색상을 표시한다.
-//                displayPaintProperty();
-//            }
-//        };
-
         //펜 색상 선택 팔레트를 눌렀을 때
         PenPaletteActivity.colorlistener = new PenPaletteActivity.OnColorSelectedListener() {
             public void onColorSelected(int color) {
@@ -750,29 +635,9 @@ public class MemoWriteActivity extends BlunoLibrary {
         Log.d("!!!!!!!!!!","펜 선택 color 값"+mColor);
         Log.d("!!!!!!!!!!","펜 선택 size 값"+mSize);
 
-//        Intent i = new Intent();
-//        i.putExtra("current_size",current_size);
-//        Toast.makeText(MemoWriteActivity.this,"인텐트 부르기" +current_size,Toast.LENGTH_SHORT).show();
-//        setResult(REQUEST_CURRENT_SIZE,i);
-
-
-
         //펜 색상, 굵기변경 팔레트 띄우기
         Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
         startActivityForResult(intent, REQUEST_PEN_SIZE);
-
-
-
-
-
-
-//        Toast.makeText(MemoWriteActivity.this,"값을 넘기자",Toast.LENGTH_SHORT).show();
-//        if(current_size != 0) {
-//
-//            Intent i = new Intent();
-//            i.putExtra("current_size", current_size);
-//            setResult(REQUEST_CURRENT_SIZE, i);
-//        }
     }
 
     /**
@@ -942,7 +807,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         onDestroyProcess();
         // 노트를 디비에 저장하고
         // undo리스트를 삭제.
-        saveNote();
+//        MemoTitle.saveNote();
         paintboard.undo.clearList();
     }
 
@@ -952,16 +817,6 @@ public class MemoWriteActivity extends BlunoLibrary {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==REQUEST_DRAW_TEXT)
         {
-//            Bundle bundle = getIntent().getExtras();
-//            if(bundle != null){
-//                String text = bundle.getString("text","").toString();
-//                float x = data.getFloatExtra("x",0.0f);
-//                float y = data.getFloatExtra("y",0.0f);
-//                Log.i(TAG,"text:"+text);
-//                paintboard.drawText(text,x,y);
-//            }
-
-
             int isCancel = data.getIntExtra("isCancel",0);
             if(isCancel==0) {
                 int count = 0;
@@ -1037,7 +892,10 @@ public class MemoWriteActivity extends BlunoLibrary {
                 displayPaintProperty();
             }
         }
-
+        if(requestCode == REQUEST_INPUT_TITLE){
+            Toast.makeText(MemoWriteActivity.this, "종료값은 들어옴", Toast.LENGTH_SHORT).show();
+            MemoWriteActivity.this.finish();
+        }
     }
 
 //    @Override

@@ -67,6 +67,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="yu.kyp.common.activity.ActivityBase" />
         </activity>
+
     </application>
 
 </manifest>
