@@ -633,9 +633,11 @@ public class PaintBoard extends View {
                 this.getParent().requestDisallowInterceptTouchEvent(true);
 
                 mPath.lineTo(touchX, touchY);
-                //지우개 모드일때 손을 떼고 나서 지워지는 문제점을 발견하여 다음의 코드를 추가
-                canvasWrite.drawPath(mPath,mPaint);
 
+                //지우개 모드일때 손을 떼고 나서 지워지는 문제점을 발견하여 다음의 코드를 추가
+                if(mEraserMode == true) {
+                    canvasWrite.drawPath(mPath, mPaint);
+                }
                 break;
             default:
                 return false;

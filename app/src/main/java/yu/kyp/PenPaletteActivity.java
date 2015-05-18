@@ -502,7 +502,7 @@ class NeonPenDataAdapter extends BaseAdapter {
 
     //형광펜의 색상 선택을 위한 Int형 색상 배열 생성
     public static final int [] neoncolors = new int[] {
-            0xffe8ff2a,0xffff4242,0xffff9500,0xff00b4ff,0xffff099c,0xff7fff24,0xffaa26fc
+            0xfffffc7f,0xfff06d61,0xffff9933,0xff8ed0d4,0xffe0b0cb,0xffc7f464,0xffcebfe0
     };
 
     int rowCount;
@@ -583,7 +583,7 @@ class NeonPenDataAdapter extends BaseAdapter {
         // create a Button with the color
         final Button aItem = new Button(mContext);
         aItem.setText(" ");
-        aItem.setAlpha(30);
+        aItem.setAlpha(20);
         aItem.setLayoutParams(params);
         aItem.setPadding(4, 4, 4, 4);
         aItem.setBackgroundColor(neoncolors[position]);

@@ -614,8 +614,7 @@ public class MemoWriteActivity extends BlunoLibrary {
                 for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
                 alpha_temp_value = for_alpha.getInt("alpha_value_is",0);
 
-
-                paintboard.set_alpha(40);
+                paintboard.set_alpha(100);
 
                 //선택되어진 색상을 적용한다.
                 paintboard.updatePaintProperty(mColor, mSize);
