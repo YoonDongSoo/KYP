@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * Created by DONGSOO on 2015-04-28.
  */
 public class UndoList extends ArrayList<Bitmap> {
-    private static final int MAX_UNDOS = 5;
+    private static final int MAX_UNDOS = 50;
     private static final String TAG = UndoList.class.getSimpleName();
     private static final int SIZE_WIDTH = 0;
     private static final int SIZE_HEIGHT = 0;
@@ -43,9 +43,27 @@ public class UndoList extends ArrayList<Bitmap> {
             return null;
 
         Bitmap bmp = get(size()-1);
-        Log.d(TAG, "SIZE:" + size());
+        Log.d("!!!", "SIZE:" + size());
+        Log.d("!!!", "bmpsize:" + bmp.getWidth());
+        Log.d("!!!", "bmpSIZE:" + bmp.getHeight());
         return bmp;
     }
+
+//    /**
+//     * 비트맵을 JPEG로 변환한다.
+//     * @param src
+//     * @param format
+//     * @param quality
+//     * @return
+//     */
+//    public Bitmap codec(Bitmap src, Bitmap.CompressFormat format, int quality) {
+//        ByteArrayOutputStream os = new ByteArrayOutputStream();
+//        src.compress(format, quality, os);
+//
+//        byte[] array = os.toByteArray();
+//        return BitmapFactory.decodeByteArray(array, 0, array.length);
+//    }
+
 
     /**
      * Bitmap을 undo 목록에 추가한다.
@@ -65,6 +83,9 @@ public class UndoList extends ArrayList<Bitmap> {
 //        canvas.drawBitmap(bitmap,null,dest,null);
 
         add(bitmap);
+        int w = bitmap.getWidth();
+        Log.d("!!!","에드리스트사이즈" +bitmap.getWidth());
+        Log.d("!!!","에드리스트사이즈" +bitmap.getHeight());
 
         // 최대개수(MAX_UNDOS)보다 많으면 앞에서 부터 삭제한다.
 //        while (size() >= MAX_UNDOS){
@@ -88,7 +109,7 @@ public class UndoList extends ArrayList<Bitmap> {
     }
 
     /**
-     * Bitmap을 recycle처리하고 리스트 항목을 제거한다.ㄴ
+     * Bitmap을 recycle처리하고 리스트 항목을 제거한다.
      */
     public void clearList() {
         for(Bitmap b:this)

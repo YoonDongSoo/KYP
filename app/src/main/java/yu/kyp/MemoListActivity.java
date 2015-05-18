@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,8 +17,6 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import yu.kyp.common.activity.ActivityBase;
-import yu.kyp.common.database.DataTable;
-import yu.kyp.common.database.DatabaseHelper;
 import yu.kyp.image.NoteManager;
 
 
@@ -26,9 +25,21 @@ public class MemoListActivity extends ActivityBase {
     private static final String TAG = MemoListActivity.class.getSimpleName();
     private NoteManager noteManager = null;
     private Context context = null;
+    private static SharedPreferences sp;
+    static SharedPreferences sp2;
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("p_size_value",2);
+            editor.commit();
+
+            sp2 = getSharedPreferences("current_e_size",MODE_PRIVATE);
+            SharedPreferences.Editor editor2 = sp2.edit();
+            editor2.putInt("e_size_value",2);
+            editor2.commit();
+
             Intent i = new Intent(context,MemoWriteActivity2.class);
             i.putExtra("NOTE_NO",(int)id);
             startActivity(i);
@@ -71,8 +82,12 @@ public class MemoListActivity extends ActivityBase {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_list);
+
         context = this;
         noteManager = new NoteManager(this);
+
+
+
         /*// 노트 SEED데이터 입력
         try {
             noteManager.insertSeedData();
@@ -108,6 +123,7 @@ public class MemoListActivity extends ActivityBase {
         if(adapterListNote==null) {
             adapterListNote = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, c, new String[]{"TITLE", "LAST_MOD_DT"}, new int[]{android.R.id.text1, android.R.id.text2});
             ListView listviewNote = (ListView) findViewById(R.id.listViewNote);
+            
             listviewNote.setAdapter(adapterListNote);
         }
         else
@@ -139,7 +155,6 @@ public class MemoListActivity extends ActivityBase {
 
         return super.onOptionsItemSelected(item);
     }
-
 
     public void buttonNewMemo_OnClick(View v)
     {
