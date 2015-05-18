@@ -1,7 +1,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="yu.kyp.MemoWriteActivity">
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="yu.kyp.MemoWriteActivity2">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -39,8 +42,7 @@
             android:layout_alignParentTop="false"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:onClick="buttonSetting_OnClick"/>
+            android:layout_centerVertical="true" />
     </RelativeLayout>
 
     <LinearLayout
@@ -56,7 +58,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/textviewsize"
 
-             />
+            />
 
         <Button
             android:layout_width="wrap_content"
@@ -75,20 +77,20 @@
             android:layout_height="wrap_content"
             android:text="그림"
             android:layout_alignParentEnd="true"
-            android:id="@+id/buttonPicture"
-            android:onClick="buttonPicture_OnClick" />
+            android:id="@+id/buttonPicture" />
 
-        </RelativeLayout>
+    </RelativeLayout>
 
 
     <view
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="yu.kyp.PaintBoard"
-        android:id="@+id/paintBoard"
+        class="yu.kyp.image.TouchImageView"
+        android:id="@+id/touchViewPaint"
         android:layout_below="@+id/relativeSubmenu"
         android:layout_above="@+id/bottom_linear"
         android:padding="2dp" />
+
 
     <LinearLayout
         android:orientation="horizontal"
@@ -104,43 +106,37 @@
             android:layout_height="wrap_content"
             android:text="←"
             android:id="@+id/buttonBack"
-            android:layout_weight="1"
-            android:onClick="buttonBack_OnClick" />
+            android:layout_weight="1" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="T"
             android:id="@+id/buttonText"
-            android:layout_weight="1"
-            android:onClick="buttonText_OnClick" />
+            android:layout_weight="1" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="펜"
             android:id="@+id/buttonPen"
-            android:layout_weight="1"
-            android:onClick="buttonPen_OnClick"/>
+            android:layout_weight="1"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="지우"
             android:id="@+id/buttonEraser"
-            android:layout_weight="1"
-            android:onClick="buttonEraser_OnClick"/>
+            android:layout_weight="1"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="알람"
             android:id="@+id/buttonAlarm"
-            android:layout_weight="1"
-            android:onClick="buttonAlarm_OnClick" />
+            android:layout_weight="1" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="und"
             android:id="@+id/buttonUndo"
-            android:layout_weight="1"
-            android:onClick="buttonUndo_OnClick"/>
+            android:layout_weight="1"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
