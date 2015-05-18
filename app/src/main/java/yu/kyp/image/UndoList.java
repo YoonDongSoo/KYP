@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by DONGSOO on 2015-04-28.
  */
 public class UndoList extends ArrayList<Bitmap> {
-    private static final int MAX_UNDOS = 5;
+    private static final int MAX_UNDOS = 50;
     private static final String TAG = UndoList.class.getSimpleName();
 
 
@@ -44,6 +44,22 @@ public class UndoList extends ArrayList<Bitmap> {
         return bmp;
     }
 
+//    /**
+//     * 비트맵을 JPEG로 변환한다.
+//     * @param src
+//     * @param format
+//     * @param quality
+//     * @return
+//     */
+//    public Bitmap codec(Bitmap src, Bitmap.CompressFormat format, int quality) {
+//        ByteArrayOutputStream os = new ByteArrayOutputStream();
+//        src.compress(format, quality, os);
+//
+//        byte[] array = os.toByteArray();
+//        return BitmapFactory.decodeByteArray(array, 0, array.length);
+//    }
+
+
     /**
      * Bitmap을 undo 목록에 추가한다.
      * 최대 MAX_UNDOS 까지 저장된다.
@@ -51,7 +67,6 @@ public class UndoList extends ArrayList<Bitmap> {
      */
     public void addList(Bitmap bitmap)
     {
-        Log.v("!!!","에드리스트 들어옴?");
         add(bitmap);
         int w = bitmap.getWidth();
         Log.d("!!!","에드리스트사이즈" +bitmap.getWidth());
@@ -79,7 +94,7 @@ public class UndoList extends ArrayList<Bitmap> {
     }
 
     /**
-     * Bitmap을 recycle처리하고 리스트 항목을 제거한다.ㄴ
+     * Bitmap을 recycle처리하고 리스트 항목을 제거한다.
      */
     public void clearList() {
         for(Bitmap b:this)

@@ -4,6 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="색상 선택"
+        android:textSize="@dimen/font_size"
+        android:layout_margin="10dp"
+        />
     <GridView
         android:id="@+id/colorGrid"
         android:layout_width="wrap_content"
@@ -11,9 +18,59 @@
         android:layout_gravity="center"
         android:layout_margin="10dp"
         />
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="두께 선택"
+        android:textSize="@dimen/font_size"
+        android:layout_margin="10dp"
+        />
+    <SeekBar
+        android:id="@+id/sizeSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:max="50"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="투명도 선택"
+        android:textSize="@dimen/font_size"
+        android:layout_margin="10dp"
+        />
+    <SeekBar
+        android:id="@+id/alphaSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:max="255"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="형광펜"
+        android:textSize="@dimen/font_size"
+        android:layout_margin="10dp"
+        />
     <GridView
-        android:id="@+id/sizeGrid"
+        android:id="@+id/neonPen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="최근 사용한 색상"
+        android:textSize="@dimen/font_size"
+        android:layout_margin="10dp"
+        />
+    <GridView
+        android:id="@+id/recent_color_grid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -36,15 +93,18 @@
             android:drawablePadding="4dp"
             android:text="다른 색"
             />
-
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/selectBtn"
             android:drawablePadding="4dp"
             android:text="확인"/>
-
-
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/cancelBtn"
+            android:drawablePadding="4dp"
+            android:text="취소"/>
     </LinearLayout>
 
 </LinearLayout>
