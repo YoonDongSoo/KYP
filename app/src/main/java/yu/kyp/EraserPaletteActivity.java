@@ -16,12 +16,13 @@ import android.widget.Toast;
  */
 public class EraserPaletteActivity extends Activity {
     Button closeBtn;
+    private static SharedPreferences sp1;
     private static SharedPreferences sp2;
     SeekBar eraserSeekBar;
     static int e_size_value = 0;
     private static final int REQUEST_ERASER_SIZE = 4;
     static int progress_state = 0;
-
+    static int progress_state2 =0;
     public static OnEraserSelectedListener listener;
 
     public interface OnEraserSelectedListener { //지우개 사이즈 누른것 체크
@@ -49,14 +50,14 @@ public class EraserPaletteActivity extends Activity {
         sp2 = getSharedPreferences("currnt_e_size",MODE_PRIVATE);
         e_size_value = sp2.getInt("e_size_value",0);
         Toast.makeText(EraserPaletteActivity.this, "지우개에서의 사이즈" + e_size_value, Toast.LENGTH_SHORT).show();
-        if(e_size_value != 2) {
+//        if(e_size_value != 2) {
             eraserSeekBar.setProgress(e_size_value);
-        }
+//        }
 
         //시크바가 움직이지 않았을 경우
         Intent i = new Intent();
-        progress_state = 0;
-        i.putExtra("e_size",progress_state);
+        progress_state2 = 0;
+        i.putExtra("e_size",progress_state2);
         setResult(REQUEST_ERASER_SIZE,i);
 
         //시크바가 터치되었을 경우
@@ -74,6 +75,12 @@ public class EraserPaletteActivity extends Activity {
                 Toast.makeText(EraserPaletteActivity.this,"seekbar: " + eraserSeekBar.getProgress(), Toast.LENGTH_SHORT).show();
 
                 setResult(REQUEST_ERASER_SIZE,i);
+//
+
+//                sp1 = getSharedPreferences("current_e_size",MODE_PRIVATE);
+//                SharedPreferences.Editor editor2 = sp1.edit();
+//                editor2.putInt("e_size_value",progress_state);
+//                editor2.commit();
             }
 
             @Override

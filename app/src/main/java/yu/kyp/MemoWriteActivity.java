@@ -52,6 +52,7 @@ public class MemoWriteActivity extends BlunoLibrary {
     PaintBoard paintboard;
     static RecentColorAdapter recentcoloradapter;
     SeekBar sizeSeekBar;
+    static int alpha_temp_value=0;
 
     static GridView recent_color_grid;
 
@@ -390,6 +391,11 @@ public class MemoWriteActivity extends BlunoLibrary {
         SharedPreferences.Editor editor2 = sp2.edit();
         editor2.remove("e_size_value");
         editor2.commit();
+
+        for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+        SharedPreferences.Editor editor3 = for_alpha.edit();
+        editor3.putInt("alpha_value_is",255);
+        editor3.commit();
     }
 
     /**
@@ -497,14 +503,17 @@ public class MemoWriteActivity extends BlunoLibrary {
             oldSize = mSize;
 //
 //            //mColor = Color.WHITE;
+
+            sp2 = getSharedPreferences("currnt_e_size",MODE_PRIVATE);
+            int e_size_value = sp2.getInt("e_size_value",0);
 //
             //선택된 크기로 지우개 기능 활성화
 //            EraserPaletteActivity.listener = new EraserPaletteActivity.OnEraserSelectedListener() {
 //                public void onEraserSelected(int size) {
 //                    mSize = size;
-                    paintboard.setEraserPaint(mSize);
-                    //화면의 좌측 상단에 선택한 것을 표시한다.
-                    displayPaintProperty();
+            paintboard.setEraserPaint(e_size_value);
+            //화면의 좌측 상단에 선택한 것을 표시한다.
+            displayPaintProperty();
 //                }
 //            };
 
@@ -566,6 +575,9 @@ public class MemoWriteActivity extends BlunoLibrary {
 
 //                recentcoloradapter.recent_color_list = color_save;
 //                displayRecentColor();
+                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+                alpha_temp_value = for_alpha.getInt("alpha_value_is",0);
+                paintboard.set_alpha(alpha_temp_value);
 
                 //선택되어진 색상을 적용한다.
                 paintboard.updatePaintProperty(mColor, mSize);
@@ -582,17 +594,28 @@ public class MemoWriteActivity extends BlunoLibrary {
                 //최근 사용한 색상을 저장
                 color_save.add(mColor);
 
+                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+                alpha_temp_value = for_alpha.getInt("alpha_value_is",0);
+                paintboard.set_alpha(alpha_temp_value);
+
                 //선택되어진 색상을 적용한다.
                 paintboard.updatePaintProperty(mColor, mSize);
                 //화면의 좌측 상단에 선택한 색상을 표시한다.
                 displayPaintProperty();
             }
         };
+        //형광펜 팔레트를 눌렀을 때
         PenPaletteActivity.neoncolorlistener = new PenPaletteActivity.OnNeonColorSelectedListener() {
             @Override
             public void onNeonColorSelected(int color) {
                 mColor = color;
                 oldColor = mColor;
+
+                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+                alpha_temp_value = for_alpha.getInt("alpha_value_is",0);
+
+
+                paintboard.set_alpha(40);
 
                 //선택되어진 색상을 적용한다.
                 paintboard.updatePaintProperty(mColor, mSize);
@@ -886,6 +909,8 @@ public class MemoWriteActivity extends BlunoLibrary {
             if(data.getIntExtra("e_size",0) != 0){
                 eraser_size = data.getIntExtra("e_size",0);
 
+
+
                 oldSize = mSize;
                 mSize = eraser_size;
                 Toast.makeText(MemoWriteActivity.this, "지우개 사이즈 넘어왔네~" + eraser_size, Toast.LENGTH_SHORT).show();
@@ -904,13 +929,7 @@ public class MemoWriteActivity extends BlunoLibrary {
                 displayPaintProperty();
             }
         }
-        if(requestCode == REQUEST_ALPHA){
-            if(data.getIntExtra("alpha_size",0) != 0) {
-                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
-                Toast.makeText(MemoWriteActivity.this, "알파값 넘어왔네~" + for_alpha.getInt("alpha_value_is",0), Toast.LENGTH_SHORT).show();
-                paintboard.set_alpha(for_alpha.getInt("alpha_value_is",0));
-            }
-        }
+
     }
 
 //    @Override

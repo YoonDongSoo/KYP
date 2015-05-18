@@ -58,6 +58,7 @@ public class PenPaletteActivity extends Activity {
     static int progress_state = 0;          //펜사이즈
     static int progress_state2 = 0;         //알파값
     static int p_size_value = 0;
+    static int alpha_value = 255;
 
 
     public static OnPenSelectedListener penlistener;
@@ -146,6 +147,14 @@ public class PenPaletteActivity extends Activity {
         Toast.makeText(PenPaletteActivity.this,"펜팔레트에서의 사이즈" + p_size_value,Toast.LENGTH_SHORT).show();
         if(p_size_value != 2) {
             sizeSeekBar.setProgress(p_size_value);
+        }
+        alphaSeekBar.setProgress(255);
+
+        for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+        alpha_value = for_alpha.getInt("alpha_value_is",0);
+        Toast.makeText(PenPaletteActivity.this,"펜팔레트에서의 투명도" + alpha_value,Toast.LENGTH_SHORT).show();
+        if(alpha_value != 255) {
+            alphaSeekBar.setProgress(alpha_value);
         }
 
         //펜 사이즈 시크바가 움직이지 않았을 경우(터치가 아예 안되었을 경우)

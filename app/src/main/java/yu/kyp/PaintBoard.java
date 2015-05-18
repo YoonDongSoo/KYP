@@ -595,7 +595,7 @@ public class PaintBoard extends View {
                 this.getParent().requestDisallowInterceptTouchEvent(false);
 
                 mPath.lineTo(touchX, touchY);
-                canvasWrite.drawPath(mPath,mPaint);
+                canvasWrite.drawPath(mPath, mPaint);
 
                 //Path 객체 초기화
                 mPath.reset();
@@ -610,7 +610,6 @@ public class PaintBoard extends View {
                 break;
             //화면에 손을 댔을 때
             case MotionEvent.ACTION_DOWN:
-
                 //scrollview에 영향을 안받고 draw 기능 적용
                 this.getParent().requestDisallowInterceptTouchEvent(true);
 
@@ -630,13 +629,12 @@ public class PaintBoard extends View {
                 break;
             //움직일 때
             case MotionEvent.ACTION_MOVE:
-
-//                Log.i("draw", "actionmove called.");
                 //scrollview에 영향을 안받고 draw 기능 적용
                 this.getParent().requestDisallowInterceptTouchEvent(true);
 
                 mPath.lineTo(touchX, touchY);
-
+                //지우개 모드일때 손을 떼고 나서 지워지는 문제점을 발견하여 다음의 코드를 추가
+                canvasWrite.drawPath(mPath,mPaint);
 
                 break;
             default:
@@ -649,163 +647,6 @@ public class PaintBoard extends View {
     }
 
 
-
-//    /**
-//     * Process event for touch down
-//     *
-//     * @param event
-//     * @return
-//     */
-//    private Rect touchDown(MotionEvent event) {
-//        float x = event.getX();
-//        float y = event.getY();
-//        int i;
-//
-//
-//
-//        mPath.moveTo(x, y);
-//
-//
-//        return mInvalidRect;
-//    }
-//
-//
-//    /**
-//     * Process event for touch move
-//     *
-//     * @param event
-//     * @return
-//     */
-//    private Rect touchMove(MotionEvent event) {
-//
-//        Rect rect = processMove(event);
-//
-//        return rect;
-//    }
-//
-//    private Rect touchUp(MotionEvent event, boolean cancel) {
-//
-//        Rect rect = processMove(event);
-//        return rect;
-////        int i,j;
-////        int size;
-////
-////        stroke.add(new Stroke(temp_color,temp_thickness,s.listPoint));
-////
-////            for(i=0; i<stroke.size(); i++) {
-//////            Log.i("i는","? " + i);
-////
-////                size = stroke.get(i).listPoint.size();
-////                Log.i("color", ", size" + stroke.get(i).color + ", " + stroke.get(i).thickness);
-////
-//////            Log.i("size는","? " + size);
-////                for (j = 0; j < size; j++) {
-//////                Log.i("터치업","" + stroke.get(i).listPoint.get(j).x + ", " + stroke.get(i).listPoint.get(j).y);
-////
-////                }
-////            }
-////
-////
-//////        s.listPoint.clear();
-//////        stroke.clear();
-//    }
-//
-//    /**
-//     * Process Move Coordinates
-//     * x,y값을 mPath에 넣어서 라인을 quadTo를 사용해서 그린다
-//     * lastX,lastY값을 사용한다
-//     * @param event
-//     * @return
-//     */
-//    private Rect processMove(MotionEvent event) {            /******************************/
-//
-////        //테스트 중
-////        mPaint.setAlpha(40);
-////        final float x = event.getX();
-////        final float y = event.getY();
-////        PointData p = new PointData(x, y);
-////        s.listPoint.add(p);
-////        Rect mInvalidRect = drawPointData(p, mPath, mPaint);
-////
-//        final float x = event.getX();
-//        final float y = event.getY();
-//
-//        final float dx = Math.abs(x - lastX);
-//        final float dy = Math.abs(y - lastY);
-//
-//        Rect mInvalidRect = new Rect();
-//        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-//            final int border = mInvalidateExtraBorder;
-//            //다시 그려질 영역으로 현재 이동한 좌표 추가
-//            mInvalidRect.set((int) mCurveEndX - border, (int) mCurveEndY - border,
-//                    (int) mCurveEndX + border, (int) mCurveEndY + border);
-//
-//            float cX = mCurveEndX = (x + lastX) / 2;
-//            float cY = mCurveEndY = (y + lastY) / 2;
-//
-//            mPaint.setAlpha(20);
-//            //Path 객체에 현재 좌표값을 곡선으로 추가
-//            mPath.quadTo(lastX, lastY, cX, cY);
-//
-//            // union with the control point of the new curve
-//            mInvalidRect.union((int) lastX - border, (int) lastY - border,
-//                    (int) lastX + border, (int) lastY + border);
-//
-//            // union with the end point of the new curve
-//            mInvalidRect.union((int) cX - border, (int) cY - border,
-//                    (int) cX + border, (int) cY + border);
-//
-//            lastX = x;
-//            lastY = y;
-//
-//            //Path객체를 그린다.
-//            canvasWrite.drawPath(mPath, mPaint);
-//        }
-//
-//        return mInvalidRect;
-//    }
-
-//    /**
-//     * x,y값을 mPath에 넣어서 라인을 quadTo를 사용해서 그린다
-//     * lastX,lastY값을 사용한다
-//     *
-//     */
-//    private Rect drawPointData(PointData p, Path path, Paint paint) {
-//
-//        float x = p.x;
-//        float y = p.y;
-//
-//        final float dx = Math.abs(x - lastX);
-//        final float dy = Math.abs(y - lastY);
-//
-//        Rect mInvalidRect = new Rect();
-//        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-//            final int border = mInvalidateExtraBorder;
-//            mInvalidRect.set((int) mCurveEndX - border, (int) mCurveEndY - border,      //이동좌표 추가
-//                    (int) mCurveEndX + border, (int) mCurveEndY + border);
-//
-//            float cX = mCurveEndX = (x + lastX) / 2;
-//            float cY = mCurveEndY = (y + lastY) / 2;
-//
-//
-//            path.quadTo(lastX, lastY, cX, cY);     //패스 객체에 현재 좌표값을 곡선으로 추가
-//
-//            // union with the control point of the new curve
-//            mInvalidRect.union((int) lastX - border, (int) lastY - border,
-//                    (int) lastX + border, (int) lastY + border);
-//
-//            // union with the end point of the new curve
-//            mInvalidRect.union((int) cX - border, (int) cY - border,
-//                    (int) cX + border, (int) cY + border);
-//
-//            lastX = x;
-//            lastY = y;
-//
-//            canvasWrite.drawPath(path, paint);
-//
-//        }
-//        return mInvalidRect;
-//    }
 
     /**
      * Save this contents into a Jpeg image
