@@ -1,5 +1,7 @@
 package yu.kyp.image;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -16,16 +18,19 @@ public class PaintOnTouchListener implements View.OnTouchListener {
 
     private static final String TAG = PaintOnTouchListener.class.getSimpleName();
     public Path mPath = new Path();
-    private float lastX = -1;
-    private float lastY = -1;
+    public float lastX = -1;
+    public float lastY = -1;
     private float mCurveEndX;
     private float mCurveEndY;
     private int mInvalidateExtraBorder = 10;
     static final float TOUCH_TOLERANCE = 8;
     private static final boolean RENDERING_ANTIALIAS = true;
     private static final boolean DITHER_FLAG = true;
-
     public Paint mPaint = null;
+    /**
+     * Undo 목록
+     */
+    UndoList undo = new UndoList();
 
     public PaintOnTouchListener()
     {
@@ -49,6 +54,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
         matrix.getValues(mv);
         float x = (event.getX()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_X]/mv[Matrix.MSCALE_Y]));
         float y = (event.getY()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_Y]/mv[Matrix.MSCALE_Y]));
+
         //Log.e(TAG,String.format("(%.0f,%.0f)->(%.0f,%.0f)",event.getX(),event.getY(),x,y));
 
         //======================================================
@@ -70,12 +76,8 @@ public class PaintOnTouchListener implements View.OnTouchListener {
                 //Path 객체 초기화
                 mPath.rewind();
 
-                /*// undo 목록에 넣기
-                Bitmap img = Bitmap.createBitmap(mBitmapWrite.getWidth(), mBitmapWrite.getHeight(), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas();
-                canvas.setBitmap(img);
-                canvas.drawBitmap(mBitmapWrite, 0, 0, null);
-                undo.addList(img);*/
+                // undo 목록에 넣기
+                undo.addList(((TouchImageView)v).getWriteBitmap());
 
                 return true;
             //화면에 손을 댔을 때
@@ -98,15 +100,11 @@ public class PaintOnTouchListener implements View.OnTouchListener {
 
 
 
-                    /*if(undo.size()==0)
+                    if(undo.size()==0)
                     {
                         // undo 목록에 넣기
-                        img = Bitmap.createBitmap(mBitmapWrite.getWidth(), mBitmapWrite.getHeight(), Bitmap.Config.ARGB_8888);
-                        canvas = new Canvas();
-                        canvas.setBitmap(img);
-                        canvas.drawBitmap(mBitmapWrite, 0, 0, null);
-                        undo.addList(img);
-                    }*/
+                        undo.addList(((TouchImageView)v).getWriteBitmap());
+                    }
 
                     //===================================
                     //터치 관련 처리

@@ -254,7 +254,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         if(note.TITLE==null || note.TITLE.equals("")==true)
             note.TITLE = "제목 없음";
         //note.NOTE_DATA = paintboard.undo.getLast();
-        note.NOTE_DATA = paintboard.mBitmapWrite;
+        note.NOTE_DATA = null;//paintboard.mBitmapWrite;
         note.thumbnail = new Thumbnail(note.NOTE_DATA);
         noteManager.saveNoteData(note);
     }
@@ -683,7 +683,7 @@ public class MemoWriteActivity extends BlunoLibrary {
             undoBtn.invalidate();
             alarmBtn.invalidate();
 //                        scrollBtn.invalidate();
-            paintboard.setScrollTouchListener();
+            //paintboard.setScrollTouchListener();
             /*paintboard.setOnTouchListener(new View.OnTouchListener() {
 
                 //스크롤을 위해 화면을 터치하였을 때
@@ -757,7 +757,7 @@ public class MemoWriteActivity extends BlunoLibrary {
 //                        scrollBtn.invalidate();
 
             // 손글씨용 터치리스너 붙이긴
-            paintboard.setPaintTouchListener();
+            //paintboard.setPaintTouchListener();
 
             paintboard.updatePaintProperty(mColor, mSize);
             displayPaintProperty();

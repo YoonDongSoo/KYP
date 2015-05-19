@@ -17,9 +17,12 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -39,6 +42,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
+
+import java.util.Collection;
 
 public class TouchImageView extends ImageView {
 
@@ -65,23 +70,141 @@ public class TouchImageView extends ImageView {
     //
     private Matrix matrix, prevMatrix;
     private Canvas canvasWrite;
+    private Bitmap bitmapWrite;
+    private Bitmap bitmapBackground;
+    /**
+     * 지우개 모드일때 손을 떼고 나서 지워지는 문제점을 발견하여 다음의 코드를 추가
+     */
+    private boolean mEraserMode;
 
-    public void setPaintTouchListener() {
-        paintOnTouchListener = new PaintOnTouchListener();
-        scrollOnTouchListener = null;
-        setOnTouchListener(paintOnTouchListener);
+    /**
+     * Undo 리스트 리턴
+     * @return
+     * Undo 리스트
+     */
+    public UndoList getUndo() {
+        return paintOnTouchListener.undo;
     }
 
-    public void setScrollTouchListener()
-    {
-        paintOnTouchListener = null;
-        scrollOnTouchListener = new PrivateOnTouchListener();
-        setOnTouchListener(scrollOnTouchListener);
+    public Bitmap getWriteBitmap() {
+        return bitmapWrite.copy(Bitmap.Config.ARGB_8888,false);
     }
 
-    public void setWriteCanvas(Canvas canvas) {
-        canvasWrite = canvas;
+    public void setWriteBitmap(Bitmap bitmapWrite) {
+        this.bitmapWrite = bitmapWrite;
     }
+
+    /**
+     * undo 처리하기
+     * 1) undo.pop
+     * 2) 마지막 bitmap으로 변경
+     */
+    public void undo() {
+        paintOnTouchListener.undo.pop();
+        Bitmap prev = paintOnTouchListener.undo.getLast();
+        if (prev != null){
+            //이건 필요 없는것 같은데?
+            //drawBackground(canvasWrite);
+            canvasWrite.drawBitmap(bitmapBackground,0,0,null);
+            canvasWrite.drawBitmap(prev, 0, 0, null/*mPaint*/);
+            invalidate();
+
+
+        }
+    }
+
+    public void setBackgroundBitmap(Bitmap bitmapBackground) {
+        this.bitmapBackground = bitmapBackground;
+    }
+
+    /**
+     * PaintOnTouchListner.mPaint에 Alpha값을 설정한다.
+     * @param alpha_value
+     */
+    public void setPaintAlpha(int alpha_value) {
+        paintOnTouchListener.mPaint.setAlpha(alpha_value);
+    }
+
+    /**
+     * mPaint의 색상과 굵기 변경
+     * @param color
+     * 색상
+     * @param size
+     * 펜 굵긴
+     */
+    public void updatePaintProperty(int color, int size) {
+        //지우개 모드를 false로 변경
+        mEraserMode = false;
+        paintOnTouchListener.mPaint.setXfermode(null);
+        // 알파값은 따로 설정되지 않나?
+        //paintOnTouchListener.mPaint.setAlpha(0xFF);
+//        mPaint.setAlpha(20);
+
+        //전달받은 색상과 크기 적용
+        paintOnTouchListener.mPaint.setColor(color);
+        Log.v("!!!", "pen color" + color);
+        paintOnTouchListener.mPaint.setStrokeWidth(size);
+        //temp_color=color;
+        //temp_thickness=size;
+        //Log.d("!!!!!!!!!!","값 나오는 중"+temp_color);
+    }
+
+    public void drawText(String str, float x, float y) {
+        //        super.onDraw(canvas);
+
+//        Log.i("onDraw","");
+//        Log.d("!!!!!!!!!!","ondraw");
+
+        //canvasBackground.drawBitmap(mBitmap, 0, 0, null);
+        //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        paintOnTouchListener.mPaint.setStyle(Paint.Style.FILL);
+        paintOnTouchListener.mPaint.setColor(Color.BLACK);
+        canvasWrite.drawColor(Color.TRANSPARENT);
+//
+////        Rect rt = new Rect();
+////        mPaint.getTextBounds(str,0,str.length(),rt);
+////        rt.set((int) x, (int) y + rt.top, (int) x + rt.width(), (int) y + rt.bottom);
+////        canvasWrite.drawRect(rt,ptRound);
+        canvasWrite.drawText(str, x, y, paintOnTouchListener.mPaint);
+        paintOnTouchListener.mPaint.setStyle(Paint.Style.STROKE);
+//        mTextMode = true;
+
+        // undo 목록에 넣기
+        paintOnTouchListener.undo.addList(getWriteBitmap());
+    }
+
+    /**
+     * 지우개 기능
+     * @param size
+     */
+    public void setEraserPaint(int size) {
+        Log.d("!!!!","지우개모드들어옴");
+        //지우개 모드를 true로 바꾼다.
+        mEraserMode=true;
+
+        //setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR)) -> 검은색 펜
+        // 을 이용하여 지우개와 동일한 기능을 사용할 수 있다.
+        paintOnTouchListener.mPaint.setXfermode(null);
+        paintOnTouchListener.mPaint.setAlpha(0);
+        paintOnTouchListener.mPaint.setXfermode(new PorterDuffXfermode(
+                PorterDuff.Mode.CLEAR));
+        //지우개 크기 적용
+        paintOnTouchListener.mPaint.setStrokeWidth(size);
+        paintOnTouchListener.mPaint.setAntiAlias(true);
+        paintOnTouchListener.mPaint.setStrokeWidth(size);
+        //temp_thickness=size;
+    }
+
+    /**
+     * 마지막 좌표를 기준으로 0.25% 줌을 한다.
+     */
+    public void zoomInBitmap() {
+        /*float scale = getScaleX()+0.25f;
+        int width = bitmapBackground.getWidth();
+        int height = bitmapBackground.getHeight();
+        setZoom(scale,paintOnTouchListener.lastX/width,paintOnTouchListener.lastY/height);*/
+    }
+
 
     private static enum State { NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM };
     private State state;
@@ -157,6 +280,25 @@ public class TouchImageView extends ImageView {
         onDrawReady = false;
         super.setOnTouchListener(new PrivateOnTouchListener());
     }
+
+    public void setPaintTouchListener() {
+        if(paintOnTouchListener == null)
+            paintOnTouchListener = new PaintOnTouchListener();
+        setOnTouchListener(paintOnTouchListener);
+    }
+
+    public void setScrollTouchListener()
+    {
+        if(scrollOnTouchListener == null)
+            scrollOnTouchListener = new PrivateOnTouchListener();
+
+        setOnTouchListener(scrollOnTouchListener);
+    }
+
+    public void setWriteCanvas(Canvas canvas) {
+        canvasWrite = canvas;
+    }
+
 
     @Override
     public void setOnTouchListener(View.OnTouchListener l) {
@@ -328,6 +470,7 @@ public class TouchImageView extends ImageView {
             //======================================================
             // 2. drawPath
             canvasWrite.drawPath(paintOnTouchListener.mPath, tempPaint);
+
 
 
         }
