@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="8"
         android:id="@+id/titleSearchEdit"
+        android:singleLine="true"
         />
         <Button
             android:layout_width="wrap_content"
@@ -26,4 +27,13 @@
         android:layout_height="wrap_content"
         android:id="@+id/search_list">
     </ListView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="검색 결과가 없습니다."
+        android:id="@+id/titlenotsearch"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        android:textSize="@dimen/font_size"
+        />
 </LinearLayout>

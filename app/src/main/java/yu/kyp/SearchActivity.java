@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import yu.kyp.common.activity.ActivityBase;
 import yu.kyp.common.database.DB;
@@ -26,6 +28,9 @@ public class SearchActivity extends ActivityBase{
     Button buttonTitleSearch;
     EditText titleSearchEdit;
     ListView search_list;
+    TextView titlenotsearch;
+    ListView listviewNote;
+    Cursor c;
 
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
@@ -45,29 +50,38 @@ public class SearchActivity extends ActivityBase{
         buttonTitleSearch = (Button) findViewById(R.id.buttonTitleSearch);
         titleSearchEdit = (EditText) findViewById(R.id.titleSearchEdit);
         search_list = (ListView) findViewById(R.id.search_list);
+        titlenotsearch = (TextView) findViewById(R.id.titlenotsearch);
         search_list.setOnItemClickListener(listenerListNote);
 
         noteManager = new NoteManager(this);
 
         buttonTitleSearch.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                adapterListNote = null;
                 //edittext에 입력한 제목이 포함되어있는 db들을 불러온다.
                 noteManager.titlegetNoteList(titleSearchEdit.getText().toString());
+
                 //위에서 불러온 db들을 listview에 뿌려준다.
                 bindNote();
             }
         });
     }
     private void bindNote() {
-        Cursor c = noteManager.titlegetNoteList(titleSearchEdit.getText().toString());
+        c = noteManager.titlegetNoteList(titleSearchEdit.getText().toString());
         if(adapterListNote==null) {
             adapterListNote = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, c, new String[]{"TITLE", "LAST_MOD_DT"}, new int[]{android.R.id.text1, android.R.id.text2});
-            ListView listviewNote = (ListView) findViewById(R.id.search_list);
+            listviewNote = (ListView) findViewById(R.id.search_list);
             listviewNote.setAdapter(adapterListNote);
+            Toast.makeText(SearchActivity.this,"검색된 메모는 " + c.getCount() + "개입니다.",Toast.LENGTH_SHORT).show();
         }
         else
         {
             adapterListNote.changeCursor(c);
+        }
+        //검색 결과가 없을 때
+        if(c.moveToNext() == false){
+            //검색결과가 없다는 텍스트뷰를 띄워줌
+            titlenotsearch.setVisibility(View.VISIBLE);
         }
 
     }

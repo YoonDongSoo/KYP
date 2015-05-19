@@ -287,6 +287,16 @@ public class NoteManager {
     }
 
     /**
+     * 검색하여 나온 제목의 갯수를 리턴한다.
+     * @param title
+     * @return
+     */
+    public Cursor titlegetCountNoteList(String title)
+    {
+        return db.execCursor("SELECT COUNT(NOTE_NO),NOTE_NO AS _id, * FROM NOTE WHERE TITLE LIKE '%"+ title + "%' ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
+    }
+
+    /**
      * 노트 SEED데이터 입력
      */
     public void insertSeedData() throws Exception {
