@@ -71,6 +71,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="yu.kyp.common.activity.ActivityBase" />
         </activity>
+        <activity
+            android:name=".SearchActivity"
+            android:label=""
+            android:windowSoftInputMode="stateHidden|adjustPan">
+        </activity>
+
 
     </application>
 

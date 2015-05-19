@@ -101,6 +101,12 @@ public class MemoListActivity extends ActivityBase {
 
     }
 
+    //검색 버튼이 눌렸을 때
+    public void buttonSearch_OnClick(View v){
+        Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();

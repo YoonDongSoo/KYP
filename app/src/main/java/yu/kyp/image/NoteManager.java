@@ -8,11 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-
 import yu.kyp.common.Utils;
 import yu.kyp.common.database.DB;
 import yu.kyp.common.database.DataTable;
@@ -280,6 +275,15 @@ public class NoteManager {
     public Cursor getNoteList()
     {
         return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE WHERE IS_DEL=0 ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
+    }
+
+    /**
+     * 검색하여 나온 NOTE테이블을 리턴한다.
+     * @return
+     */
+    public Cursor titlegetNoteList(String title)
+    {
+        return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE WHERE TITLE LIKE '%"+ title + "%' ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
     }
 
     /**

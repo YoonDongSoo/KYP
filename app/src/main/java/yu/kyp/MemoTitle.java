@@ -39,13 +39,13 @@ public class MemoTitle extends Activity {
         Button titleOk = (Button) findViewById(R.id.titleOk);
         Button titleCancel = (Button) findViewById(R.id.titleCancel);
 
-        //È®ÀÎ ¹öÆ°À» ´­·¶À» ¶§
+        //í™•ì¸ ë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ
         titleOk.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-                //ÀûÈù ±ÛÀÚ¸¦ string º¯¼ö str¿¡ ³Ö±â
+                //ì íŒ ê¸€ìë¥¼ string ë³€ìˆ˜ strì— ë„£ê¸°
                 String str = titleEdit.getText().toString();
 
-                //±ÛÀÚÀûÈ÷´Â°Å Å×½ºÆ®
+                //ê¸€ìì íˆëŠ”ê±° í…ŒìŠ¤íŠ¸
                 Toast.makeText(MemoTitle.this, str, Toast.LENGTH_LONG).show();
 
                 Intent i = new Intent();
@@ -57,7 +57,7 @@ public class MemoTitle extends Activity {
             }
         });
 
-        //Ãë¼Ò ¹öÆ°À» ´­·¶À» ¶§
+        //ì·¨ì†Œ ë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ
         titleCancel.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
@@ -67,16 +67,16 @@ public class MemoTitle extends Activity {
 
     }
     /**
-     * ³ëÆ®¸¦ DB¿¡ ÀúÀåÇÑ´Ù.
-     * º¯°æµÈ »çÇ×ÀÌ ¾øÀ¸¸é ÀúÀåÇÏÁö ¾Ê´Â´Ù.
+     * ë…¸íŠ¸ë¥¼ DBì— ì €ì¥í•œë‹¤.
+     * ë³€ê²½ëœ ì‚¬í•­ì´ ì—†ìœ¼ë©´ ì €ì¥í•˜ì§€ ì•ŠëŠ”ë‹¤.
      */
     private void saveNote() {
-        // º¯°æµÈ »çÇ×ÀÌ ¾øÀ¸¸é DB¿¡ ÀúÀåÇÏÁö ¾Ê´Â´Ù.
+        // ë³€ê²½ëœ ì‚¬í•­ì´ ì—†ìœ¼ë©´ DBì— ì €ì¥í•˜ì§€ ì•ŠëŠ”ë‹¤.
         if(paintboard.undo.size()<=1)
             return;
 
         if(note.TITLE==null || note.TITLE.equals("")==true)
-            note.TITLE = "Á¦¸ñ ¾øÀ½";
+            note.TITLE = "ì œëª© ì—†ìŒ";
         note.NOTE_DATA = paintboard.undo.getLast();
         note.thumbnail = new Thumbnail(note.NOTE_DATA);
         noteManager.saveNoteData(note);
