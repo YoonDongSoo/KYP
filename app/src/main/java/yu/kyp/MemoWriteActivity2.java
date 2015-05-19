@@ -3,15 +3,12 @@ package yu.kyp;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridView;
-import android.widget.TextView;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
@@ -240,5 +237,11 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             /*paintboard.updatePaintProperty(mColor, mSize);
             displayPaintProperty();*/
         }
+    }
+    public void buttonSetting_OnClick(View v)
+    {
+//        Toast.makeText(MemoWriteActivity2.this,"설정 눌렀음",Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(),SettingsActivity.class);
+        startActivity(i);
     }
 }
