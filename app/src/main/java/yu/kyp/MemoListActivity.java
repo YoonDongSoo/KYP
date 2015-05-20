@@ -162,8 +162,24 @@ public class MemoListActivity extends ActivityBase {
         startActivity(i);
     }
 
+
+
+    public void buttonSelect_OnClick(View v)
+    {
+        startActivity(new Intent(this,SelectActivity.class));
+    }
+
+
     public void buttonTrash_OnClick(View v)
     {
         startActivity(new Intent(this,TrashActivity.class));
     }
+
+    public void buttonSetting_OnClick(View v)
+    {
+        startActivity(new Intent(this,SettingsActivity.class));
+    }
+
+
 }
+
