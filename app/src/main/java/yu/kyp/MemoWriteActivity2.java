@@ -244,4 +244,8 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         Intent i = new Intent(getApplicationContext(),SettingsActivity.class);
         startActivity(i);
     }
+    public void buttonAlarm_OnClick(View v){
+        Intent i = new Intent(getApplicationContext(),AlarmActivity.class);
+        startActivity(i);
+    }
 }
