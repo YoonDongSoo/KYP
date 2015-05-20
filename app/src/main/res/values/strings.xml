@@ -19,5 +19,6 @@
     <string name="title_activity_zoom">ZoomActivity</string>
     <string name="title_activity_photo">PhotoActivity</string>
     <string name="title_activity_trash">TrashActivity</string>
+    <string name="title_activity_memo_write_activity2">MemoWriteActivity2</string>
 
 </resources>

@@ -40,10 +40,9 @@
         />
         <ListPreference
             android:key="button_background_setting"
-            android:title="배경설정"
+            android:title="테마 설정"
             android:entries="@array/entries_background"
             android:entryValues="@array/entryvalues_background"
-
             />
         <ListPreference
             android:key="button_alarm_setting"
@@ -62,7 +61,6 @@
             android:entries="@array/entries_list"
             android:entryValues="@array/entryvalues_list"
             />
-
 
 
     </PreferenceCategory>

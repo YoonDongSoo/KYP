@@ -1,11 +1,13 @@
 package yu.kyp;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 //import android.annotation.TargetApi;
 //import android.content.Context;
@@ -265,56 +267,133 @@ import android.preference.PreferenceManager;
 //}
 public class SettingsActivity extends PreferenceActivity{
 
+    public static String ThemeBackGround = null;
+    RelativeLayout memoListRelativeLayout;
+    MemoListActivity memolistactivity;
+    static SharedPreferences sp;
 
       protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
 
         addPreferencesFromResource(R.xml.pref_settings);
+          memolistactivity = new MemoListActivity();
 
-        setOnPreferenceChange(findPreference("button_percent_setting"));
-        setOnPreferenceChange(findPreference("button_zoominout_percent_setting"));
-        setOnPreferenceChange(findPreference("button_font_setting"));
-        setOnPreferenceChange(findPreference("button_background_setting"));
-        setOnPreferenceChange(findPreference("button_alarm_setting"));
-        setOnPreferenceChange(findPreference("button_list_setting"));
-    }
+        final ListPreference button_background_setting = (ListPreference)findPreference("button_background_setting");
+
+//        setOnPreferenceChange(findPreference("button_percent_setting"));
+//        setOnPreferenceChange(findPreference("button_zoominout_percent_setting"));
+//        setOnPreferenceChange(findPreference("button_font_setting"));
+//        setOnPreferenceChange(findPreference("button_background_setting"));
+//        setOnPreferenceChange(findPreference("button_alarm_setting"));
+//        setOnPreferenceChange(findPreference("button_list_setting"));
+
+          ThemeBackGround = button_background_setting.getValue();
+          button_background_setting.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+              @Override
+              public boolean onPreferenceChange(Preference preference, Object newValue) {
+                  StringBuffer result = new StringBuffer();
+                  result.append("설정이 완료되었습니다.");
+                  ThemeBackGround = newValue.toString();
+
+                  sp = getSharedPreferences("setbackground", MODE_PRIVATE);
+                  SharedPreferences.Editor editor = sp.edit();
+                  editor.putInt("notheme", 1);
+                  editor.commit();
+
+                  //A instanceof B란 A의 객체가 B에 속해있는지(상속) 여부를 판단
+                  //만약 속해있다면 TRUE를 출력한다.
+                  if(preference instanceof ListPreference) {
+
+                      ListPreference listPreference = (ListPreference) preference;
+                      int index = listPreference.findIndexOfValue(ThemeBackGround);
+                      preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
+                      Toast.makeText(SettingsActivity.this,"선택한 테마는? " + listPreference.getEntries()[index],Toast.LENGTH_SHORT).show();
+                      if(listPreference.getEntries()[index].equals("테마1")){
+                          sp = getSharedPreferences("setbackground",MODE_PRIVATE);
+                          SharedPreferences.Editor editor2 = sp.edit();
+                          editor2.putInt("theme", 1);
+                          editor2.commit();
+                      }
+                      else if(listPreference.getEntries()[index].equals("테마2")){
+                          sp = getSharedPreferences("setbackground",MODE_PRIVATE);
+                          SharedPreferences.Editor editor2 = sp.edit();
+                          editor2.putInt("theme",2);
+                          editor2.commit();
+                      }
+                      else if(listPreference.getEntries()[index].equals("테마3")){
+                          sp = getSharedPreferences("setbackground",MODE_PRIVATE);
+                          SharedPreferences.Editor editor2 = sp.edit();
+                          editor2.putInt("theme",3);
+                          editor2.commit();
+                      }
+                      else if(listPreference.getEntries()[index].equals("테마4")){
+                          sp = getSharedPreferences("setbackground",MODE_PRIVATE);
+                          SharedPreferences.Editor editor2 = sp.edit();
+                          editor2.putInt("theme",4);
+                          editor2.commit();
+                      }
+                      else if(listPreference.getEntries()[index].equals("테마5")){
+                          sp = getSharedPreferences("setbackground",MODE_PRIVATE);
+                          SharedPreferences.Editor editor2 = sp.edit();
+                          editor2.putInt("theme",5);
+                          editor2.commit();
+                      }
+                      else if(listPreference.getEntries()[index].equals("테마6")){
+                          sp = getSharedPreferences("setbackground",MODE_PRIVATE);
+                          SharedPreferences.Editor editor2 = sp.edit();
+                          editor2.putInt("theme",6);
+                          editor2.commit();
+                      }
+                      else if(listPreference.getEntries()[index].equals("테마7")){
+                          sp = getSharedPreferences("setbackground",MODE_PRIVATE);
+                          SharedPreferences.Editor editor2 = sp.edit();
+                          editor2.putInt("theme",7);
+                          editor2.commit();
+                      }
+                  }
+                  return true;
+              }
+          });
+
+      }
 
 
-    private void setOnPreferenceChange(Preference mPreference) {
-        mPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
-
-        onPreferenceChangeListener.onPreferenceChange(mPreference,
-                PreferenceManager.getDefaultSharedPreferences(mPreference.getContext()).
-                        getString(mPreference.getKey(), ""));
-    }
-
-    private Preference.OnPreferenceChangeListener onPreferenceChangeListener = new
-            Preference.OnPreferenceChangeListener() {
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
-//            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences();
-//            int value = sharedPreferences.getInt("button_percent_setting",30);
-
-            String stringValue = newValue.toString();
-
-            if(preference instanceof ListPreference) {
-
-                ListPreference listPreference = (ListPreference) preference;
-                int index = listPreference.findIndexOfValue(stringValue);
-                preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
-
-            }
-//            else if(preference instanceof SeekBarPreference)
-//            {
+//    private void setOnPreferenceChange(Preference mPreference) {
+//        mPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
 //
-//                preference.setSummary(value);
+//        onPreferenceChangeListener.onPreferenceChange(mPreference,
+//                PreferenceManager.getDefaultSharedPreferences(mPreference.getContext()).
+//                        getString(mPreference.getKey(), ""));
+//    }
+//
+//    private Preference.OnPreferenceChangeListener onPreferenceChangeListener = new
+//            Preference.OnPreferenceChangeListener() {
+//
+//        @Override
+//        public boolean onPreferenceChange(Preference preference, Object newValue) {
+////            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences();
+////            int value = sharedPreferences.getInt("button_percent_setting",30);
+//
+//
+//            String stringValue = newValue.toString();
+//
+//            if(preference instanceof ListPreference) {
+//
+//                ListPreference listPreference = (ListPreference) preference;
+//                int index = listPreference.findIndexOfValue(stringValue);
+//                preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
+//
 //            }
-            return true;
-        }
-
-    };
+////            else if(preference instanceof SeekBarPreference)
+////            {
+////
+////                preference.setSummary(value);
+////            }
+//            return true;
+//        }
+//
+//    };
 
 
 

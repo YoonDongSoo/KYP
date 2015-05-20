@@ -1,14 +1,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="yu.kyp.MemoListActivity">
+    tools:context="yu.kyp.MemoListActivity"
+    android:id="@+id/memoListRelativeLayout">
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="@android:color/holo_blue_dark"
+        android:background="#AACEBFE0"
         android:padding="10dp"
         android:id="@+id/relativeLayout">
 
@@ -30,14 +31,32 @@
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
-        <Button
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="신규"
-            android:id="@+id/buttonNewMemo"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:onClick="buttonNewMemo_OnClick" />
+            android:orientation="horizontal"
+            android:id="@+id/linearLayout"
+            android:layout_alignParentEnd="true">
+
+            <Button
+                android:layout_width="34dp"
+                android:layout_height="wrap_content"
+                android:text="신규"
+                android:id="@+id/buttonNewMemo"
+                android:onClick="buttonNewMemo_OnClick"
+                android:layout_alignParentTop="true"
+             />
+
+            <Button
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:text="검색"
+                android:id="@+id/buttonSearch"
+                android:onClick="buttonSearch_OnClick"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+             />
+        </LinearLayout>
     </RelativeLayout>
 
     <ListView
@@ -46,7 +65,9 @@
         android:id="@+id/listViewNote"
         android:layout_below="@+id/relativeLayout"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:cacheColorHint="#00000000"
+        />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -54,48 +75,52 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="@android:color/holo_blue_dark"
+        android:background="#AACEBFE0"
         android:padding="10dp">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+"
-            android:id="@+id/button1"
-            android:layout_weight="1" />
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="+"-->
+            <!--android:id="@+id/button1"-->
+            <!--android:layout_weight="1" />-->
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="편지"
-            android:id="@+id/button2"
-            android:layout_weight="1" />
+            android:text="설정"
+            android:id="@+id/buttonSetting"
+            android:layout_weight="1"
+            android:onClick="buttonSetting_OnClick"/>
+
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="공유"-->
+            <!--android:id="@+id/button3"-->
+            <!--android:layout_weight="1"-->
+            <!--android:onClick="buttonShare_OnClick"/>-->
+
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="프린"-->
+            <!--android:id="@+id/button4"-->
+            <!--android:layout_weight="1"-->
+            <!--android:onClick="buttonPrint_OnClick"/>-->
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="카톡"
-            android:id="@+id/button3"
-            android:layout_weight="1" />
+            android:text="선택"
+            android:id="@+id/buttonSelect"
+            android:layout_weight="1"
+            android:onClick="buttonSelect_OnClick"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="프린"
-            android:id="@+id/button4"
-            android:layout_weight="1" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="형식"
-            android:id="@+id/button5"
-            android:layout_weight="1" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="휴지"
+            android:text="휴지통"
             android:id="@+id/buttonTrash"
             android:layout_weight="1"
             android:onClick="buttonTrash_OnClick" />
