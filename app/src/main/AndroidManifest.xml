@@ -82,7 +82,7 @@
         </activity>
         <activity
             android:name=".SelectActivity"
-            android:label="@string/title_activity_select" >
+            android:label="" >
         </activity>
         <activity
             android:name=".SearchActivity"

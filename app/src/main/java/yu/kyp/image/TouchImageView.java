@@ -440,6 +440,7 @@ public class TouchImageView extends ImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
         if(scrollOnTouchListener!=null)
         {
             onDrawReady = true;
@@ -450,10 +451,12 @@ public class TouchImageView extends ImageView {
             }
             //======================================================
             // 1. 현재 위치 표시
-
+            Paint paint = new Paint();
+            paint.setColor(Color.BLUE);
+            canvas.drawCircle(scrollOnTouchListener.last.x, scrollOnTouchListener.last.y, 15, paint);
 
         }
-        super.onDraw(canvas);
+
 
         if(paintOnTouchListener!=null) {
             //======================================================
@@ -1008,7 +1011,7 @@ public class TouchImageView extends ImageView {
         //
         // Remember last point position for dragging
         //
-        private PointF last = new PointF();
+        public PointF last = new PointF();
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -1016,17 +1019,7 @@ public class TouchImageView extends ImageView {
             mGestureDetector.onTouchEvent(event);
             PointF curr = new PointF(event.getX(), event.getY());
 
-            //포인터 테스트
-            Paint paint = new Paint();
-            paint.setColor(Color.BLUE);
-            Paint paint1 = new Paint();
-            paint1.setColor(Color.WHITE);
-            float initialx=0f , initialy=0f, offsetx=0f, offsety=0f;
-            float[] mv = new float[9];
-            Matrix matrix1 = ((TouchImageView)v).getImageMatrix();
-            matrix1.getValues(mv);
-            float x = (event.getX()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_X]/mv[Matrix.MSCALE_Y]));
-            float y = (event.getY()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_Y]/mv[Matrix.MSCALE_Y]));
+
 
 
             if (state == State.NONE || state == State.DRAG || state == State.FLING) {
@@ -1036,13 +1029,6 @@ public class TouchImageView extends ImageView {
                         if (fling != null)
                             fling.cancelFling();
                         setState(State.DRAG);
-
-
-                       // canvasWrite.drawCircle(initialx, initialy, 15, paint1);
-                        canvasWrite.drawCircle(x, y, 15, paint);
-                        initialx = x;
-                        initialy = y;
-
                         break;
 
                     case MotionEvent.ACTION_MOVE:
@@ -1054,25 +1040,12 @@ public class TouchImageView extends ImageView {
                             matrix.postTranslate(fixTransX, fixTransY);
                             fixTrans();
                             last.set(curr.x, curr.y);
-
-                          //  canvasWrite.drawCircle(initialx, initialy, 15, paint1);
-                            canvasWrite.drawCircle(x, y, 15, paint);
-                            initialx = x;
-                            initialy = y;
-
                         }
                         break;
 
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_POINTER_UP:
                         setState(State.NONE);
-
-                       // canvasWrite.drawCircle(initialx, initialy, 15, paint1);
-                        canvasWrite.drawCircle(x, y, 15, paint);
-                        initialx = x;
-                        initialy = y;
-
-
                         break;
                 }
 
