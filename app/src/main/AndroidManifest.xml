@@ -2,10 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="yu.kyp" >
 
-    <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="17" />
-
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"  />
     <uses-permission
@@ -21,23 +17,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
-    <supports-screens
-        android:anyDensity="true"
-        android:largeScreens="true" />
-
-
-
-
-
-
-    <!--<provider android:name=".data.DBProvider"-->
-        <!--android:authorities="com.sam.data.DBProvider">-->
-    <!--</provider>-->
-    <!-- Provider 등록 authorities로 Content Provider 구분 -->
-    <provider android:name="DataProvider" android:authorities="yu.kyp"/>
-
-
+    <supports-screens android:largeScreens="true" android:anyDensity="true"/>
 
     <application
         android:allowBackup="true"
@@ -62,6 +42,10 @@
             android:label="@string/title_activity_memo_write" >
         </activity>
         <activity
+            android:name=".MemoWriteActivity2"
+            android:label="@string/title_activity_memo_write_activity2" >
+        </activity>
+        <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
@@ -71,8 +55,7 @@
         </activity>
         <activity
             android:name=".EraserPaletteActivity"
-            android:label="@string/pen_palette_dialog"
-            android:theme="@android:style/Theme.Dialog" >
+            android:label="" >
         </activity>
 
         <service
@@ -83,10 +66,11 @@
             android:name=".test.ZoomActivity"
             android:label="@string/title_activity_zoom" >
         </activity>
+
         <activity
             android:name=".TextDialog"
-            android:label=""
-            android:theme="@android:style/Theme.Dialog" >
+            android:theme="@android:style/Theme.Dialog"
+            android:label="">
         </activity>
         <activity
             android:name=".TrashActivity"
@@ -100,6 +84,13 @@
             android:name=".SelectActivity"
             android:label="@string/title_activity_select" >
         </activity>
+        <activity
+            android:name=".SearchActivity"
+            android:label=""
+            android:windowSoftInputMode="stateHidden|adjustPan">
+        </activity>
+
+
     </application>
 
 </manifest>

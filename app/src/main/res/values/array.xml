@@ -32,15 +32,23 @@
     </string-array>
 
     <string-array name="entries_background">
-        <item>일반 노트</item>
-        <item>무지 노트</item>
-        <item>회의 노트</item>
+        <item>테마1</item>
+        <item>테마2</item>
+        <item>테마3</item>
+        <item>테마4</item>
+        <item>테마5</item>
+        <item>테마6</item>
+        <item>테마7</item>
 
     </string-array>
     <string-array name="entryvalues_background">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
 
     </string-array>
 

@@ -43,7 +43,6 @@
             android:title="테마 설정"
             android:entries="@array/entries_background"
             android:entryValues="@array/entryvalues_background"
-
             />
         <ListPreference
             android:key="button_alarm_setting"

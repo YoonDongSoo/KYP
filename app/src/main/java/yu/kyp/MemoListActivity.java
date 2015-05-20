@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 
 import yu.kyp.common.activity.ActivityBase;
@@ -26,7 +27,10 @@ public class MemoListActivity extends ActivityBase {
     private NoteManager noteManager = null;
     private Context context = null;
     private static SharedPreferences sp;
+    RelativeLayout memoListRelativeLayout;
     static SharedPreferences sp2;
+    private static SharedPreferences sp3;
+    static int theme_num =7;
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -40,7 +44,7 @@ public class MemoListActivity extends ActivityBase {
             editor2.putInt("e_size_value",2);
             editor2.commit();
 
-            Intent i = new Intent(context,MemoWriteActivity.class);
+            Intent i = new Intent(context,MemoWriteActivity2.class);
             i.putExtra("NOTE_NO",(int)id);
             startActivity(i);
         }
@@ -83,6 +87,11 @@ public class MemoListActivity extends ActivityBase {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_list);
 
+        memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
+        memoListRelativeLayout.setBackgroundColor(0xffffff);
+
+//        memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
+
         context = this;
         noteManager = new NoteManager(this);
 
@@ -101,9 +110,43 @@ public class MemoListActivity extends ActivityBase {
 
     }
 
+    //검색 버튼이 눌렸을 때
+    public void buttonSearch_OnClick(View v){
+        Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+
+        sp3 = getSharedPreferences("setbackground", MODE_PRIVATE);
+
+        //SettingsActivity에서 받은 Preferences값을 이용하여 테마 이미지 처리
+        if(sp3.getInt("theme",0) == 1){
+            memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.cat2));
+        }
+        if(sp3.getInt("theme",0) == 2){
+            memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
+        }
+        if(sp3.getInt("theme",0) == 3){
+
+        }
+        if(sp3.getInt("theme",0) == 4){
+
+        }
+        if(sp3.getInt("theme",0) == 5){
+
+        }
+        if(sp3.getInt("theme",0) == 6){
+
+        }
+        if(sp3.getInt("theme",0) == 7){
+
+        }
+
+
+
         // ListView에 노트 내용 뿌려주기.
         bindNote();
         Log.d(TAG, "onResume");
@@ -158,7 +201,7 @@ public class MemoListActivity extends ActivityBase {
 
     public void buttonNewMemo_OnClick(View v)
     {
-        Intent i = new Intent(context,MemoWriteActivity.class);
+        Intent i = new Intent(context,MemoWriteActivity2.class);
         startActivity(i);
     }
 
