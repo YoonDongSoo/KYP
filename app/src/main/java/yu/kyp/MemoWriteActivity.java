@@ -251,6 +251,7 @@ public class MemoWriteActivity extends BlunoLibrary {
             note.TITLE = "제목 없음";
         //note.NOTE_DATA = paintboard.undo.getLast();
 //        note.NOTE_DATA = paintboard.mBitmapWrite;
+        note.NOTE_DATA = null;//paintboard.mBitmapWrite;
         note.thumbnail = new Thumbnail(note.NOTE_DATA);
         noteManager.saveNoteData(note);
     }
