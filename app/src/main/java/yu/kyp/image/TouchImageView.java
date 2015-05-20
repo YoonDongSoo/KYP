@@ -73,6 +73,7 @@ public class TouchImageView extends ImageView {
      * 지우개 모드일때 손을 떼고 나서 지워지는 문제점을 발견하여 다음의 코드를 추가
      */
     private boolean mEraserMode;
+    private boolean isScrollMode;
 
     /**
      * Undo 리스트 리턴
@@ -283,6 +284,7 @@ public class TouchImageView extends ImageView {
         if(paintOnTouchListener == null)
             paintOnTouchListener = new PaintOnTouchListener();
         setOnTouchListener(paintOnTouchListener);
+        isScrollMode = false;
     }
 
     public void setScrollTouchListener()
@@ -291,6 +293,7 @@ public class TouchImageView extends ImageView {
             scrollOnTouchListener = new PrivateOnTouchListener();
 
         setOnTouchListener(scrollOnTouchListener);
+        isScrollMode = true;
     }
 
     public void setWriteCanvas(Canvas canvas) {
@@ -441,7 +444,7 @@ public class TouchImageView extends ImageView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if(scrollOnTouchListener!=null)
+        if(isScrollMode==true && scrollOnTouchListener!=null)
         {
             onDrawReady = true;
             imageRenderedAtLeastOnce = true;
@@ -458,7 +461,7 @@ public class TouchImageView extends ImageView {
         }
 
 
-        if(paintOnTouchListener!=null) {
+        if(isScrollMode==false && paintOnTouchListener!=null) {
             //======================================================
             // 1. 스케일과 offset을 가져와서 StrokeWidth 맞추기
             Paint tempPaint = new Paint(paintOnTouchListener.mPaint);
