@@ -13,14 +13,17 @@
         android:padding="10dp"
         android:id="@+id/relativeLayout">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:text="뒤로"
             android:id="@+id/buttonBack"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:onClick="buttonBack_OnClick"
+            android:src="@drawable/button_back"
+            android:background="@null" />
 
 
 
@@ -55,23 +58,23 @@
         android:layout_alignParentStart="true">
 
 
-        <Button
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="프린트"
-            android:id="@+id/button4"
+            android:id="@+id/buttonPrint"
             android:layout_weight="1"
             android:onClick="buttonPrint_OnClick"/>
 
-        <Button
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="공유"
-            android:id="@+id/button3"
+            android:id="@+id/buttonShare"
             android:layout_weight="1"
             android:onClick="buttonShare_OnClick"/>
 
-        <Button
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="삭제"

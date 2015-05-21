@@ -4,23 +4,28 @@
     android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:orientation="horizontal"
-        >
+        android:background="@drawable/search_background">
     <EditText
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:layout_weight="8"
         android:id="@+id/titleSearchEdit"
         android:singleLine="true"
-        />
-        <Button
+        android:background="@drawable/search_background2"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_margin="5dp"/>
+        <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:text="검색"
             android:id="@+id/buttonTitleSearch"
             android:onClick="buttonTitleSearch_OnClick"
-            />
+            android:src="@drawable/button_search"
+            android:background="@null" />
     </LinearLayout>
     <ListView
         android:layout_width="wrap_content"

@@ -65,7 +65,7 @@
             android:textColor="@color/White"
             android:padding="@dimen/abc_text_size_small_material" />
 
-        <Button
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/buttonColor"
@@ -116,9 +116,9 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/buttonPen"
-            android:src="@drawable/button_pen"
             android:layout_weight="1"
-            android:onClick="buttonPen_OnClick"/>
+            android:onClick="buttonPen_OnClick"
+            android:src="@drawable/button_pen" />
 
         <ImageButton
             android:layout_width="wrap_content"

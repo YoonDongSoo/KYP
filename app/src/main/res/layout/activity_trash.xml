@@ -8,18 +8,20 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="65dp"
         android:id="@+id/relativeLayout2"
-        android:background="#AACEBFE0">
+        android:background="@drawable/trash_top">
 
-        <Button
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:text="뒤로"
             android:id="@+id/buttonBack"
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
-            android:onClick="buttonBack_OnClick" />
+            android:onClick="buttonBack_OnClick"
+            android:src="@drawable/button_back"
+            android:background="@null" />
 
 
         <TextView
@@ -52,14 +54,16 @@
 
 
 
-        <Button
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:text="삭제"
             android:id="@+id/buttonDelete"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:onClick="buttonDelete_OnClick" />
+            android:onClick="buttonDelete_OnClick"
+            android:src="@drawable/button_finaldelete"
+            android:background="@null" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -69,15 +73,16 @@
             android:id="@+id/textView5"
             android:layout_centerInParent="true" />
 
-        <Button
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:text="복원"
             android:id="@+id/Restore"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/buttonBack"
-            android:layout_centerVertical="true"
-            android:onClick="buttonRestore_OnClick"/>
+            android:onClick="buttonRestore_OnClick"
+            android:src="@drawable/button_backup"
+            android:background="@null"
+            android:layout_alignTop="@+id/textView5"
+            android:layout_toEndOf="@+id/buttonBack" />
     </RelativeLayout>
 
     <ListView

@@ -1,15 +1,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/memoListRelativeLayout"
     tools:context="yu.kyp.MemoListActivity"
-    android:id="@+id/memoListRelativeLayout">
+    android:background="@drawable/background7">
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="65dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="#AACEBFE0"
+        android:background="@drawable/list_top"
         android:padding="10dp"
         android:id="@+id/relativeLayout">
 
@@ -38,25 +39,31 @@
             android:id="@+id/linearLayout"
             android:layout_alignParentEnd="true">
 
-            <Button
-                android:layout_width="34dp"
-                android:layout_height="wrap_content"
-                android:text="신규"
-                android:id="@+id/buttonNewMemo"
-                android:onClick="buttonNewMemo_OnClick"
-                android:layout_alignParentTop="true"
-             />
-
-            <Button
+            <ImageButton
                 android:layout_width="35dp"
-                android:layout_height="wrap_content"
+                android:layout_height="35dp"
                 android:text="검색"
                 android:id="@+id/buttonSearch"
+                android:layout_weight="1"
                 android:onClick="buttonSearch_OnClick"
+                android:src="@drawable/button_search"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
              />
         </LinearLayout>
+
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:text="신규"
+            android:id="@+id/buttonNewMemo"
+            android:layout_weight="1"
+            android:onClick="buttonNewMemo_OnClick"
+            android:src="@drawable/button_plus"
+            android:background="@null"
+            android:layout_marginRight="30dp"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/linearLayout" />
     </RelativeLayout>
 
     <ListView
@@ -67,7 +74,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:cacheColorHint="#00000000"
-        />
+        android:layout_above="@+id/linearLayout2" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -75,8 +82,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="#AACEBFE0"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:id="@+id/linearLayout2">
 
         <!--<Button-->
             <!--android:layout_width="wrap_content"-->
@@ -85,13 +92,15 @@
             <!--android:id="@+id/button1"-->
             <!--android:layout_weight="1" />-->
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="50dp"
             android:text="설정"
             android:id="@+id/buttonSetting"
             android:layout_weight="1"
-            android:onClick="buttonSetting_OnClick"/>
+            android:onClick="buttonSetting_OnClick"
+            android:src="@drawable/button_setting"
+            android:background="@null" />
 
         <!--<Button-->
             <!--android:layout_width="wrap_content"-->
@@ -109,21 +118,25 @@
             <!--android:layout_weight="1"-->
             <!--android:onClick="buttonPrint_OnClick"/>-->
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="50dp"
             android:text="선택"
             android:id="@+id/buttonSelect"
             android:layout_weight="1"
-            android:onClick="buttonSelect_OnClick"/>
+            android:onClick="buttonSelect_OnClick"
+            android:src="@drawable/button_select"
+            android:background="@null" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="50dp"
             android:text="휴지통"
             android:id="@+id/buttonTrash"
             android:layout_weight="1"
-            android:onClick="buttonTrash_OnClick" />
+            android:onClick="buttonTrash_OnClick"
+            android:src="@drawable/button_trash"
+            android:background="@null" />
 
     </LinearLayout>
 
