@@ -1,14 +1,15 @@
 package yu.kyp;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.Shape;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -17,10 +18,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.image.Note;
@@ -38,6 +44,12 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     private static final int REQUEST_INPUT_TITLE = 5;
     private StringBuffer strBuffer = new StringBuffer();
     private NoteManager noteManager = null;
+    Date curDate = new Date();
+    Uri eventUriString;
+    Calendar mCalendar = Calendar.getInstance();
+    static int select_memo_year;
+    static int select_memo_month;
+    static int select_memo_day;
     /**
      * 노트 객체
      */
@@ -64,13 +76,14 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     private ArrayList<Integer> color_save = new ArrayList<Integer>();
     private int alpha_temp_value;
     private boolean text_flag;
+    private static SharedPreferences memo_title;
 
     private ViewTreeObserver.OnGlobalLayoutListener touchViewPaint_OnGlobalLayoutLIstener = new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
         public void onGlobalLayout() {
             int height = viewTouchPaint.getHeight();
             int width = viewTouchPaint.getWidth();
-            Log.e(TAG,String.format("width:%d height:%d",width,height));
+            Log.e(TAG, String.format("width:%d height:%d", width, height));
 
             //=========================================
             // 1. 배경 비트맵&캔버스 설정
@@ -81,14 +94,12 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             //=========================================
             // 2. width,height로 빈 비트맵을 만들거나
             //    기존 데이터를 DB에서 가져온다.
-            if(note.NOTE_DATA==null) {
+            if (note.NOTE_DATA == null) {
                 bitmapWrite = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                 canvasWrite = new Canvas(bitmapWrite);
-                canvasWrite.drawBitmap(bitmapBackground,0,0,null);
-            }
-            else
-            {
-                bitmapWrite = note.NOTE_DATA.copy(Bitmap.Config.ARGB_8888,true);    // mutable로 copy해야 함.
+                canvasWrite.drawBitmap(bitmapBackground, 0, 0, null);
+            } else {
+                bitmapWrite = note.NOTE_DATA.copy(Bitmap.Config.ARGB_8888, true);    // mutable로 copy해야 함.
                 canvasWrite = new Canvas(bitmapWrite);
             }
 
@@ -131,7 +142,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         getNoteData();
 
         // 3. 손글씨용 터치 리스너를 붙이기.
-        viewTouchPaint =  (TouchImageView)findViewById(R.id.touchViewPaint);
+        viewTouchPaint = (TouchImageView) findViewById(R.id.touchViewPaint);
         viewTouchPaint.setPaintTouchListener(); // 손글씨용 터치 리스너
 
         // 4. TouchImageView size가 결정되었을 때 프로세스가 시작된다.
@@ -146,12 +157,10 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         super.onWindowFocusChanged(hasFocus);
 
 
-
     }
 
     private void getNoteData() {
-        try
-        {
+        try {
 
             Intent i = getIntent();
             int noteNo = i.getIntExtra("NOTE_NO", 0);
@@ -159,13 +168,10 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 note = noteManager.getNote(noteNo);
                 //paintboard.undo.addList(note.NOTE_DATA);;
 
-            }
-            else
-            {
+            } else {
                 note = new Note();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -195,7 +201,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
     @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {
-        switch (theConnectionState) {											//Four connection state
+        switch (theConnectionState) {                                            //Four connection state
             case isConnected:
                 Log.d(TAG, "Connected");
                 //buttonScan.setText("Connected");
@@ -225,31 +231,25 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     public void onSerialReceived(String theString) {
         //serialReceivedText.append(theString);							//append the text into the EditText
         //The Serial data from the BLUNO may be sub-packaged, so using a recvBuffer to hold the String is a good choice.
-        Log.d(TAG,"onSerialReceived:"+theString);
+        Log.d(TAG, "onSerialReceived:" + theString);
         strBuffer.append(theString);
 
         // 임시로 주석처리
-        if(theString.contains("ZOM01")==true)
-        {
+        if (theString.contains("ZOM01") == true) {
             viewTouchPaint.zoomInBitmap();
             strBuffer = new StringBuffer();
-        }
-        else if(theString.contains("ZOM02")==true)
-        {
+        } else if (theString.contains("ZOM02") == true) {
             //viewTouchPaint.zoomOutBitmap();
             strBuffer = new StringBuffer();
-        }
-        else if(theString.contains("ZOM03")==true)
-        {
+        } else if (theString.contains("ZOM03") == true) {
             //viewTouchPaint.zoomResetBitmap();
             strBuffer = new StringBuffer();
         }
     }
 
-    public void buttonScroll_OnClick(View v)
-    {
+    public void buttonScroll_OnClick(View v) {
 
-        scrollSelected=!scrollSelected;
+        scrollSelected = !scrollSelected;
 
         //=====================================================
         // 1. 줌스크롤용 터치리스너 붙이기
@@ -300,10 +300,10 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
     /**
      * 저장 버튼 클릭시.
+     *
      * @param v
      */
-    public void buttonSave_OnClick(View v)
-    {
+    public void buttonSave_OnClick(View v) {
         // DB에 저장
         saveNote();
     }
@@ -314,31 +314,28 @@ public class MemoWriteActivity2 extends BlunoLibrary {
      */
     private void saveNote() {
         // 변경된 사항이 없으면 DB에 저장하지 않는다.
-        if(viewTouchPaint.getUndo().size()<=1)
+        if (viewTouchPaint.getUndo().size() <= 1)
             return;
 
-        if(note.TITLE==null || note.TITLE.equals("")==true)
+        if (note.TITLE == null || note.TITLE.equals("") == true)
             note.TITLE = "제목 없음";
-        note.NOTE_DATA = bitmapWrite.copy(Bitmap.Config.ARGB_8888,false);
+        note.NOTE_DATA = bitmapWrite.copy(Bitmap.Config.ARGB_8888, false);
         note.thumbnail = new Thumbnail(note.NOTE_DATA);
         noteManager.saveNoteData(note);
-        Toast.makeText(this,"저장 됨.",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "저장 됨.", Toast.LENGTH_SHORT).show();
     }
 
-    public void buttonBack_OnClick(View v)
-    {
+    public void buttonBack_OnClick(View v) {
         // 1.저장하지 않고 나갈때는 물어보기 팝업
         // 2. activity 종료
         finish();
     }
 
-    public void buttonUndo_OnClick(View v)
-    {
+    public void buttonUndo_OnClick(View v) {
         viewTouchPaint.undo();
     }
 
-    public void buttonPen_OnClick(View v)
-    {
+    public void buttonPen_OnClick(View v) {
         //펜 색상 선택 팔레트를 눌렀을 때
         PenPaletteActivity.colorlistener = new PenPaletteActivity.OnColorSelectedListener() {
 
@@ -353,7 +350,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 //                recentcoloradapter.recent_color_list = color_save;
 //                displayRecentColor();
                 for_alpha = getSharedPreferences("alpha_value", MODE_PRIVATE);
-                alpha_temp_value = for_alpha.getInt("alpha_value_is",0);
+                alpha_temp_value = for_alpha.getInt("alpha_value_is", 0);
                 viewTouchPaint.setPaintAlpha(alpha_temp_value);
 
                 //선택되어진 색상을 적용한다.
@@ -364,15 +361,15 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         };
         //최근 사용한 색 선택 팔레트를 눌렀을 때
         PenPaletteActivity.recentcolorlistener = new PenPaletteActivity.OnRecentColorSelectedListener() {
-            public void onRecentColorSelected(int color){
+            public void onRecentColorSelected(int color) {
                 mColor = color;
                 oldColor = mColor;
 
                 //최근 사용한 색상을 저장
                 color_save.add(mColor);
 
-                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
-                alpha_temp_value = for_alpha.getInt("alpha_value_is",0);
+                for_alpha = getSharedPreferences("alpha_value", MODE_PRIVATE);
+                alpha_temp_value = for_alpha.getInt("alpha_value_is", 0);
                 viewTouchPaint.setPaintAlpha(alpha_temp_value);
 
                 //선택되어진 색상을 적용한다.
@@ -388,8 +385,8 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 mColor = color;
                 oldColor = mColor;
 
-                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
-                alpha_temp_value = for_alpha.getInt("alpha_value_is",0);
+                for_alpha = getSharedPreferences("alpha_value", MODE_PRIVATE);
+                alpha_temp_value = for_alpha.getInt("alpha_value_is", 0);
 
                 viewTouchPaint.setPaintAlpha(100);
 
@@ -417,8 +414,8 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 displayPaintProperty();
             }
         };*/
-        Log.e("!!!!!!!!!!","펜 선택 color 값"+mColor);
-        Log.e("!!!!!!!!!!","펜 선택 size 값"+mSize);
+        Log.e("!!!!!!!!!!", "펜 선택 color 값" + mColor);
+        Log.e("!!!!!!!!!!", "펜 선택 size 값" + mSize);
 
         //펜 색상, 굵기변경 팔레트 띄우기
         Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
@@ -438,12 +435,11 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        onActivityResultProcess(requestCode, resultCode, data);					//onActivityResult Process by BlunoLibrary
+        onActivityResultProcess(requestCode, resultCode, data);                    //onActivityResult Process by BlunoLibrary
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==REQUEST_DRAW_TEXT)
-        {
-            int isCancel = data.getIntExtra("isCancel",0);
-            if(isCancel==0) {
+        if (requestCode == REQUEST_DRAW_TEXT) {
+            int isCancel = data.getIntExtra("isCancel", 0);
+            if (isCancel == 0) {
                 int count = 0;
                 DisplayMetrics outMetrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
@@ -457,22 +453,20 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 Log.i(TAG, "text:" + text);
 
 
-                for(count = 0; count<text.length; count++) {
+                for (count = 0; count < text.length; count++) {
                     //drawText를 위해 y의 위치를 옮겨줘야함(하지않을 경우 같은 자리에 써짐)
                     y += 60.0f;
                     viewTouchPaint.drawText(text[count], x, y);
                 }
                 text_flag = true;
-            }
-            else
-            {
+            } else {
                 // 취소 버튼 눌렀을 때
-                Log.i(TAG,"취소 버튼 눌렀네~");
+                Log.i(TAG, "취소 버튼 눌렀네~");
                 text_flag = true;
             }
         }
-        if(requestCode == REQUEST_PEN_SIZE){
-            if(data.getIntExtra("p_size",0) != 0) {
+        if (requestCode == REQUEST_PEN_SIZE) {
+            if (data.getIntExtra("p_size", 0) != 0) {
                 int pen_size = data.getIntExtra("p_size", 0);
                 Log.i("펜의 사이즈", "" + pen_size);
                 //oldSize = mSize;
@@ -482,10 +476,8 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
                 SharedPreferences sp = getSharedPreferences("current_p_size", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
-                editor.putInt("p_size_value",pen_size);
+                editor.putInt("p_size_value", pen_size);
                 editor.commit();
-
-
 
 
                 viewTouchPaint.updatePaintProperty(mColor, pen_size);
@@ -494,10 +486,9 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
             }
         }
-        if(requestCode == REQUEST_ERASER_SIZE){
-            if(data.getIntExtra("e_size",0) != 0){
-                int eraser_size = data.getIntExtra("e_size",0);
-
+        if (requestCode == REQUEST_ERASER_SIZE) {
+            if (data.getIntExtra("e_size", 0) != 0) {
+                int eraser_size = data.getIntExtra("e_size", 0);
 
 
                 //oldSize = mSize;
@@ -506,7 +497,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
                 SharedPreferences sp2 = getSharedPreferences("current_e_size", MODE_PRIVATE);
                 SharedPreferences.Editor editor2 = sp2.edit();
-                editor2.putInt("e_size_value",eraser_size);
+                editor2.putInt("e_size_value", eraser_size);
                 editor2.commit();
 
                 //펜 사이즈, 크기  저장
@@ -518,7 +509,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 displayPaintProperty();
             }
         }
-        if(requestCode == REQUEST_INPUT_TITLE){
+        if (requestCode == REQUEST_INPUT_TITLE) {
             Toast.makeText(MemoWriteActivity2.this, "종료값은 들어옴", Toast.LENGTH_SHORT).show();
             MemoWriteActivity2.this.finish();
         }
@@ -553,8 +544,181 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 //        MemoTitle.saveNote();
         viewTouchPaint.getUndo().clearList();
     }
-    public void buttonAlarm_OnClick(View v){
-        Intent i = new Intent(getApplicationContext(),AlarmActivity.class);
-        startActivity(i);
+
+    public void buttonAlarm_OnClick(View v) {
+        Toast.makeText(MemoWriteActivity2.this, "알람 눌렸다", Toast.LENGTH_SHORT).show();
+
+        Date curDate = new Date();
+        String curDateStr = String.valueOf(curDate.getTime());
+        Calendar calendar = Calendar.getInstance();
+        Date date = new Date();
+        calendar.setTime(date);
+
+        setCalendar();
+        setMemoDate();
+
+        new DatePickerDialog(
+                MemoWriteActivity2.this,
+                dateSetListener,
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
+
+    private void setCalendar() {
+        Toast.makeText(MemoWriteActivity2.this, "캘린더버튼이야", Toast.LENGTH_SHORT).show();
+        Calendar calendar = Calendar.getInstance();
+        Date date = new Date();
+
+        calendar.setTime(date);
+
+        new TimePickerDialog(
+                MemoWriteActivity2.this,
+                timeSetListener,
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+        ).show();
+
+
+        Date curDate = new Date();
+        mCalendar.setTime(curDate);
+
+        int year = mCalendar.get(Calendar.YEAR);
+        int monthOfYear = mCalendar.get(Calendar.MONTH);
+        int dayOfMonth = mCalendar.get(Calendar.DAY_OF_MONTH);
+
+        String monthStr = String.valueOf(monthOfYear + 1);
+        if (monthOfYear < 9) {
+            monthStr = "0" + monthStr;
+        }
+
+        String dayStr = String.valueOf(dayOfMonth);
+        if (dayOfMonth < 10) {
+            dayStr = "0" + dayStr;
+        }
+
+        int hourOfDay = mCalendar.get(Calendar.HOUR_OF_DAY);
+        int minute = mCalendar.get(Calendar.MINUTE);
+
+        String hourStr = String.valueOf(hourOfDay);
+        if (hourOfDay < 10) {
+            hourStr = "0" + hourStr;
+        }
+
+        String minuteStr = String.valueOf(minute);
+        if (minute < 10) {
+            minuteStr = "0" + minuteStr;
+        }
+
+    }
+
+    private void setMemoDate() {
+        Date date = new Date();
+
+        //Calendar calendar = Calendar.getInstance();
+        mCalendar.setTime(date);
+
+        int year = mCalendar.get(Calendar.YEAR);
+        int monthOfYear = mCalendar.get(Calendar.MONTH);
+        int dayOfMonth = mCalendar.get(Calendar.DAY_OF_MONTH);
+
+        String monthStr = String.valueOf(monthOfYear + 1);
+        if (monthOfYear < 9) {
+            monthStr = "0" + monthStr;
+        }
+
+        String dayStr = String.valueOf(dayOfMonth);
+        if (dayOfMonth < 10) {
+            dayStr = "0" + dayStr;
+        }
+
+        int hourOfDay = mCalendar.get(Calendar.HOUR_OF_DAY);
+        int minute = mCalendar.get(Calendar.MINUTE);
+
+        String hourStr = String.valueOf(hourOfDay);
+        if (hourOfDay < 10) {
+            hourStr = "0" + hourStr;
+        }
+
+        String minuteStr = String.valueOf(minute);
+        if (minute < 10) {
+            minuteStr = "0" + minuteStr;
+        }
+
+    }
+
+    /**
+     * 날짜 설정 리스너
+     */
+    DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
+            mCalendar.set(year, monthOfYear, dayOfMonth);
+
+            select_memo_year = year-1900;
+            select_memo_month = monthOfYear;
+            select_memo_day = dayOfMonth;
+            Toast.makeText(MemoWriteActivity2.this, "날짜 설정이 눌렸음" + select_memo_year
+                    + "," + select_memo_month + ","
+                    + select_memo_day, Toast.LENGTH_SHORT).show();
+
+            String monthStr = String.valueOf(monthOfYear + 1);
+            if (monthOfYear < 9) {
+                monthStr = "0" + monthStr;
+            }
+
+            String dayStr = String.valueOf(dayOfMonth);
+            if (dayOfMonth < 10) {
+                dayStr = "0" + dayStr;
+            }
+
+        }
+    };
+
+    /**
+     * 시간 설정 리스너
+     */
+    TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+        public void onTimeSet(TimePicker view, int hour_of_day, int minute) {
+            String title = note.TITLE;
+            Log.e(TAG, "title:" + title);
+            Toast.makeText(MemoWriteActivity2.this, "시간 설정이 눌렸음", Toast.LENGTH_SHORT).show();
+            mCalendar.set(Calendar.HOUR_OF_DAY, hour_of_day);
+            mCalendar.set(Calendar.MINUTE, minute);
+
+            String hourStr = String.valueOf(hour_of_day);
+            if (hour_of_day < 10) {
+                hourStr = "0" + hourStr;
+            }
+
+            String minuteStr = String.valueOf(minute);
+            if (minute < 10) {
+                minuteStr = "0" + minuteStr;
+            }
+
+            ContentValues eventValues = new ContentValues();
+
+            if(Build.VERSION.SDK_INT >= 8)
+                eventUriString  = Uri.parse("content://com.android.calendar/events");
+            else
+                eventUriString  = Uri.parse("content://calendar/events");
+
+            eventValues.put("calendar_id", 1); // id, We need to choose from our mobile for primary its 1
+            eventValues.put("title", title);
+            eventValues.put("description", "");
+            eventValues.put("eventLocation", "");
+
+            //hour 값 - 9 = 한국 시간
+            eventValues.put("dtstart", Date.UTC(select_memo_year, select_memo_month, select_memo_day, hour_of_day-9, minute, 00));
+            eventValues.put("dtend", Date.UTC(select_memo_year, select_memo_month, select_memo_day, hour_of_day-9, minute, 00));
+            eventValues.put("eventTimezone", TimeZone.getDefault().getID());
+            eventValues.put("eventStatus", 1); // This information is sufficient for most entries tentative (0), confirmed (1) or canceled (2):
+            eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
+
+            //캘린더에 넣기
+            getContentResolver().insert(eventUriString, eventValues);
+        }
+    };
 }
+

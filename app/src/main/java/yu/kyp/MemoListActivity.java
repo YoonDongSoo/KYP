@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import yu.kyp.common.activity.ActivityBase;
 import yu.kyp.image.NoteManager;
@@ -31,9 +32,13 @@ public class MemoListActivity extends ActivityBase {
     static SharedPreferences sp2;
     private static SharedPreferences sp3;
     static int theme_num =7;
+    private static SharedPreferences for_alpha;
+    private static SharedPreferences memo_title;
+    Cursor c;
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Toast.makeText(MemoListActivity.this,"메모 하나 눌렸당 " + position + "," + id,Toast.LENGTH_SHORT).show();
             sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
             SharedPreferences.Editor editor = sp.edit();
             editor.putInt("p_size_value",2);
@@ -44,9 +49,26 @@ public class MemoListActivity extends ActivityBase {
             editor2.putInt("e_size_value",2);
             editor2.commit();
 
+            for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+            SharedPreferences.Editor editor3 = for_alpha.edit();
+            editor3.putInt("alpha_value_is",255);
+            editor3.commit();
+
+//            sp3 = getSharedPreferences("currnt_e_size",MODE_PRIVATE);
+//            SharedPreferences.Editor editor4 = sp3.edit();
+//            editor4.putInt("e_size_value",2);
+//            editor4.commit();
+
+
+
             Intent i = new Intent(context,MemoWriteActivity2.class);
-            i.putExtra("NOTE_NO",(int)id);
+            i.putExtra("NOTE_NO", (int) id);
             startActivity(i);
+
+//            c = noteManager.memotitlegetNoteList(id);
+//            c.moveToNext();
+//            Toast.makeText(MemoListActivity.this,"메모",Toast.LENGTH_SHORT).show();
+
         }
     };
     private SimpleCursorAdapter adapterListNote = null;
@@ -70,6 +92,7 @@ public class MemoListActivity extends ActivityBase {
     };
 
     private long deleteId;
+    //메모리스트에서 메모를 롱클릭하였을 때
     private AdapterView.OnItemLongClickListener longClickListenerListNote = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -166,7 +189,7 @@ public class MemoListActivity extends ActivityBase {
         if(adapterListNote==null) {
             adapterListNote = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, c, new String[]{"TITLE", "LAST_MOD_DT"}, new int[]{android.R.id.text1, android.R.id.text2});
             ListView listviewNote = (ListView) findViewById(R.id.listViewNote);
-            
+
             listviewNote.setAdapter(adapterListNote);
         }
         else

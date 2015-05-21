@@ -10,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -536,7 +535,6 @@ public class PaintBoard extends View {
 
                 mPath.lineTo(touchX, touchY);
                 canvasWrite.drawPath(mPath, mPaint);
-
                 //Path 객체 초기화
                 mPath.reset();
 
