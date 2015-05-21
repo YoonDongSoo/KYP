@@ -114,4 +114,10 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:layout_width="356dp"
+        android:layout_height="210dp"
+        android:id="@+id/imageView2"
+        android:layout_gravity="center" />
+
 </FrameLayout>

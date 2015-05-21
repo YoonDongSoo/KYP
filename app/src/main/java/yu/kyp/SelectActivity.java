@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.OutputStream;
 
@@ -201,38 +202,45 @@ public class SelectActivity extends ActivityBase {
 
         }
 
-        Bitmap icon = note.NOTE_DATA;
-        //Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.cat2);
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("image/jpeg");
+        if(note==null)
+        {
+            Toast.makeText(context,"목록을 선택해주세요",Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Bitmap icon = note.NOTE_DATA;
+            //Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.cat2);
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("image/jpeg");
 
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "Title");
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-        Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                values);
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.TITLE, "Title");
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+            Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    values);
 
-        Log.e("!!!!","uri  "+uri);
+            Log.e("!!!!", "uri  " + uri);
 
 
-        OutputStream outstream;
-        try {
-            outstream = getContentResolver().openOutputStream(uri);
-            icon.compress(Bitmap.CompressFormat.JPEG, 100, outstream);
-            outstream.close();
-        } catch (Exception e) {
-            System.err.println(e.toString());
+            OutputStream outstream;
+            try {
+                outstream = getContentResolver().openOutputStream(uri);
+                icon.compress(Bitmap.CompressFormat.JPEG, 100, outstream);
+                outstream.close();
+            } catch (Exception e) {
+                System.err.println(e.toString());
+            }
+
+            share.putExtra(Intent.EXTRA_STREAM, uri);
+            startActivity(Intent.createChooser(share, "Share Image"));
+
+
+            ImageView imageView = (ImageView) findViewById(R.id.imageView3);
+            imageView.setImageURI(uri);
+
+            checkend = true;
         }
 
-        share.putExtra(Intent.EXTRA_STREAM, uri);
-        startActivity(Intent.createChooser(share, "Share Image"));
-
-
-
-        ImageView imageView = (ImageView) findViewById(R.id.imageView3);
-        imageView.setImageURI(uri);
-
-       checkend = true;
 
     }
 
