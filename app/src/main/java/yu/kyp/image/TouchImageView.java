@@ -73,6 +73,7 @@ public class TouchImageView extends ImageView {
      * 지우개 모드일때 손을 떼고 나서 지워지는 문제점을 발견하여 다음의 코드를 추가
      */
     private boolean mEraserMode;
+    private boolean isScrollMode;
 
     /**
      * Undo 리스트 리턴
@@ -283,6 +284,7 @@ public class TouchImageView extends ImageView {
         if(paintOnTouchListener == null)
             paintOnTouchListener = new PaintOnTouchListener();
         setOnTouchListener(paintOnTouchListener);
+        isScrollMode = false;
     }
 
     public void setScrollTouchListener()
@@ -291,6 +293,7 @@ public class TouchImageView extends ImageView {
             scrollOnTouchListener = new PrivateOnTouchListener();
 
         setOnTouchListener(scrollOnTouchListener);
+        isScrollMode = true;
     }
 
     public void setWriteCanvas(Canvas canvas) {
@@ -440,7 +443,8 @@ public class TouchImageView extends ImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if(scrollOnTouchListener!=null)
+        super.onDraw(canvas);
+        if(isScrollMode==true && scrollOnTouchListener!=null)
         {
             onDrawReady = true;
             imageRenderedAtLeastOnce = true;
@@ -450,12 +454,14 @@ public class TouchImageView extends ImageView {
             }
             //======================================================
             // 1. 현재 위치 표시
-
+            Paint paint = new Paint();
+            paint.setColor(Color.BLUE);
+            canvas.drawCircle(scrollOnTouchListener.last.x, scrollOnTouchListener.last.y, 15, paint);
 
         }
-        super.onDraw(canvas);
 
-        if(paintOnTouchListener!=null) {
+
+        if(isScrollMode==false && paintOnTouchListener!=null) {
             //======================================================
             // 1. 스케일과 offset을 가져와서 StrokeWidth 맞추기
             Paint tempPaint = new Paint(paintOnTouchListener.mPaint);
@@ -1008,7 +1014,7 @@ public class TouchImageView extends ImageView {
         //
         // Remember last point position for dragging
         //
-        private PointF last = new PointF();
+        public PointF last = new PointF();
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -1016,17 +1022,7 @@ public class TouchImageView extends ImageView {
             mGestureDetector.onTouchEvent(event);
             PointF curr = new PointF(event.getX(), event.getY());
 
-            //포인터 테스트
-            Paint paint = new Paint();
-            paint.setColor(Color.BLUE);
-            Paint paint1 = new Paint();
-            paint1.setColor(Color.WHITE);
-            float initialx=0f , initialy=0f, offsetx=0f, offsety=0f;
-            float[] mv = new float[9];
-            Matrix matrix1 = ((TouchImageView)v).getImageMatrix();
-            matrix1.getValues(mv);
-            float x = (event.getX()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_X]/mv[Matrix.MSCALE_Y]));
-            float y = (event.getY()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_Y]/mv[Matrix.MSCALE_Y]));
+
 
 
             if (state == State.NONE || state == State.DRAG || state == State.FLING) {
@@ -1036,13 +1032,6 @@ public class TouchImageView extends ImageView {
                         if (fling != null)
                             fling.cancelFling();
                         setState(State.DRAG);
-
-
-                       // canvasWrite.drawCircle(initialx, initialy, 15, paint1);
-                        canvasWrite.drawCircle(x, y, 15, paint);
-                        initialx = x;
-                        initialy = y;
-
                         break;
 
                     case MotionEvent.ACTION_MOVE:
@@ -1054,25 +1043,12 @@ public class TouchImageView extends ImageView {
                             matrix.postTranslate(fixTransX, fixTransY);
                             fixTrans();
                             last.set(curr.x, curr.y);
-
-                          //  canvasWrite.drawCircle(initialx, initialy, 15, paint1);
-                            canvasWrite.drawCircle(x, y, 15, paint);
-                            initialx = x;
-                            initialy = y;
-
                         }
                         break;
 
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_POINTER_UP:
                         setState(State.NONE);
-
-                       // canvasWrite.drawCircle(initialx, initialy, 15, paint1);
-                        canvasWrite.drawCircle(x, y, 15, paint);
-                        initialx = x;
-                        initialy = y;
-
-
                         break;
                 }
 
