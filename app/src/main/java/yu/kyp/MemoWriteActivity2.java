@@ -1,10 +1,12 @@
 package yu.kyp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -12,8 +14,10 @@ import android.graphics.drawable.shapes.Shape;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -53,7 +57,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     ImageButton saveBtn;
     ImageButton backBtn;
     Button colorBtn;
-    Button scrollBtn;
+    ImageButton scrollBtn;
     private boolean scrollSelected;
     private Bitmap bitmapBackground;
     private Canvas canvasBackground;
@@ -64,6 +68,9 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     private ArrayList<Integer> color_save = new ArrayList<Integer>();
     private int alpha_temp_value;
     private boolean text_flag;
+    private boolean isEraserMode;
+    private Context context;
+    private boolean textSelected;
 
     private ViewTreeObserver.OnGlobalLayoutListener touchViewPaint_OnGlobalLayoutLIstener = new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
@@ -105,10 +112,12 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     };
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //(TAG,"onCreate");
         super.onCreate(savedInstanceState);
+        context = this;
         setContentView(R.layout.activity_memo_write_activity2);
         //0. 블루투스
         onCreateProcess();
@@ -124,7 +133,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         saveBtn = (ImageButton) findViewById(R.id.buttonSave);
         backBtn = (ImageButton) findViewById(R.id.buttonBack);
         colorBtn = (Button) findViewById(R.id.buttonColor);
-        scrollBtn = (Button) findViewById(R.id.buttonScroll);
+        scrollBtn = (ImageButton) findViewById(R.id.buttonScroll);
 
 
         // 2. 노트데이터 불러오기
@@ -231,16 +240,18 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         // 임시로 주석처리
         if(theString.contains("ZOM01")==true)
         {
-            viewTouchPaint.zoomInBitmap();
+            viewTouchPaint.zoomInBitmap(1.5f);
             strBuffer = new StringBuffer();
         }
         else if(theString.contains("ZOM02")==true)
         {
+            viewTouchPaint.zoomInBitmap(2.0f);
             //viewTouchPaint.zoomOutBitmap();
             strBuffer = new StringBuffer();
         }
         else if(theString.contains("ZOM03")==true)
         {
+            viewTouchPaint.zoomInBitmap(2.5f);
             //viewTouchPaint.zoomResetBitmap();
             strBuffer = new StringBuffer();
         }
@@ -257,12 +268,13 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         //스크롤 버튼을 제외한 나머지 버튼들을 비활성화인 false 상태로 만듦
         if (scrollSelected) {
             Log.i("scrollBtn", "clicked.");
+            textBtn.setEnabled(false);
             penBtn.setEnabled(false);
             eraserBtn.setEnabled(false);
             undoBtn.setEnabled(false);
             alarmBtn.setEnabled(false);
 //            scrollBtn.setEnabled(false);
-
+            textBtn.invalidate();
             penBtn.invalidate();
             eraserBtn.invalidate();
             undoBtn.invalidate();
@@ -278,12 +290,13 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         //스크롤 이외의 버튼을 활성화인 true를 해줌
         else {
             Log.i("scrollBtn", "unclicked.");
+            textBtn.setEnabled(true);
             penBtn.setEnabled(true);
             eraserBtn.setEnabled(true);
             undoBtn.setEnabled(true);
             alarmBtn.setEnabled(true);
 //                        scrollBtn.setEnabled(true);
-
+            textBtn.invalidate();
             penBtn.invalidate();
             eraserBtn.invalidate();
             undoBtn.invalidate();
@@ -418,7 +431,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             }
         };*/
         Log.e("!!!!!!!!!!","펜 선택 color 값"+mColor);
-        Log.e("!!!!!!!!!!","펜 선택 size 값"+mSize);
+        Log.e("!!!!!!!!!!", "펜 선택 size 값" + mSize);
 
         //펜 색상, 굵기변경 팔레트 띄우기
         Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
@@ -552,5 +565,153 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         // undo리스트를 삭제.
 //        MemoTitle.saveNote();
         viewTouchPaint.getUndo().clearList();
+    }
+
+    /**
+     *
+     * @param v
+     */
+    public void buttonEraser_OnClick(View v)
+    {
+        //지우개 크기 선택 화면 띄우기
+        Intent intent = new Intent(getApplicationContext(), EraserPaletteActivity.class);
+        startActivityForResult(intent, REQUEST_ERASER_SIZE);
+
+        /*isEraserMode = !isEraserMode;
+        // 지우개 버튼이 선택되면
+        if (isEraserMode==false) {
+            //펜 버튼, undo 버튼 비활성화
+            penBtn.setEnabled(false);
+            undoBtn.setEnabled(false);
+
+            penBtn.invalidate();
+            undoBtn.invalidate();
+
+//            //펜 사이즈, 크기  저장
+            oldColor = mColor;
+            oldSize = mSize;
+//
+//            //mColor = Color.WHITE;
+
+            sp2 = getSharedPreferences("currnt_e_size",MODE_PRIVATE);
+            int e_size_value = sp2.getInt("e_size_value",0);
+//
+            //선택된 크기로 지우개 기능 활성화
+//            EraserPaletteActivity.listener = new EraserPaletteActivity.OnEraserSelectedListener() {
+//                public void onEraserSelected(int size) {
+//                    mSize = size;
+            paintboard.setEraserPaint(e_size_value);
+            //화면의 좌측 상단에 선택한 것을 표시한다.
+            displayPaintProperty();
+//                }
+//            };
+
+            //지우개 크기 선택 화면 띄우기
+            Intent intent = new Intent(getApplicationContext(), EraserPaletteActivity.class);
+
+            startActivityForResult(intent,REQUEST_ERASER_SIZE);
+
+        }
+        //지우개 버튼 선택이 해제되면
+        else {
+            //펜, undo 버튼 활성화
+            penBtn.setEnabled(true);
+            undoBtn.setEnabled(true);
+
+            penBtn.invalidate();
+            undoBtn.invalidate();
+
+            //이전에 저장해놓은 색상, 크기 값을 가져온다.
+            mColor = oldColor;
+            mSize = oldSize;
+            Log.d("!!!!!!!!!!","color 값"+mColor);
+            Log.d("!!!!!!!!!!","size 값"+mSize);
+
+            //선택되어진 색상과 크기를 적용한다.
+            paintboard.updatePaintProperty(mColor, mSize);
+            displayPaintProperty();
+        }*/
+    }
+
+    /**
+     * 자판 클릭
+     * @param v
+     */
+    public void buttonText_OnClick(View v)
+    {
+        textSelected = !textSelected;
+        if (textSelected==true) {
+            penBtn.setEnabled(false);
+            eraserBtn.setEnabled(false);
+            undoBtn.setEnabled(false);
+            alarmBtn.setEnabled(false);
+            scrollBtn.setEnabled(false);
+
+            penBtn.invalidate();
+            eraserBtn.invalidate();
+            undoBtn.invalidate();
+            alarmBtn.invalidate();
+            scrollBtn.invalidate();
+
+            // 안내 내보내기
+            Toast.makeText(context, "글자의 위치를 터치하세요.", Toast.LENGTH_SHORT).show();
+
+            //화면이 터치 되었을때
+            viewTouchPaint.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    float x = event.getX();
+                    float y = event.getY();
+                    PointF p = ((TouchImageView)v).transformCoordTouchToBitmap(x,y,true);
+
+
+//                    Intent i = MemoWriteActivity.this.getIntent();
+//                    boolean flag = i.getBooleanExtra("flag",false);
+
+                    //Toast.makeText(context, x + "," + y, Toast.LENGTH_SHORT).show();
+
+                    //if(text_flag == true) {
+                    if(event.getAction()==MotionEvent.ACTION_DOWN) {
+                        Intent intent = new Intent(getApplicationContext(), TextDialog.class);
+                        intent.putExtra("x", p.x);
+                        intent.putExtra("y", p.y);
+                        //startActivity(intent);
+                        startActivityForResult(intent, REQUEST_DRAW_TEXT);
+                    //    text_flag = false;
+                    }
+
+                    return true;
+                }
+                //back키를 눌렀을 때
+                public boolean onKeyDown(int keyCode, KeyEvent event){
+                    boolean endBack = false;
+                    if(keyCode == KeyEvent.KEYCODE_BACK){
+                        if(!endBack) {
+                            finish();
+                            endBack = true;
+                        }
+                    }
+                    return true;
+
+                }
+            });
+        }
+        else{
+            penBtn.setEnabled(true);
+            eraserBtn.setEnabled(true);
+            undoBtn.setEnabled(true);
+            alarmBtn.setEnabled(true);
+            scrollBtn.setEnabled(true);
+
+            penBtn.invalidate();
+            eraserBtn.invalidate();
+            undoBtn.invalidate();
+            alarmBtn.invalidate();
+            scrollBtn.invalidate();
+
+            viewTouchPaint.setPaintTouchListener();
+            viewTouchPaint.updatePaintProperty(mColor, mSize);
+            displayPaintProperty();
+        }
     }
 }

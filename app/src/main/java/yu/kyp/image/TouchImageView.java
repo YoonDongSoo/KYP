@@ -197,11 +197,11 @@ public class TouchImageView extends ImageView {
     /**
      * 마지막 좌표를 기준으로 0.25% 줌을 한다.
      */
-    public void zoomInBitmap() {
-        /*float scale = getScaleX()+0.25f;
+    public void zoomInBitmap(float scale) {
+        //float scale = 1.25f;
         int width = bitmapBackground.getWidth();
         int height = bitmapBackground.getHeight();
-        setZoom(scale,paintOnTouchListener.lastX/width,paintOnTouchListener.lastY/height);*/
+        setZoom(scale,paintOnTouchListener.lastX/width,paintOnTouchListener.lastY/height);
     }
 
 
@@ -1261,7 +1261,7 @@ public class TouchImageView extends ImageView {
      * 			to the bounds of the bitmap size.
      * @return Coordinates of the point touched, in the coordinate system of the original drawable.
      */
-    private PointF transformCoordTouchToBitmap(float x, float y, boolean clipToBitmap) {
+    public PointF transformCoordTouchToBitmap(float x, float y, boolean clipToBitmap) {
         matrix.getValues(m);
         float origW = getDrawable().getIntrinsicWidth();
         float origH = getDrawable().getIntrinsicHeight();

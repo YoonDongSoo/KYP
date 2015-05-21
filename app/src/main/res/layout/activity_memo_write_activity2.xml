@@ -9,9 +9,9 @@
         android:layout_height="65dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/write_top"
         android:padding="10dp"
-        android:id="@+id/top_relative">
+        android:id="@+id/top_relative"
+        android:background="@drawable/write_top">
 
         <ImageButton
             android:layout_width="35dp"
@@ -19,7 +19,7 @@
             android:id="@+id/buttonBack"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/back"
+            android:src="@drawable/btn_back"
             android:background="@null"
             android:onClick="buttonBack_OnClick" />
 
@@ -30,7 +30,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:background="@null"
-            android:src="@drawable/button_save"
+            android:src="@drawable/btn_save"
             android:contentDescription="저장"
             android:onClick="buttonSave_OnClick" />
 
@@ -85,7 +85,8 @@
         android:layout_above="@+id/bottom_linear"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/for_sizeNcolor" />
+        android:layout_below="@+id/for_sizeNcolor"
+        android:background="@color/White" />
 
 
     <LinearLayout
@@ -104,22 +105,24 @@
             android:id="@+id/buttonText"
             android:src="@drawable/btn_text"
             android:background="@null"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="buttonText_OnClick"/>
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/buttonEraser"
-            android:src="@drawable/button_eraser"
-            android:layout_weight="1"/>
+            android:src="@drawable/btn_eraser"
+            android:layout_weight="1"
+            android:onClick="buttonEraser_OnClick"/>
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/buttonPen"
-            android:src="@drawable/button_pen"
+            android:src="@drawable/btn_pen"
             android:layout_weight="1"
             android:onClick="buttonPen_OnClick"/>
 
@@ -128,24 +131,25 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/buttonAlarm"
-            android:src="@drawable/button_alarm"
+            android:src="@drawable/btn_alarm"
             android:layout_weight="1" />
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:id="@+id/buttonUndo"
-            android:src="@drawable/button_undo"
+            android:src="@drawable/btn_undo"
             android:layout_weight="1"
             android:onClick="buttonUndo_OnClick"
             />
-        <Button
-            android:layout_width="35dp"
+        <ImageButton
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/buttonScroll"
             android:layout_weight="1"
             android:onClick="buttonScroll_OnClick"
-            android:text="scr" />
+            android:background="@null"
+            android:src="@drawable/btn_move"/>
     </LinearLayout>
 
 </RelativeLayout>
