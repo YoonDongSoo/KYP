@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="yu.kyp.MemoWriteActivity2"
-    android:background="@drawable/background7">
+    android:background="@drawable/background7_500">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -85,8 +85,7 @@
         android:layout_above="@+id/bottom_linear"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/for_sizeNcolor"
-        android:background="@color/White" />
+        android:layout_below="@+id/for_sizeNcolor" />
 
 
     <LinearLayout

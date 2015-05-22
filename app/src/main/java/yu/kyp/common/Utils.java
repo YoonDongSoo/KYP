@@ -2,6 +2,8 @@ package yu.kyp.common;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.PointF;
 
 import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
@@ -82,5 +84,30 @@ public class Utils {
             return null;
         else
             return BitmapFactory.decodeByteArray(image, 0, image.length);
+    }
+
+    /**
+     * Touch좌표를 matrix가 적용된 canvas좌표로 변환한다.
+     * @param matrix
+     * @param x
+     * @param y
+     * @return
+     */
+    public static PointF TransformTouchPointToCanvasPoint(Matrix matrix, float x, float y) {
+        PointF point = new PointF();
+        float[] mv = new float[9];
+        matrix.getValues(mv);
+
+        float xx = (x*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_X]/mv[Matrix.MSCALE_Y]));
+        float yy = (y*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_Y]/mv[Matrix.MSCALE_Y]));
+        point.set(xx,yy);
+        return point;
+    }
+
+    public static float TransformTouchValueToCanvasValue(Matrix matrix, float value) {
+        float[] mv = new float[9];
+        matrix.getValues(mv);
+        float result = value*(1/mv[Matrix.MSCALE_Y]);
+        return result;
     }
 }

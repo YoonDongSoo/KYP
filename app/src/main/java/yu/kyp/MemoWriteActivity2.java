@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import yu.kyp.bluno.BlunoLibrary;
+import yu.kyp.common.Utils;
 import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
 import yu.kyp.image.Thumbnail;
@@ -63,11 +66,10 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     private Canvas canvasBackground;
     private int mSize = 2;
     private SharedPreferences for_alpha;
-    private int mColor;
+    private int mColor = Color.BLACK;
     private int oldColor;
     private ArrayList<Integer> color_save = new ArrayList<Integer>();
     private int alpha_temp_value;
-    private boolean text_flag;
     private boolean isEraserMode;
     private Context context;
     private boolean textSelected;
@@ -81,9 +83,9 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
             //=========================================
             // 1. 배경 비트맵&캔버스 설정
-            bitmapBackground = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            /*bitmapBackground = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             canvasBackground = new Canvas(bitmapBackground);
-            canvasBackground.drawColor(Color.WHITE);
+            canvasBackground.drawColor(Color.WHITE);*/
 
             //=========================================
             // 2. width,height로 빈 비트맵을 만들거나
@@ -91,7 +93,8 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             if(note.NOTE_DATA==null) {
                 bitmapWrite = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                 canvasWrite = new Canvas(bitmapWrite);
-                canvasWrite.drawBitmap(bitmapBackground,0,0,null);
+                // 2015-05-22 윤동수 수정: 백그라운드는 그리지 않는다.
+                //canvasWrite.drawBitmap(bitmapBackground,0,0,null);
             }
             else
             {
@@ -102,7 +105,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
             // 3. 글쓰기 비트맵&캔버스 설정
             viewTouchPaint.setImageBitmap(bitmapWrite);
-            viewTouchPaint.setBackgroundBitmap(bitmapBackground);
+            //viewTouchPaint.setBackgroundBitmap(bitmapBackground);
             viewTouchPaint.setWriteCanvas(canvasWrite);
             viewTouchPaint.setWriteBitmap(bitmapWrite);
 
@@ -134,18 +137,26 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         backBtn = (ImageButton) findViewById(R.id.buttonBack);
         colorBtn = (Button) findViewById(R.id.buttonColor);
         scrollBtn = (ImageButton) findViewById(R.id.buttonScroll);
-
+        viewTouchPaint =  (TouchImageView)findViewById(R.id.touchViewPaint);
 
         // 2. 노트데이터 불러오기
         getNoteData();
 
         // 3. 손글씨용 터치 리스너를 붙이기.
-        viewTouchPaint =  (TouchImageView)findViewById(R.id.touchViewPaint);
         viewTouchPaint.setPaintTouchListener(); // 손글씨용 터치 리스너
 
         // 4. TouchImageView size가 결정되었을 때 프로세스가 시작된다.
         ViewTreeObserver viewTree = viewTouchPaint.getViewTreeObserver();
         viewTree.addOnGlobalLayoutListener(touchViewPaint_OnGlobalLayoutLIstener);
+
+        // 5. 노트배경
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inSampleSize = 1;
+        options.inPurgeable = true;
+        bitmapBackground = BitmapFactory.decodeResource(getResources(), R.drawable.note_line_500, options);
+        viewTouchPaint.setBackgroundBitmap(bitmapBackground);
+        viewTouchPaint.setBackgroundResource(R.drawable.note_line_500);
 
     }
 
@@ -332,7 +343,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
         if(note.TITLE==null || note.TITLE.equals("")==true)
             note.TITLE = "제목 없음";
-        note.NOTE_DATA = bitmapWrite.copy(Bitmap.Config.ARGB_8888,false);
+        note.NOTE_DATA = bitmapWrite;//.copy(Bitmap.Config.ARGB_8888,false);
         note.thumbnail = new Thumbnail(note.NOTE_DATA);
         noteManager.saveNoteData(note);
         Toast.makeText(this,"저장 됨.",Toast.LENGTH_SHORT).show();
@@ -455,36 +466,28 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==REQUEST_DRAW_TEXT)
         {
-            int isCancel = data.getIntExtra("isCancel",0);
+            if(data==null)
+                return;
+            int isCancel = data.getIntExtra("isCancel",1);
             if(isCancel==0) {
-                int count = 0;
+                /*int count = 0;
                 DisplayMetrics outMetrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 
-                float density = outMetrics.density;
+                float density = outMetrics.density;*/
 
                 // ok버튼 눌렀을 때.
-                String text[] = data.getStringExtra("text").toString().split("\n");
+                //String text[] = data.getStringExtra("text").toString().split("\n");
+                String text = data.getStringExtra("text").toString();
                 float x = data.getFloatExtra("x", 0.0f);
                 float y = data.getFloatExtra("y", 0.0f);
                 Log.i(TAG, "text:" + text);
 
 
-                for(count = 0; count<text.length; count++) {
-                    //drawText를 위해 y의 위치를 옮겨줘야함(하지않을 경우 같은 자리에 써짐)
-                    y += 60.0f;
-                    viewTouchPaint.drawText(text[count], x, y);
-                }
-                text_flag = true;
-            }
-            else
-            {
-                // 취소 버튼 눌렀을 때
-                Log.i(TAG,"취소 버튼 눌렀네~");
-                text_flag = true;
+                viewTouchPaint.drawText(text, x, y);
             }
         }
-        if(requestCode == REQUEST_PEN_SIZE){
+        else if(requestCode == REQUEST_PEN_SIZE){
             if(data.getIntExtra("p_size",0) != 0) {
                 int pen_size = data.getIntExtra("p_size", 0);
                 Log.i("펜의 사이즈", "" + pen_size);
@@ -507,7 +510,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
             }
         }
-        if(requestCode == REQUEST_ERASER_SIZE){
+        else if(requestCode == REQUEST_ERASER_SIZE){
             if(data.getIntExtra("e_size",0) != 0){
                 int eraser_size = data.getIntExtra("e_size",0);
 
@@ -531,7 +534,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 displayPaintProperty();
             }
         }
-        if(requestCode == REQUEST_INPUT_TITLE){
+        else if(requestCode == REQUEST_INPUT_TITLE){
             Toast.makeText(MemoWriteActivity2.this, "종료값은 들어옴", Toast.LENGTH_SHORT).show();
             MemoWriteActivity2.this.finish();
         }
@@ -660,24 +663,15 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             viewTouchPaint.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    float x = event.getX();
-                    float y = event.getY();
-                    PointF p = ((TouchImageView)v).transformCoordTouchToBitmap(x,y,true);
+                    // 1. 스케일과 offset을 가져와서 touchX,touchY값 맞추기
+                    Matrix matrix = ((TouchImageView)v).getImageMatrix();
+                    PointF pointCanvas = Utils.TransformTouchPointToCanvasPoint(matrix, event.getX(), event.getY());
 
-
-//                    Intent i = MemoWriteActivity.this.getIntent();
-//                    boolean flag = i.getBooleanExtra("flag",false);
-
-                    //Toast.makeText(context, x + "," + y, Toast.LENGTH_SHORT).show();
-
-                    //if(text_flag == true) {
                     if(event.getAction()==MotionEvent.ACTION_DOWN) {
                         Intent intent = new Intent(getApplicationContext(), TextDialog.class);
-                        intent.putExtra("x", p.x);
-                        intent.putExtra("y", p.y);
-                        //startActivity(intent);
+                        intent.putExtra("x", pointCanvas.x);
+                        intent.putExtra("y", pointCanvas.y);
                         startActivityForResult(intent, REQUEST_DRAW_TEXT);
-                    //    text_flag = false;
                     }
 
                     return true;
@@ -709,6 +703,9 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             alarmBtn.invalidate();
             scrollBtn.invalidate();
 
+            for_alpha = getSharedPreferences("alpha_value", MODE_PRIVATE);
+            alpha_temp_value = for_alpha.getInt("alpha_value_is",0);
+            viewTouchPaint.setPaintAlpha(alpha_temp_value);
             viewTouchPaint.setPaintTouchListener();
             viewTouchPaint.updatePaintProperty(mColor, mSize);
             displayPaintProperty();
