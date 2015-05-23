@@ -269,10 +269,8 @@ public class PenPaletteActivity extends Activity {
         neonPen.setAdapter(neonpenadapter);
         neonPen.setNumColumns(neonpenadapter.getNumColumns());
 
-        //recent_color_list = memowriteactivity.color_save;
-        recent_color_list.addAll(memowriteactivity.color_save);
-      //  recentcoloradapter.recent_color_arraylist = recent_color_list;
-        recentcoloradapter.recent_color_arraylist.addAll(recent_color_list);
+        recent_color_list = memowriteactivity.color_save;
+        recentcoloradapter.recent_color_arraylist = recent_color_list;
         Log.i("!!!!!onCreate@@@@@@@@", "어레이갯수" + recent_color_list.size());
 //        cancel.setOnClickListener(new OnClickListener() {
 //            public void onClick(View v) {

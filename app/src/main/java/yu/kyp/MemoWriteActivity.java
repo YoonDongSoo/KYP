@@ -553,7 +553,7 @@ public class MemoWriteActivity extends BlunoLibrary {
                 Toast.makeText(MemoWriteActivity.this, "색상" + mColor, Toast.LENGTH_SHORT).show();
 
 //                recentcoloradapter.recent_color_list = color_save;
-                displayRecentColor();
+//                displayRecentColor();
                 for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
                 alpha_temp_value = for_alpha.getInt("alpha_value_is",0);
                 paintboard.set_alpha(alpha_temp_value);
