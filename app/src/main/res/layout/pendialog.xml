@@ -12,7 +12,7 @@
 
         <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:text="뒤로"
             android:id="@+id/buttonBack"
             android:layout_centerVertical="true"
@@ -21,7 +21,8 @@
             android:onClick="buttonback_OnClick"
             android:src="@drawable/button_back"
             android:background="@null"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="10dp"
+            android:layout_alignParentEnd="false" />
 
         <TextView
             android:layout_width="wrap_content"
