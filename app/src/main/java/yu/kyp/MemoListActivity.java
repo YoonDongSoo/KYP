@@ -100,9 +100,9 @@ public class MemoListActivity extends ActivityBase {
         noteManager = new NoteManager(this);
 
         // 2. ListView OnItemClickLIstener 설정
-        ListView listviewNote = (ListView) findViewById(R.id.listViewNote);
-        listviewNote.setOnItemClickListener(listenerListNote);
-        listviewNote.setOnItemLongClickListener(longClickListenerListNote);
+        ListViewNote = (ListView) findViewById(R.id.listViewNote);
+        ListViewNote.setOnItemClickListener(listenerListNote);
+        ListViewNote.setOnItemLongClickListener(longClickListenerListNote);
 
     }
 
@@ -164,7 +164,8 @@ public class MemoListActivity extends ActivityBase {
 //            ListView ListViewNote = (ListView) findViewById(R.id.listViewNote);
 //            ListViewNote.setAdapter(adapterListNote);
             adapterlist = new ListCursorAdapter(this,c);
-            ListViewNote.setAdapter(adapterlist);
+            if(adapterlist!=null)
+                ListViewNote.setAdapter(adapterlist);
         }
         else
         {
@@ -217,7 +218,7 @@ public class MemoListActivity extends ActivityBase {
 
     public void buttonSetting_OnClick(View v)
     {
-        startActivity(new Intent(this,SettingsActivity.class));
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
     @Override

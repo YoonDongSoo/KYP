@@ -23,13 +23,13 @@ public class ListCursorAdapter extends CursorAdapter {
     String Time;
     String ListName;
 
-    public int listItem[];
+    //public int listItem[];
     private NoteManager noteManager = null;
 
     public ListCursorAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
         // noteManager = new NoteManager(context);
-        listItem = new int[cursor.getCount()];
+        //listItem = new int[cursor.getCount()];
     }
 
     public View newView(Context context, Cursor cursor, ViewGroup parent) {

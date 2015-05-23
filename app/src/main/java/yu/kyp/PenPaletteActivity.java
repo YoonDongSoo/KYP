@@ -658,6 +658,8 @@ class NeonPenDataAdapter extends BaseAdapter {
             public void onClick(View v) {
 
                 if (PenPaletteActivity.neoncolorlistener != null) {
+                    Pref.setAlpha(mContext,100);
+
                     PenPaletteActivity.neoncolorlistener.onNeonColorSelected(((Integer) v.getTag()).intValue());
                     if(((Integer) v.getTag()).intValue()==0)
                         return;

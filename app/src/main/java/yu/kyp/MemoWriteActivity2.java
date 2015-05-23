@@ -468,7 +468,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 mColor = color;
                 oldColor = mColor;
 
-                viewTouchPaint.setPaintAlpha(100);
+                viewTouchPaint.setPaintAlpha(Pref.getAlpha(context,100));
 
                 //선택되어진 색상을 적용한다.
                 viewTouchPaint.updatePaintProperty(mColor, mSize);
