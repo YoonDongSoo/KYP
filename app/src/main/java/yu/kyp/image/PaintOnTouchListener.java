@@ -1,15 +1,15 @@
 package yu.kyp.image;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import yu.kyp.common.Utils;
 
 /**
  * Created by DONGSOO on 2015-05-17.
@@ -49,11 +49,9 @@ public class PaintOnTouchListener implements View.OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {
         //======================================================
         // 1. 스케일과 offset을 가져와서 touchX,touchY값 맞추기
-        float[] mv = new float[9];
         Matrix matrix = ((TouchImageView)v).getImageMatrix();
-        matrix.getValues(mv);
-        float x = (event.getX()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_X]/mv[Matrix.MSCALE_Y]));
-        float y = (event.getY()*(1/mv[Matrix.MSCALE_Y]) - (mv[Matrix.MTRANS_Y]/mv[Matrix.MSCALE_Y]));
+        PointF pointCanvas = Utils.TransformTouchPointToCanvasPoint(matrix, event.getX(), event.getY());
+
 
         //Log.e(TAG,String.format("(%.0f,%.0f)->(%.0f,%.0f)",event.getX(),event.getY(),x,y));
 
@@ -65,7 +63,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
                 //Log.i("draw", "actionup called.");
                 v.getParent().requestDisallowInterceptTouchEvent(false);
                 //touchUp 메소드 호출
-                Rect rect = touchUp(x,y, false);
+                Rect rect = touchUp(pointCanvas.x,pointCanvas.y, false);
                 //s = null;   // Stroke 인스턴스 삭제
 
                 //화면을 갱신한다.
@@ -90,7 +88,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
                     //scrollview에 영향을 안받고 draw 기능 적용
                     v.getParent().requestDisallowInterceptTouchEvent(true);
                     //touchDown()메소드 호출
-                    rect = touchDown(x,y);
+                    rect = touchDown(pointCanvas.x,pointCanvas.y);
 
 
                     //화면을 갱신한다.
@@ -100,11 +98,12 @@ public class PaintOnTouchListener implements View.OnTouchListener {
 
 
 
-                    if(undo.size()==0)
+                    // 2015-05-22 윤동수 주석처리: 여기에서 undo에 넣지 않아도 될것 같은데?
+                    /*if(undo.size()==0)
                     {
                         // undo 목록에 넣기
                         undo.addList(((TouchImageView)v).getWriteBitmap());
-                    }
+                    }*/
 
                     //===================================
                     //터치 관련 처리
@@ -124,7 +123,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
                     //scrollview에 영향을 안받고 draw 기능 적용
                     v.getParent().requestDisallowInterceptTouchEvent(true);
                     //touchMove() 메소드 호출
-                    rect = touchMove(x,y);
+                    rect = touchMove(pointCanvas.x,pointCanvas.y);
 
                     //화면을 갱신한다.
                     if (rect != null) {
@@ -137,17 +136,14 @@ public class PaintOnTouchListener implements View.OnTouchListener {
     }
 
 
+
+
     /**
      * Process event for touch down
      *
      * @return
      */
     private Rect touchDown(final float x, final float y) {
-
-
-
-
-
         lastX = x;
         lastY = y;
 

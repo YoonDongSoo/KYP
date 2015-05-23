@@ -15,7 +15,7 @@ public class UndoList extends ArrayList<Bitmap> {
      * Undo 최대 개수
      * 2015-05-21 윤동수:최대10개까지해야함. Out of Memory오류 발생
      */
-    private static final int MAX_UNDOS = 10;
+    private static final int MAX_UNDOS = 9;
     private static final String TAG = UndoList.class.getSimpleName();
     private static final int SIZE_WIDTH = 0;
     private static final int SIZE_HEIGHT = 0;
