@@ -1,11 +1,15 @@
 package yu.kyp.image;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.text.method.Touch;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -23,7 +27,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
     private float mCurveEndX;
     private float mCurveEndY;
     private int mInvalidateExtraBorder = 10;
-    static final float TOUCH_TOLERANCE = 8;
+    static final float TOUCH_TOLERANCE = 4;
     private static final boolean RENDERING_ANTIALIAS = true;
     private static final boolean DITHER_FLAG = true;
     public Paint mPaint = null;
@@ -60,75 +64,51 @@ public class PaintOnTouchListener implements View.OnTouchListener {
         switch (event.getAction()) {
             //손을 떼었을 때
             case MotionEvent.ACTION_UP:
-                //Log.i("draw", "actionup called.");
-                v.getParent().requestDisallowInterceptTouchEvent(false);
-                //touchUp 메소드 호출
-                Rect rect = touchUp(pointCanvas.x,pointCanvas.y, false);
-                //s = null;   // Stroke 인스턴스 삭제
+                // 1.touchUp 메소드 호출
+                Rect rect = touchUp(pointCanvas.x, pointCanvas.y, v);
+
+                //화면을 갱신한다.
+                if (rect != null) {
+                    v.invalidate(rect);
+                }
+                else
+                    v.invalidate();
+
+                //2015-05-23 윤동수 주석
+                //Path 객체 초기화
+                //mPath.rewind();
+                //mPath.reset();
+                // undo 목록에 넣기
+                undo.addList(((TouchImageView)v).getWriteBitmap());
+
+
+                return true;
+            //화면에 손을 댔을 때
+            case MotionEvent.ACTION_DOWN:
+                //touchDown()메소드 호출
+                rect = touchDown(pointCanvas.x,pointCanvas.y);
 
                 //화면을 갱신한다.
                 if (rect != null) {
                     v.invalidate(rect);
                 }
 
-                //Path 객체 초기화
-                mPath.rewind();
-
+                // 젤 처음 화면으로 undo하기 위해서 필요함.
                 // undo 목록에 넣기
-                undo.addList(((TouchImageView)v).getWriteBitmap());
-
-                return true;
-            //화면에 손을 댔을 때
-            case MotionEvent.ACTION_DOWN:
-                //Log.i("draw", "actiondown called.");
-
-//                    if (mBitmapWrite == null){
-//                        ;
-//                    }
-                    //scrollview에 영향을 안받고 draw 기능 적용
-                    v.getParent().requestDisallowInterceptTouchEvent(true);
-                    //touchDown()메소드 호출
-                    rect = touchDown(pointCanvas.x,pointCanvas.y);
-
-
-                    //화면을 갱신한다.
-                    if (rect != null) {
-                        v.invalidate(rect);
-                    }
-
-
-
-                    // 2015-05-22 윤동수 주석처리: 여기에서 undo에 넣지 않아도 될것 같은데?
-                    /*if(undo.size()==0)
-                    {
-                        // undo 목록에 넣기
-                        undo.addList(((TouchImageView)v).getWriteBitmap());
-                    }*/
-
-                    //===================================
-                    //터치 관련 처리
-                    //===================================
-                    /*//좌표값 저장
-                    x = event.getRawX();
-                    y = event.getRawY();
-                    //터치 상태
-                    istouched = true;
-                    touchx = x; touchy =y;
-                    String msg = "터치를 입력받음 : " + x + " / " + y;
-                    Log.d(TAG,msg);*/
+                if(undo.size()==0)
+                {
+                    undo.addList(((TouchImageView)v).getWriteBitmap());
+                }
                 return true;
             //움직일 때
             case MotionEvent.ACTION_MOVE:
-                //Log.i("draw", "actionmove called.");
-                    //scrollview에 영향을 안받고 draw 기능 적용
-                    v.getParent().requestDisallowInterceptTouchEvent(true);
-                    //touchMove() 메소드 호출
-                    rect = touchMove(pointCanvas.x,pointCanvas.y);
+                //touchMove() 메소드 호출
+                rect = touchMove(pointCanvas.x,pointCanvas.y,v);
 
-                    //화면을 갱신한다.
-                    if (rect != null) {
-                        v.invalidate(rect);
-                    }
+                //화면을 갱신한다.
+                if (rect != null) {
+                    v.invalidate(rect);
+                }
 
                 return true;
         }
@@ -153,6 +133,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
         Rect mInvalidRect = new Rect();
         //Path객체에 현재 좌표값 추가
         mPath.moveTo(x, y);
+        mPath.lineTo(x,y);
         /**********************/
 
         /*final int border = mInvalidateExtraBorder;
@@ -174,16 +155,34 @@ public class PaintOnTouchListener implements View.OnTouchListener {
      *
      * @return
      */
-    private Rect touchMove(final float x, final float y) {
+    private Rect touchMove(final float x, final float y, final View v) {
 
-        Rect rect = processMove(x,y);
+        Rect rect = processMove(x,y,v);
 
         return rect;
     }
 
-    private Rect touchUp(final float x, final float y, boolean cancel) {
-        Rect rect = processMove(x,y);
-        return rect;
+    private Rect touchUp(final float x, final float y, final View v) {
+        mPath.lineTo(x,y);
+        // 2015-05-23 추가: 기존에 그은 것을 초기화하고 다시 그린다.
+        drawPath((TouchImageView) v);
+        //Rect rect = processMove(x,y);
+        //return rect;
+        return null;
+    }
+
+    /**
+     * 기존에 그은 것을 삭제하고 mPath를 캔버스에 다시 drawPath한다.
+     * @param v
+     */
+    private void drawPath(TouchImageView v) {
+        Canvas canvas = v.getWriteCanvas();
+        Bitmap prev = undo.getLast();
+        if (prev != null){
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            canvas.drawBitmap(prev, 0, 0, null);
+        }
+        canvas.drawPath(mPath, mPaint);
     }
 
     /**
@@ -193,7 +192,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
      *
      * @return
      */
-    private Rect processMove(final float x, final float y) {            /******************************/
+    private Rect processMove(final float x, final float y,final View v) {            /******************************/
 
 
         final float dx = Math.abs(x - lastX);
@@ -209,8 +208,13 @@ public class PaintOnTouchListener implements View.OnTouchListener {
             float cX = mCurveEndX = (x + lastX) / 2;
             float cY = mCurveEndY = (y + lastY) / 2;
 
+
             //Path 객체에 현재 좌표값을 곡선으로 추가
             mPath.quadTo(lastX, lastY, cX, cY);
+
+            // 2015-05-23 추가: 기존에 그은 것을 삭제하고 다시 그린다.
+            drawPath((TouchImageView) v);
+
 
             // union with the control point of the new curve
             mInvalidRect.union((int) lastX - border, (int) lastY - border,

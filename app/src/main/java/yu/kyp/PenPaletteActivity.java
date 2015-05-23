@@ -21,6 +21,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import yu.kyp.common.Pref;
+import yu.kyp.common.Utils;
+
 /**
  * 선굵기를 선택하는 대화상자용 액티비티
  *
@@ -142,30 +145,40 @@ public class PenPaletteActivity extends Activity {
         //투명도 시크바
         alphaSeekBar = (SeekBar) findViewById(R.id.alphaSeekBar);
 
-        sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
+        //===========================================================
+        // 펜 굵기 설정
+        /*sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
         p_size_value = sp.getInt("p_size_value",0);
         Toast.makeText(PenPaletteActivity.this,"펜팔레트에서의 사이즈" + p_size_value,Toast.LENGTH_SHORT).show();
         if(p_size_value != 2) {
             sizeSeekBar.setProgress(p_size_value);
-        }
-        alphaSeekBar.setProgress(255);
+        }*/
+        p_size_value = Pref.getPenSize(this,20);
+        sizeSeekBar.setMax(50);
+        sizeSeekBar.setProgress(p_size_value);
 
+        //===========================================================
+        // 펜 alpha값 설정
+        /*alphaSeekBar.setProgress(255);
         for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
         alpha_value = for_alpha.getInt("alpha_value_is",0);
         Toast.makeText(PenPaletteActivity.this,"펜팔레트에서의 투명도" + alpha_value,Toast.LENGTH_SHORT).show();
         if(alpha_value != 255) {
             alphaSeekBar.setProgress(alpha_value);
-        }
+        }*/
+        alpha_value = Pref.getAlpha(this,255);
+        alphaSeekBar.setMax(255);
+        alphaSeekBar.setProgress(alpha_value);
 
         //펜 사이즈 시크바가 움직이지 않았을 경우(터치가 아예 안되었을 경우)
         Intent i = new Intent();
         progress_state = 0;
-        i.putExtra("p_size",progress_state);
+        i.putExtra("p_size", progress_state);
         setResult(REQUEST_PEN_SIZE,i);
 
         Intent i2 = new Intent();
         progress_state2 = 255;
-        i2.putExtra("alpha_size",progress_state2);
+        i2.putExtra("alpha_size", progress_state2);
         setResult(REQUEST_ALPHA,i2);
 
         //펜 사이즈 시크바가 터치되었을 경우
@@ -178,9 +191,10 @@ public class PenPaletteActivity extends Activity {
                 Intent i = new Intent();
 //                int current_progress = sizeSeekBar.getProgress();
                 progress_state = sizeSeekBar.getProgress();
-                i.putExtra("p_size",progress_state);
+                i.putExtra("p_size", progress_state);
 
-                Toast.makeText(PenPaletteActivity.this,"seekbar: " + sizeSeekBar.getProgress(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(PenPaletteActivity.this,"seekbar: " + sizeSeekBar.getProgress(), Toast.LENGTH_LONG).show();
+                Pref.setPenSize(mainContext,progress_state);
 
                 setResult(REQUEST_PEN_SIZE,i);
             }
@@ -205,15 +219,12 @@ public class PenPaletteActivity extends Activity {
                 progress_state2 = alphaSeekBar.getProgress();
 
                 Intent i2 = new Intent();
-                i2.putExtra("alpha_size",progress_state2);
-                setResult(REQUEST_ALPHA,i2);
+                i2.putExtra("alpha_size", progress_state2);
+                setResult(REQUEST_ALPHA, i2);
 
                 Toast.makeText(PenPaletteActivity.this,"투명도 seekbar: " + alphaSeekBar.getProgress(), Toast.LENGTH_SHORT).show();
 
-                for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
-                SharedPreferences.Editor editor2 = for_alpha.edit();
-                editor2.putInt("alpha_value_is",progress_state2);
-                editor2.commit();
+                Pref.setAlpha(mainContext,progress_state2);
 
                 paintBoard.set_alpha(progress_state2);
             }
@@ -241,8 +252,6 @@ public class PenPaletteActivity extends Activity {
         colorgrid.setAdapter(coloradapter);
         colorgrid.setNumColumns(coloradapter.getNumColumns());
 
-        //사이즈
-        sizeSeekBar.setMax(50);
 
 
 //        sizegrid.setColumnWidth(14);

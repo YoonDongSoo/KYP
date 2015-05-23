@@ -30,9 +30,9 @@ public class Note {
      */
     public boolean IS_DEL = false;
     /**
-     * 배경
+     * 배경 (0:라인 1:무지 2:회의록)
      */
-    public String BACKGROUND;
+    public int BACKGROUND;
 
     /**
      * 썸네일 객체

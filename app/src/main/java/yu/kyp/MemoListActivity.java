@@ -24,6 +24,7 @@ import yu.kyp.image.NoteManager;
 public class MemoListActivity extends ActivityBase {
 
     private static final String TAG = MemoListActivity.class.getSimpleName();
+    private static final int REQUEST_WRITE_BG = 5;
     private NoteManager noteManager = null;
     private Context context = null;
     private static SharedPreferences sp;
@@ -87,26 +88,18 @@ public class MemoListActivity extends ActivityBase {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_list);
 
+        // 1. 변수 준비
         memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
         memoListRelativeLayout.setBackgroundColor(0xffffff);
-
-//        memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
-
         context = this;
         noteManager = new NoteManager(this);
 
-
-
-        /*// 노트 SEED데이터 입력
-        try {
-            noteManager.insertSeedData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-        // ListView OnItemClickLIstener 설정
+        // 2. ListView OnItemClickLIstener 설정
         ListView listviewNote = (ListView) findViewById(R.id.listViewNote);
         listviewNote.setOnItemClickListener(listenerListNote);
         listviewNote.setOnItemLongClickListener(longClickListenerListNote);
+
+
 
     }
 
@@ -201,8 +194,8 @@ public class MemoListActivity extends ActivityBase {
 
     public void buttonNewMemo_OnClick(View v)
     {
-        Intent i = new Intent(context,MemoWriteActivity2.class);
-        startActivity(i);
+        Intent i = new Intent(context,WriteBackgoundSelectActivity.class);
+        startActivityForResult(i, REQUEST_WRITE_BG);
     }
 
 
@@ -223,6 +216,26 @@ public class MemoListActivity extends ActivityBase {
         startActivity(new Intent(this,SettingsActivity.class));
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG,"requestCode:"+requestCode+" resultCode:"+resultCode);
+        if(requestCode==REQUEST_WRITE_BG)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                if(data!=null)
+                {
+                    // 1. 결과값으로 배경 종류를 받는다. (0:라인 1:무지 2:회의록)
+                    int position = data.getIntExtra("position",0);
+                    Intent i = new Intent(context,MemoWriteActivity2.class);
+                    i.putExtra("bg_type",position);
+                    startActivity(i);
 
+
+                }
+            }
+        }
+    }
 }
 
