@@ -28,7 +28,7 @@ public class CreateTables {
         col.put("NOTE_DATA", "BLOB");
         col.put("LAST_MOD_DT","TEXT NOT NULL");
         col.put("IS_DEL","INTEGER NOT NULL");
-        col.put("BACKGROUND","TEXT");
+        col.put("BACKGROUND","INTEGER NOT NULL");
         if(dropTables==true)
             db.dropTable("NOTE");
         db.createTableWithoutDefaultPK("NOTE", col);

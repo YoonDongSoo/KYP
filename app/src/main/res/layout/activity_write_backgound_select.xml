@@ -1,0 +1,51 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="yu.kyp.WriteBackgoundSelectActivity"
+    android:background="@drawable/background7_500">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:padding="10dp"
+        android:id="@+id/top_relative"
+        android:background="@drawable/write_top">
+
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/buttonBack"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/btn_back"
+            android:background="@null"
+            android:onClick="buttonBack_OnClick" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="메모지 선택"
+            android:id="@+id/textViewTitle"
+            android:textColor="@color/White"
+            android:onClick="textViewTitle_OnClick"
+            android:clickable="true"
+            android:layout_centerInParent="true" />
+
+
+
+    </RelativeLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/listViewBackground"
+        android:layout_below="@+id/top_relative"
+        android:layout_centerHorizontal="true"
+        android:dividerHeight="30dp"
+        android:divider="@android:color/transparent"
+        android:layout_marginTop="30dp" />
+
+</RelativeLayout>

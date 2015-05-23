@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.SimpleCursorAdapter;
 
 import yu.kyp.common.activity.ActivityBase;
 import yu.kyp.image.NoteManager;
@@ -23,6 +24,7 @@ import yu.kyp.image.NoteManager;
 public class MemoListActivity extends ActivityBase {
 
     private static final String TAG = MemoListActivity.class.getSimpleName();
+    private static final int REQUEST_WRITE_BG = 5;
     private NoteManager noteManager = null;
     private Context context = null;
     private static SharedPreferences sp;
@@ -36,7 +38,6 @@ public class MemoListActivity extends ActivityBase {
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
             sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
             SharedPreferences.Editor editor = sp.edit();
             editor.putInt("p_size_value",2);
@@ -85,7 +86,6 @@ public class MemoListActivity extends ActivityBase {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,17 +99,8 @@ public class MemoListActivity extends ActivityBase {
         context = this;
         noteManager = new NoteManager(this);
 
-
-
-        /*// 노트 SEED데이터 입력
-        try {
-            noteManager.insertSeedData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-        // ListView OnItemClickLIstener 설정
+        // 2. ListView OnItemClickLIstener 설정
         ListViewNote = (ListView) findViewById(R.id.listViewNote);
-        ListViewNote.setAdapter(adapterlist);
         ListViewNote.setOnItemClickListener(listenerListNote);
         ListViewNote.setOnItemLongClickListener(longClickListenerListNote);
 
@@ -154,7 +145,6 @@ public class MemoListActivity extends ActivityBase {
 
         // ListView에 노트 내용 뿌려주기.
         bindNote();
-
         Log.d(TAG, "onResume");
         Log.d(TAG, "Settings.getDefaultFactor():" + settings.getDefaultFactor());
         Log.i(TAG,"Setting.getFontType():"+settings.getFontType());
@@ -174,13 +164,13 @@ public class MemoListActivity extends ActivityBase {
 //            ListView ListViewNote = (ListView) findViewById(R.id.listViewNote);
 //            ListViewNote.setAdapter(adapterListNote);
             adapterlist = new ListCursorAdapter(this,c);
-            ListViewNote.setAdapter(adapterlist);
+            if(adapterlist!=null)
+                ListViewNote.setAdapter(adapterlist);
         }
         else
         {
             adapterlist.changeCursor(c);
         }
-
 
     }
 
@@ -209,8 +199,8 @@ public class MemoListActivity extends ActivityBase {
 
     public void buttonNewMemo_OnClick(View v)
     {
-        Intent i = new Intent(context,MemoWriteActivity2.class);
-        startActivity(i);
+        Intent i = new Intent(context,WriteBackgoundSelectActivity.class);
+        startActivityForResult(i, REQUEST_WRITE_BG);
     }
 
 
@@ -228,9 +218,29 @@ public class MemoListActivity extends ActivityBase {
 
     public void buttonSetting_OnClick(View v)
     {
-        startActivity(new Intent(this,SettingsActivity.class));
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG,"requestCode:"+requestCode+" resultCode:"+resultCode);
+        if(requestCode==REQUEST_WRITE_BG)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                if(data!=null)
+                {
+                    // 1. 결과값으로 배경 종류를 받는다. (0:라인 1:무지 2:회의록)
+                    int position = data.getIntExtra("position",0);
+                    Intent i = new Intent(context,MemoWriteActivity2.class);
+                    i.putExtra("bg_type",position);
+                    startActivity(i);
 
+
+                }
+            }
+        }
+    }
 }
 

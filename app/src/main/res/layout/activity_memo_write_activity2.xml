@@ -42,7 +42,9 @@
             android:id="@+id/textViewTitle"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/White" />
+            android:textColor="@color/White"
+            android:onClick="textViewTitle_OnClick"
+            android:clickable="true" />
 
 
 

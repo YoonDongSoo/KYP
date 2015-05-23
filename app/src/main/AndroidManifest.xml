@@ -2,22 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="yu.kyp" >
 
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"  />
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
-    <grant-uri-permission android:path="string"
+
+    <grant-uri-permission
+        android:path="string"
         android:pathPattern="string"
         android:pathPrefix="string" />
-    <!--<uses-permission-->
-        <!--android:name="android.permission.READ_EXTERNAL_STORAGE"-->
-        <!--android:maxSdkVersion="18"/>-->
+    <!-- <uses-permission -->
+    <!-- android:name="android.permission.READ_EXTERNAL_STORAGE" -->
+    <!-- android:maxSdkVersion="18"/> -->
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <supports-screens android:largeScreens="true" android:anyDensity="true"/>
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true" />
 
     <application
         android:allowBackup="true"
@@ -66,11 +69,10 @@
             android:name=".test.ZoomActivity"
             android:label="@string/title_activity_zoom" >
         </activity>
-
         <activity
             android:name=".TextDialog"
-            android:theme="@android:style/Theme.Dialog"
-            android:label="">
+            android:label=""
+            android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
             android:name=".TrashActivity"
@@ -87,10 +89,12 @@
         <activity
             android:name=".SearchActivity"
             android:label=""
-            android:windowSoftInputMode="stateHidden|adjustPan">
+            android:windowSoftInputMode="stateHidden|adjustPan" >
         </activity>
-
-
+        <activity
+            android:name=".WriteBackgoundSelectActivity"
+            android:label="@string/title_activity_write_backgound_select" >
+        </activity>
     </application>
 
 </manifest>

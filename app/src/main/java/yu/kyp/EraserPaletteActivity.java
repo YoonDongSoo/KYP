@@ -1,6 +1,7 @@
 package yu.kyp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
+
+import yu.kyp.common.Pref;
 
 
 /**
@@ -24,6 +27,7 @@ public class EraserPaletteActivity extends Activity {
     static int progress_state = 0;
     static int progress_state2 =0;
     public static OnEraserSelectedListener listener;
+    private Context context;
 
     public interface OnEraserSelectedListener { //지우개 사이즈 누른것 체크
         public void onEraserSelected(int eraser);
@@ -40,6 +44,7 @@ public class EraserPaletteActivity extends Activity {
         setContentView(R.layout.eraserdialog);
 
         this.setTitle("지우개굵기 선택");
+        context = this;
 
         //취소버튼
         closeBtn = (Button) findViewById(R.id.closeBtn);
@@ -49,10 +54,10 @@ public class EraserPaletteActivity extends Activity {
 
         sp2 = getSharedPreferences("currnt_e_size",MODE_PRIVATE);
         e_size_value = sp2.getInt("e_size_value",0);
-        Toast.makeText(EraserPaletteActivity.this, "지우개에서의 사이즈" + e_size_value, Toast.LENGTH_SHORT).show();
-//        if(e_size_value != 2) {
-            eraserSeekBar.setProgress(e_size_value);
-//        }
+        //Toast.makeText(EraserPaletteActivity.this, "지우개에서의 사이즈" + e_size_value, Toast.LENGTH_SHORT).show();
+
+        // 기본 지우개 두께 (SharedPreference에서 가져온다.)
+        eraserSeekBar.setProgress(Pref.getEraserSize(this,50));
 
         //시크바가 움직이지 않았을 경우
         Intent i = new Intent();
@@ -70,11 +75,10 @@ public class EraserPaletteActivity extends Activity {
                 Intent i = new Intent();
 //                int current_progress = sizeSeekBar.getProgress();
                 progress_state = eraserSeekBar.getProgress();
-                i.putExtra("e_size",progress_state);
-
-                Toast.makeText(EraserPaletteActivity.this,"seekbar: " + eraserSeekBar.getProgress(), Toast.LENGTH_SHORT).show();
-
+                i.putExtra("e_size", progress_state);
+                //Toast.makeText(EraserPaletteActivity.this,"seekbar: " + eraserSeekBar.getProgress(), Toast.LENGTH_SHORT).show();
                 setResult(REQUEST_ERASER_SIZE,i);
+                Pref.setEraserSize(context,progress_state);
 //
 
 //                sp1 = getSharedPreferences("current_e_size",MODE_PRIVATE);

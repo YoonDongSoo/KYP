@@ -21,5 +21,6 @@
     <string name="title_activity_trash">TrashActivity</string>
     <string name="title_activity_memo_write_activity2">MemoWriteActivity2</string>
     <string name="title_activity_select">SelectActivity</string>
+    <string name="title_activity_write_backgound_select">WriteBackgoundSelectActivity</string>
 
 </resources>

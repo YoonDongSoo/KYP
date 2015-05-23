@@ -3,7 +3,8 @@
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
     <file url="file://$PROJECT_DIR$/app/src/main/java/yu/kyp/MemoTitle.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/yu/kyp/SettingsActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/yu/kyp/WriteBackgoundSelectActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/yu/kyp/common/Pref.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/yu/kyp/image/TouchImageView.java" charset="UTF-8" />
   </component>
 </project>
-
