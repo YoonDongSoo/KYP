@@ -2,109 +2,332 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="@drawable/list_background">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/select_list_top">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="뒤로"
+            android:id="@+id/buttonBack"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:onClick="buttonback_OnClick"
+            android:src="@drawable/button_back"
+            android:background="@null"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="펜색상 설정"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/White"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="10dp"
+            android:layout_alignParentRight="@+id/buttonBack"
+            android:textSize="20dp"/>
+
+        </RelativeLayout>
+
+    <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:background="@null">-->
+
+       <!--&lt;!&ndash;<Button&ndash;&gt;-->
+           <!--&lt;!&ndash;android:id="@+id/cancel"&ndash;&gt;-->
+           <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+           <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+           <!--&lt;!&ndash;android:text="취소"&ndash;&gt;-->
+           <!--&lt;!&ndash;android:textColor="@color/White"&ndash;&gt;-->
+           <!--&lt;!&ndash;android:layout_centerVertical="true"&ndash;&gt;-->
+           <!--&lt;!&ndash;android:textSize="20dp"&ndash;&gt;-->
+           <!--&lt;!&ndash;android:background="@null" />&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_marginLeft="20dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_marginTop="15dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_marginBottom="10dp"&ndash;&gt;-->
+       <!---->
+
+
+        <!--&lt;!&ndash;<Button&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:id="@+id/buttonsave"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:text="저장"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_alignParentRight="true"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_centerVertical="true"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:textSize="20dp"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:textColor="@color/White"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:background="@null"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;android:layout_alignParentRight="true"&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;android:layout_marginRight="20dp"&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;android:layout_marginTop="15dp"&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;android:layout_marginBottom="10dp"&ndash;&gt;&ndash;&gt;-->
+
+    <!--</RelativeLayout>-->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="#ffffffff">
+    </LinearLayout>
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@null">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="15dp">
+
+    <TextView
+        android:id="@+id/pen_stroke"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="두께"
+        android:textColor="@color/White"
+        android:textSize="20dp"
+        android:layout_margin="10dp"
+       />
+    <ImageView
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_toRightOf="@+id/pen_stroke"
+        android:layout_centerVertical="true"
+        android:background="@drawable/stroke_circle"
+        android:id="@+id/imageView3"
+        android:backgroundTint="@color/White"
+        android:layout_marginLeft="10dp"
+        />
+
+        <SeekBar
+        android:id="@+id/sizeSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:thumb="@drawable/seekbar_button"
+        android:progressBackgroundTint="@color/White"
+        android:layout_gravity="center"
+        android:max="50"
+        android:indeterminate="false"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/imageView4"
+            android:layout_toRightOf="@+id/imageView3"
+            android:layout_marginLeft="5dp" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/stroke_circle"
+            android:id="@+id/imageView4"
+            android:backgroundTint="@color/White"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp" />
+
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ffffffff">
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginBottom="15dp">
+
+    <TextView
+        android:id="@+id/pen_alpha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="투명도"
+        android:textColor="@color/White"
+        android:textSize="20dp"
+        android:layout_margin="10dp"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_toRightOf="@+id/pen_alpha"
+            android:layout_centerVertical="true"
+            android:background="@drawable/alpha_circle"
+            android:id="@+id/imageView5" />
+
+        <SeekBar
+        android:id="@+id/alphaSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:thumb="@drawable/seekbar_button"
+        android:progressBackgroundTint="@color/White"
+        android:layout_gravity="center"
+        android:max="255"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/imageView5"
+            android:layout_toLeftOf="@+id/imageView6" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/stroke_circle"
+            android:id="@+id/imageView6"
+            android:backgroundTint="@color/White"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp" />
+
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ffffffff">
+    </LinearLayout>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_marginLeft="5dp"-->
+        <!--android:layout_marginBottom="20dp">-->
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="펜"-->
+        <!--android:textColor="@color/White"-->
+        <!--android:layout_marginLeft="5dp"-->
+        <!--android:textSize="15dp"-->
+
+        <!--/>-->
+    <!--<GridView-->
+        <!--android:id="@+id/colorGrid"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_margin="5dp"-->
+        <!--/>-->
+
+    <!--</LinearLayout>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="20dp">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="펜"
+            android:textColor="@color/White"
+            android:textSize="15dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="18dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            />
+        <GridView
+            android:id="@+id/colorGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="20dp">
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="색상 선택"
-        android:textSize="@dimen/font_size"
-        android:layout_margin="10dp"
-        />
-    <GridView
-        android:id="@+id/colorGrid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="두께 선택"
-        android:textSize="@dimen/font_size"
-        android:layout_margin="10dp"
-        />
-    <SeekBar
-        android:id="@+id/sizeSeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
-        android:max="50"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="투명도 선택"
-        android:textSize="@dimen/font_size"
-        android:layout_margin="10dp"
-        />
-    <SeekBar
-        android:id="@+id/alphaSeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
-        android:max="255"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="형광펜"
-        android:textSize="@dimen/font_size"
-        android:layout_margin="10dp"
+        android:textColor="@color/White"
+        android:textSize="15dp"
+        android:layout_margin="8dp"
         />
     <GridView
         android:id="@+id/neonPen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="10dp"
-        />
+        android:layout_margin="5dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginBottom="20dp">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="최근 사용한 색상"
-        android:textSize="@dimen/font_size"
-        android:layout_margin="10dp"
+        android:text="최근 사용"
+        android:textColor="@color/White"
+        android:textSize="15dp"
+        android:layout_margin="5dp"
         />
     <GridView
         android:id="@+id/recent_color_grid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         />
-
-    <LinearLayout
-        android:id="@+id/buttonLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="4dp"
-        android:layout_gravity="center_horizontal"
-        >
-        <Button
-            android:id="@+id/othersBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/colorpalette"
-            android:drawablePadding="4dp"
-            android:text="다른 색"
-            />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/selectBtn"
-            android:drawablePadding="4dp"
-            android:text="확인"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/cancelBtn"
-            android:drawablePadding="4dp"
-            android:text="취소"/>
     </LinearLayout>
+    <!--<LinearLayout-->
+        <!--android:id="@+id/buttonLayout"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:padding="4dp"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!-->-->
+        <!--<Button-->
+            <!--android:id="@+id/othersBtn"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:drawableLeft="@drawable/colorpalette"-->
+            <!--android:drawablePadding="4dp"-->
+            <!--android:text="다른 색"-->
+            <!--/>-->
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/selectBtn"-->
+            <!--android:drawablePadding="4dp"-->
+            <!--android:text="확인"/>-->
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/cancelBtn"-->
+            <!--android:drawablePadding="4dp"-->
+            <!--android:text="취소"/>-->
+    <!--</LinearLayout>-->
 
+</LinearLayout>
 </LinearLayout>

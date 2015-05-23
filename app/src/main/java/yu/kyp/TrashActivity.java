@@ -22,6 +22,7 @@ public class TrashActivity extends ActivityBase {
     CheckedTextView tv;
     ArrayList<Long> check = new ArrayList<>();
     CheckBox alldelete;
+    boolean allchecked = false;
     private NoteManager noteManager = null;
     private CustomCursorAdapter adapterListNote = null;
     private AdapterView.OnItemClickListener listenerItemClick = new AdapterView.OnItemClickListener() {
@@ -129,8 +130,11 @@ public class TrashActivity extends ActivityBase {
                 adapterListNote.checked[i]=false;
             }
         }
-        if(alldelete.isChecked())
+
+        if(allchecked=true) {
             alldelete.setChecked(!alldelete.isChecked());
+            allchecked = false;
+        }
         bindNote();
 
 
@@ -138,12 +142,14 @@ public class TrashActivity extends ActivityBase {
 
     public void buttonAllDelete_OnClick(View v)
     {
+       allchecked=true;
        alldelete = (CheckBox)findViewById(R.id.chkAll);
        adapterListNote.setAllChecked(alldelete.isChecked());
        adapterListNote.notifyDataSetChanged();
 
 
         bindNote();
+
     }
 
     public void buttonRestore_OnClick(View v)
@@ -161,8 +167,10 @@ public class TrashActivity extends ActivityBase {
                 adapterListNote.checked[i]=false;
             }
         }
-        if(alldelete.isChecked())
+        if(allchecked=true) {
             alldelete.setChecked(!alldelete.isChecked());
+            allchecked = false;
+        }
         bindNote();
 
     }

@@ -19,7 +19,7 @@
             android:id="@+id/buttonBack"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/back"
+            android:src="@drawable/button_backclick"
             android:background="@null"
             android:onClick="buttonBack_OnClick" />
 

@@ -19,6 +19,7 @@
         android:id="@+id/selectlistview"
         android:layout_alignRight="@+id/checkbox"
         android:layout_alignParentStart="true"
+
        />
 
 
