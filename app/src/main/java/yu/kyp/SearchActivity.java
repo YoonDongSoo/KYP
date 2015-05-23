@@ -5,8 +5,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -25,7 +25,7 @@ public class SearchActivity extends ActivityBase{
     private SimpleCursorAdapter adapterListNote = null;
     private static final String TAG = SearchActivity.class.getSimpleName();
 
-    Button buttonTitleSearch;
+    ImageButton buttonTitleSearch;
     EditText titleSearchEdit;
     ListView search_list;
     TextView titlenotsearch;
@@ -47,7 +47,7 @@ public class SearchActivity extends ActivityBase{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.title_search);
 
-        buttonTitleSearch = (Button) findViewById(R.id.buttonTitleSearch);
+        buttonTitleSearch = (ImageButton) findViewById(R.id.buttonTitleSearch);
         titleSearchEdit = (EditText) findViewById(R.id.titleSearchEdit);
         search_list = (ListView) findViewById(R.id.search_list);
         titlenotsearch = (TextView) findViewById(R.id.titlenotsearch);
@@ -73,6 +73,7 @@ public class SearchActivity extends ActivityBase{
             listviewNote = (ListView) findViewById(R.id.search_list);
             listviewNote.setAdapter(adapterListNote);
             Toast.makeText(SearchActivity.this,"검색된 메모는 " + c.getCount() + "개입니다.",Toast.LENGTH_SHORT).show();
+            titlenotsearch.setVisibility(View.GONE);
         }
         else
         {

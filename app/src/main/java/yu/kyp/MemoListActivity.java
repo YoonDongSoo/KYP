@@ -32,6 +32,9 @@ public class MemoListActivity extends ActivityBase {
     static SharedPreferences sp2;
     private static SharedPreferences sp3;
     static int theme_num =7;
+    private ListCursorAdapter adapterlist = null;
+    private ListView ListViewNote;
+
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -50,7 +53,7 @@ public class MemoListActivity extends ActivityBase {
             startActivity(i);
         }
     };
-    private SimpleCursorAdapter adapterListNote = null;
+   // private SimpleCursorAdapter adapterListNote = null;
     private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
     {
         @Override
@@ -88,9 +91,11 @@ public class MemoListActivity extends ActivityBase {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_list);
 
-        // 1. 변수 준비
-        memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
-        memoListRelativeLayout.setBackgroundColor(0xffffff);
+       // memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
+        //memoListRelativeLayout.setBackgroundColor(0xffffff);
+
+        //memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
+
         context = this;
         noteManager = new NoteManager(this);
 
@@ -98,8 +103,6 @@ public class MemoListActivity extends ActivityBase {
         ListView listviewNote = (ListView) findViewById(R.id.listViewNote);
         listviewNote.setOnItemClickListener(listenerListNote);
         listviewNote.setOnItemLongClickListener(longClickListenerListNote);
-
-
 
     }
 
@@ -156,15 +159,16 @@ public class MemoListActivity extends ActivityBase {
      */
     private void bindNote() {
         Cursor c = noteManager.getNoteList();
-        if(adapterListNote==null) {
-            adapterListNote = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, c, new String[]{"TITLE", "LAST_MOD_DT"}, new int[]{android.R.id.text1, android.R.id.text2});
-            ListView listviewNote = (ListView) findViewById(R.id.listViewNote);
-            
-            listviewNote.setAdapter(adapterListNote);
+        if(adapterlist==null) {
+//            adapterListNote = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, c, new String[]{"TITLE", "LAST_MOD_DT"}, new int[]{android.R.id.text1, android.R.id.text2});
+//            ListView ListViewNote = (ListView) findViewById(R.id.listViewNote);
+//            ListViewNote.setAdapter(adapterListNote);
+            adapterlist = new ListCursorAdapter(this,c);
+            ListViewNote.setAdapter(adapterlist);
         }
         else
         {
-            adapterListNote.changeCursor(c);
+            adapterlist.changeCursor(c);
         }
 
     }

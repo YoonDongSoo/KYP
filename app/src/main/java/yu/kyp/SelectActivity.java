@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -40,6 +39,7 @@ public class SelectActivity extends ActivityBase {
     private static SharedPreferences sp;
     static SharedPreferences sp2;
     CheckBox buttonCheck;
+
     private boolean checkend = false;
     Note note;
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
@@ -78,6 +78,7 @@ public class SelectActivity extends ActivityBase {
         selectlistNote = (ListView) findViewById(R.id.listViewSelectNote);
         selectlistNote.setAdapter(adapterSelectlist);
         buttonCheck = (CheckBox)findViewById(R.id.buttonCheck);
+
 
     }
 
@@ -142,6 +143,7 @@ public class SelectActivity extends ActivityBase {
         return super.onOptionsItemSelected(item);
     }
 
+
     public void buttonDelete_OnClick(View v)
     {
 
@@ -177,7 +179,6 @@ public class SelectActivity extends ActivityBase {
         adapterSelectlist.setAllChecked(buttonCheck.isChecked());
         adapterSelectlist.notifyDataSetChanged();
     }
-
 
 
 
@@ -235,8 +236,8 @@ public class SelectActivity extends ActivityBase {
             startActivity(Intent.createChooser(share, "Share Image"));
 
 
-            ImageView imageView = (ImageView) findViewById(R.id.imageView3);
-            imageView.setImageURI(uri);
+//            ImageView imageView = (ImageView) findViewById(R.id.imageView3);
+//            imageView.setImageURI(uri);
 
             checkend = true;
         }
@@ -252,6 +253,12 @@ public class SelectActivity extends ActivityBase {
         doPhotoPrint();
         checkend = true;
     }
+
+    public void buttonback_OnClick(View v)
+    {
+        finish();
+    }
+
     private void doPhotoPrint() {
         PrintHelper photoPrinter = new PrintHelper(this);
         photoPrinter.setScaleMode(PrintHelper.SCALE_MODE_FIT);
@@ -259,4 +266,6 @@ public class SelectActivity extends ActivityBase {
                 R.drawable.ic_launcher);
         photoPrinter.printBitmap("droids.jpg - test print", bitmap);
     }
+
+
 }

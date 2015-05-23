@@ -1,27 +1,28 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="yu.kyp.SelectActivity">
+    android:layout_height="wrap_content"
+    tools:context="yu.kyp.SelectActivity"
+    android:background="@drawable/list_background">
 
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="#AACEBFE0"
+        android:background="@drawable/select_list_top"
         android:padding="10dp"
         android:id="@+id/relativeLayout">
 
         <ImageButton
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="뒤로"
             android:id="@+id/buttonBack"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:onClick="buttonBack_OnClick"
+            android:onClick="buttonback_OnClick"
             android:src="@drawable/button_back"
             android:background="@null" />
 
@@ -30,11 +31,13 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:button = "@drawable/button_listallcheck"
             android:id="@+id/buttonCheck"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:onClick="buttonCheck_OnClick" />
+            android:onClick="buttonCheck_OnClick"
+            android:checked="false"
+            android:clickable="true" />
     </RelativeLayout>
 
     <ListView
@@ -45,13 +48,12 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:cacheColorHint="#00000000"
-        />
+        android:layout_above="@+id/linearLayout" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#AACEBFE0"
         android:padding="10dp"
         android:id="@+id/linearLayout"
         android:layout_alignParentBottom="true"
@@ -64,7 +66,9 @@
             android:text="프린트"
             android:id="@+id/buttonPrint"
             android:layout_weight="1"
-            android:onClick="buttonPrint_OnClick"/>
+            android:onClick="buttonPrint_OnClick"
+            android:background="@null"
+            android:src="@drawable/button_printclick" />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -72,7 +76,9 @@
             android:text="공유"
             android:id="@+id/buttonShare"
             android:layout_weight="1"
-            android:onClick="buttonShare_OnClick"/>
+            android:onClick="buttonShare_OnClick"
+            android:background="@null"
+            android:src="@drawable/button_shareclick" />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -82,17 +88,19 @@
             android:layout_weight="1"
             android:onClick="buttonDelete_OnClick"
             android:layout_alignParentBottom="true"
-            android:layout_alignEnd="@+id/relativeLayout" />
+            android:layout_alignEnd="@+id/relativeLayout"
+            android:background="@null"
+            android:src="@drawable/button_deleteclick" />
 
     </LinearLayout>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView3"
-        android:layout_above="@+id/linearLayout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="75dp" />
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/imageView3"-->
+        <!--android:layout_above="@+id/linearLayout"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginBottom="75dp" />-->
 
 
 </RelativeLayout>
