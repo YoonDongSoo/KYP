@@ -10,7 +10,7 @@
         android:layout_height="65dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/list_top"
+        android:background="@drawable/top"
         android:padding="10dp"
         android:id="@+id/relativeLayout">
 

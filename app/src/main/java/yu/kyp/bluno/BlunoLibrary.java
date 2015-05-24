@@ -30,8 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yu.kyp.R;
+import yu.kyp.common.Pref;
+import yu.kyp.common.activity.ActivityBase;
 
-public abstract  class BlunoLibrary extends Activity {
+public abstract  class BlunoLibrary extends ActivityBase {
 
 	private Context mainContext=this;
 
@@ -96,7 +98,8 @@ public abstract  class BlunoLibrary extends Activity {
         	if(mConnectionState== connectionStateEnum.isConnecting)
 			mConnectionState= connectionStateEnum.isToScan;
 			onConectionStateChange(mConnectionState);
-			mBluetoothLeService.close();
+			if(mBluetoothLeService!=null)
+				mBluetoothLeService.close();
 		}};
 		
     private Runnable mDisonnectingOverTimeRunnable=new Runnable(){
@@ -106,7 +109,8 @@ public abstract  class BlunoLibrary extends Activity {
         	if(mConnectionState== connectionStateEnum.isDisconnecting)
 			mConnectionState= connectionStateEnum.isToScan;
 			onConectionStateChange(mConnectionState);
-			mBluetoothLeService.close();
+			if(mBluetoothLeService!=null)
+				mBluetoothLeService.close();
 		}};
     
 	public static final String SerialPortUUID="0000dfb1-0000-1000-8000-00805f9b34fb";
@@ -140,30 +144,16 @@ public abstract  class BlunoLibrary extends Activity {
 					return;
 				scanLeDevice(false);
 				System.out.println("onListItemClick " + device.getName().toString());
-				
-				System.out.println("Device Name:"+device.getName() + "   " + "Device Name:" + device.getAddress());
+				System.out.println("Device Name:" + device.getName() + "   " + "Device Name:" + device.getAddress());
+				Log.e(TAG, "onListItemClick " + device.getName().toString());
+				Log.e(TAG, "Device Name:" + device.getName() + "   " + "Device Name:" + device.getAddress());
 				
 				mDeviceName=device.getName().toString();
 				mDeviceAddress=device.getAddress().toString();
-				
-		        if(mDeviceName.equals("No Device Available") && mDeviceAddress.equals("No Address Available"))
-		        {
-		        	mConnectionState= connectionStateEnum.isToScan;
-		        	onConectionStateChange(mConnectionState);
-		        }
-		        else{
-		        	if (mBluetoothLeService.connect(mDeviceAddress)) {
-				        Log.d(TAG, "Connect request success");
-			        	mConnectionState= connectionStateEnum.isConnecting;
-			        	onConectionStateChange(mConnectionState);
-			            mHandler.postDelayed(mConnectingOverTimeRunnable, 10000);
-		        	}
-			        else {
-				        Log.d(TAG, "Connect request fail");
-			        	mConnectionState= connectionStateEnum.isToScan;
-			        	onConectionStateChange(mConnectionState);
-					}
-		        }
+				Pref.setDeviceName(mainContext, mDeviceName);
+				Pref.setDeviceAddress(mainContext,mDeviceAddress);
+
+				connectUsedBluetoothLe();
 			}
 		})
 		.setOnCancelListener(new DialogInterface.OnCancelListener(){
@@ -181,10 +171,39 @@ public abstract  class BlunoLibrary extends Activity {
 		}).create();
 		
     }
-    
-    
-    
-    public void onResumeProcess() {
+
+	/**
+	 * SharedPreference에 저장된 DeviceName과 DeviceAddress으로 BLE 접속한다.
+	 * 상태는 mConnectionState에 저장된다
+	 */
+	protected void connectUsedBluetoothLe() {
+		//Log.e(TAG,"connectUsedBluetoothLe");
+		String deviceName = Pref.getDeviceName(mainContext, "No Device Available");
+		String deviceAddress = Pref.getDeviceAddress(mainContext, "No Address Available");
+
+		if(deviceName.equals("No Device Available") && deviceAddress.equals("No Address Available"))
+        {
+            mConnectionState= connectionStateEnum.isToScan;
+            onConectionStateChange(mConnectionState);
+        }
+        else{
+			if(mBluetoothLeService!=null) {
+				if (mBluetoothLeService.connect(deviceAddress)) {
+					Log.d(TAG, "Connect request success");
+					mConnectionState = connectionStateEnum.isConnecting;
+					onConectionStateChange(mConnectionState);
+					mHandler.postDelayed(mConnectingOverTimeRunnable, 10000);
+				} else {
+					Log.d(TAG, "Connect request fail");
+					mConnectionState = connectionStateEnum.isToScan;
+					onConectionStateChange(mConnectionState);
+				}
+			}
+        }
+	}
+
+
+	public void onResumeProcess() {
     	System.out.println("BlUNOActivity onResume");
 		// Ensures Bluetooth is enabled on the device. If Bluetooth is not
 		// currently enabled,
@@ -201,6 +220,7 @@ public abstract  class BlunoLibrary extends Activity {
 		
 	    mainContext.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 
+		connectUsedBluetoothLe();
 	}
     
 
@@ -225,7 +245,7 @@ public abstract  class BlunoLibrary extends Activity {
 
 	
 	public void onStopProcess() {
-		System.out.println("MiUnoActivity onStop");
+		Log.e(TAG,"MiUnoActivity onStop");
 		if(mBluetoothLeService!=null)
 		{
 //			mBluetoothLeService.disconnect();
@@ -414,12 +434,17 @@ public abstract  class BlunoLibrary extends Activity {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
-            System.out.println("mServiceConnection onServiceConnected");
+            Log.e(TAG,"mServiceConnection onServiceConnected");
         	mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 ((Activity) mainContext).finish();
             }
+			else
+			{
+				// SharedPreference에 저장된 DeviceName과 DeviceAddress으로 BLE 접속한다.
+				connectUsedBluetoothLe();
+			}
         }
 
         @Override

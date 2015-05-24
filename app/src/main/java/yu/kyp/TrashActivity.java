@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import yu.kyp.common.activity.ActivityBase;
@@ -41,7 +42,9 @@ public class TrashActivity extends ActivityBase {
         listviewNote = (ListView) findViewById(R.id.listViewNote);
         listviewNote.setAdapter(adapterListNote);
 
-
+        // 배경설정
+        RelativeLayout layoutTop = (RelativeLayout)findViewById(R.id.layoutTop);
+        setBackground(layoutTop);
 
     }
 

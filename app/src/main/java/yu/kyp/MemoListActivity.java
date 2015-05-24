@@ -50,7 +50,7 @@ public class MemoListActivity extends ActivityBase {
     Cursor for_thumbnail;
     private Note note;
     private Context mContext;
-    static int memo_theme_number = 3;
+    //static int memo_theme_number = 3;
     private ImageAdapter adapterGridNote = null;
     GridView memolist_gridview;
 //    ListView listviewNote;
@@ -116,7 +116,7 @@ public class MemoListActivity extends ActivityBase {
         setContentView(R.layout.activity_memo_list);
 
         memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
-        memoListRelativeLayout.setBackgroundColor(0xffffff);
+        //memoListRelativeLayout.setBackgroundColor(0xffffff);
 
         //memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
 
@@ -141,38 +141,15 @@ public class MemoListActivity extends ActivityBase {
     protected void onResume() {
         super.onResume();
 
-        sp3 = getSharedPreferences("setbackground", MODE_PRIVATE);
+        setBackground(memoListRelativeLayout);
 
-        //SettingsActivity에서 받은 Preferences값을 이용하여 테마 이미지 처리
-        if(sp3.getInt("theme",0) == 1){
-            memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.cat2));
-        }
-        if(sp3.getInt("theme",0) == 2){
-            memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
-        }
-        if(sp3.getInt("theme",0) == 3){
-
-        }
-        if(sp3.getInt("theme",0) == 4){
-
-        }
-        if(sp3.getInt("theme",0) == 5){
-
-        }
-        if(sp3.getInt("theme",0) == 6){
-
-        }
-        if(sp3.getInt("theme",0) == 7){
-
-        }
-
-
-
-        //         ListView에 노트 내용 뿌려주기.
-        sp = getSharedPreferences("list_select", MODE_PRIVATE);
-        memo_theme_number = sp.getInt("list_num",0);
-        if (memo_theme_number == 1) {
-            Toast.makeText(MemoListActivity.this,"리스트종류"+memo_theme_number,Toast.LENGTH_SHORT).show();
+        //ListView에 노트 내용 뿌려주기.
+        //0:바둑판 1:timeline 2:리스트
+        int listType = settings.getListType();
+        //sp = getSharedPreferences("list_select", MODE_PRIVATE);
+        //memo_theme_number = sp.getInt("list_num",0);
+        if (listType == 0) {
+            Toast.makeText(MemoListActivity.this,"리스트종류"+listType,Toast.LENGTH_SHORT).show();
             //바둑판()
 
 
@@ -187,36 +164,36 @@ public class MemoListActivity extends ActivityBase {
             //그리드뷰의 한 부분이 클릭되었을 때
             memolist_gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView parent, View v, int position, long id) {
-                    Toast.makeText(MemoListActivity.this,"그리드뷰",Toast.LENGTH_SHORT).show();
-                    sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
+                    Toast.makeText(MemoListActivity.this, "그리드뷰", Toast.LENGTH_SHORT).show();
+                    sp = getSharedPreferences("current_p_size", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sp.edit();
-                    editor.putInt("p_size_value",2);
+                    editor.putInt("p_size_value", 2);
                     editor.commit();
 
-                    sp2 = getSharedPreferences("current_e_size",MODE_PRIVATE);
+                    sp2 = getSharedPreferences("current_e_size", MODE_PRIVATE);
                     SharedPreferences.Editor editor2 = sp2.edit();
-                    editor2.putInt("e_size_value",2);
+                    editor2.putInt("e_size_value", 2);
                     editor2.commit();
 
-                    for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+                    for_alpha = getSharedPreferences("alpha_value", MODE_PRIVATE);
                     SharedPreferences.Editor editor3 = for_alpha.edit();
-                    editor3.putInt("alpha_value_is",255);
+                    editor3.putInt("alpha_value_is", 255);
                     editor3.commit();
 
 
-                    Intent i = new Intent(context,MemoWriteActivity2.class);
+                    Intent i = new Intent(context, MemoWriteActivity2.class);
                     i.putExtra("NOTE_NO", (int) id);
                     startActivity(i);
                 }
             });
 
         }
-        else if (memo_theme_number == 2){
+        else if (listType == 1){
             //타임라인 형식으로 리스트 생성
-            Toast.makeText(MemoListActivity.this,"리스트종류"+memo_theme_number,Toast.LENGTH_SHORT).show();
+            Toast.makeText(MemoListActivity.this,"리스트종류"+listType,Toast.LENGTH_SHORT).show();
         }
-        else if (memo_theme_number == 3){
-            Toast.makeText(MemoListActivity.this,"리스트종류"+memo_theme_number,Toast.LENGTH_SHORT).show();
+        else if (listType == 2){
+            Toast.makeText(MemoListActivity.this,"리스트종류"+listType,Toast.LENGTH_SHORT).show();
 
             memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
 
@@ -235,6 +212,8 @@ public class MemoListActivity extends ActivityBase {
         Log.i(TAG, "Setting.getAlarmType():" + settings.getAlarmType());
         Log.i(TAG, "Setting.getListType():" + settings.getListType());
     }
+
+
 
     /**
      * ListView에 노트 내용 뿌려주기.

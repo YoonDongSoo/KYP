@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context="yu.kyp.SelectActivity"
-    android:background="@drawable/list_background">
+    android:background="@drawable/list_background"
+    android:id="@+id/layoutTop">
 
 
     <RelativeLayout
@@ -10,7 +11,7 @@
         android:layout_height="60dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/select_list_top"
+        android:background="@drawable/top"
         android:padding="10dp"
         android:id="@+id/relativeLayout">
 

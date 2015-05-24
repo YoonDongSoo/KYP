@@ -14,10 +14,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+
+import yu.kyp.common.activity.ActivityBase;
 
 
-
-public class WriteBackgoundSelectActivity extends Activity {
+public class WriteBackgoundSelectActivity extends ActivityBase {
 
 
     private static final String TAG = WriteBackgoundSelectActivity.class.getSimpleName();
@@ -36,6 +38,10 @@ public class WriteBackgoundSelectActivity extends Activity {
         WriteBackgroundAdapter adapter = new WriteBackgroundAdapter(this,R.layout.write_background_select_list_item,items);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(listenerWriteBgSelect);
+
+        // 배경설정
+        RelativeLayout layoutTop = (RelativeLayout)findViewById(R.id.layoutTop);
+        setBackground(layoutTop);
     }
 
     /**

@@ -7,16 +7,19 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import yu.kyp.common.Pref;
+import yu.kyp.common.activity.ActivityBase;
 
 
 /**
  * 지우개의 굵기를 선택하는 대화상자용 액티비티
  *
  */
-public class EraserPaletteActivity extends Activity {
+public class EraserPaletteActivity extends ActivityBase {
     ImageButton buttonBack;
     private static SharedPreferences sp1;
     private static SharedPreferences sp2;
@@ -63,6 +66,10 @@ public class EraserPaletteActivity extends Activity {
         progress_state2 = 0;
         i.putExtra("e_size",progress_state2);
         setResult(REQUEST_ERASER_SIZE,i);
+
+        // 배경설정
+        LinearLayout layoutTop = (LinearLayout)findViewById(R.id.layoutTop);
+        setBackground(layoutTop);
 
         //시크바가 터치되었을 경우
         eraserSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

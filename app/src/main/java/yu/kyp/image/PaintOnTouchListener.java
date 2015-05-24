@@ -35,6 +35,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
      * Undo 목록
      */
     UndoList undo = new UndoList();
+    public PointF pointCanvas = new PointF();
 
     public PaintOnTouchListener()
     {
@@ -54,7 +55,7 @@ public class PaintOnTouchListener implements View.OnTouchListener {
         //======================================================
         // 1. 스케일과 offset을 가져와서 touchX,touchY값 맞추기
         Matrix matrix = ((TouchImageView)v).getImageMatrix();
-        PointF pointCanvas = Utils.TransformTouchPointToCanvasPoint(matrix, event.getX(), event.getY());
+        pointCanvas = Utils.TransformTouchPointToCanvasPoint(matrix, event.getX(), event.getY());
 
 
         //Log.e(TAG,String.format("(%.0f,%.0f)->(%.0f,%.0f)",event.getX(),event.getY(),x,y));
