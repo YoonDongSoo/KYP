@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.common.Pref;
+import yu.kyp.common.Settings;
 import yu.kyp.common.Utils;
 import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
@@ -108,6 +108,9 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             viewTouchPaint.setWriteCanvas(canvasWrite);
             viewTouchPaint.setWriteBitmap(bitmapWrite);
 
+
+
+
             ViewTreeObserver obs = viewTouchPaint.getViewTreeObserver();
             obs.removeOnGlobalLayoutListener(this);
 
@@ -146,7 +149,9 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
 
         // 3. 손글씨용 터치 리스너를 붙이기.
-        viewTouchPaint.setPaintTouchListener(); // 손글씨용 터치 리스너
+        //viewTouchPaint.setPaintTouchListener(); // 손글씨용 터치 리스너
+        //viewTouchPaint.setScrollTouchListener();
+        setScrollMode();
 
         // 4. TouchImageView size가 결정되었을 때 프로세스가 시작된다.
         ViewTreeObserver viewTree = viewTouchPaint.getViewTreeObserver();
@@ -173,15 +178,19 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         }
 
 
-        // 6. 기본 글쓰기 설정
+        //=============================================
+        // 6. 설정 적용
+        // 기본 글쓰기 설정
         mSize = Pref.getPenSize(this,20);
-
-        //화면의 상단에 선택한 색상을 표시.
+        // 화면의 상단에 선택한 색상을 표시.
         displayPaintProperty();
 
-
-
-
+        //=============================================
+        // 7. 기본 화면 배율 설정
+        Settings setting = new Settings(context);
+        viewTouchPaint.scaleTemp = setting.getDefaultFactor();
+        viewTouchPaint.setZoom(setting.getDefaultFactor());
+        viewTouchPaint.invalidate();
     }
 
     @Override
@@ -273,20 +282,20 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     public void onSerialReceived(String theString) {
         //serialReceivedText.append(theString);							//append the text into the EditText
         //The Serial data from the BLUNO may be sub-packaged, so using a recvBuffer to hold the String is a good choice.
-        Log.d(TAG,"onSerialReceived:"+theString);
+        //Log.e(TAG,"onSerialReceived:"+theString);
         strBuffer.append(theString);
 
         // 임시로 주석처리
         if(theString.contains("ZMIN")==true)
         {
-            viewTouchPaint.zoomInBitmap();
+            viewTouchPaint.zoomInBitmap(context);
 
             Log.e(TAG,"ZMIN");
             strBuffer = new StringBuffer();
         }
         else if(theString.contains("ZMOT")==true)
         {
-            viewTouchPaint.zoomOutBitmap();
+            viewTouchPaint.zoomOutBitmap(context);
 
             Log.e(TAG,"ZMOT");
             //viewTouchPaint.zoomInBitmap(2.0f);
@@ -534,18 +543,20 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 Log.i(TAG, "text:" + text);
 
 
-                viewTouchPaint.drawText(text, x, y);
+                viewTouchPaint.drawText(this,text, x, y);
             }
         }
         else if(requestCode == REQUEST_PEN_SIZE){
-            if(data.getIntExtra("p_size",0) != 0) {
+            /*if(data.getIntExtra("p_size",0) != 0) {
                 setDrawPenMode();   // 펜쓰기 상태로 전환
-            }
+            }*/
+            setDrawPenMode();   // 펜쓰기 상태로 전환
         }
         else if(requestCode == REQUEST_ERASER_SIZE){
-            if(data.getIntExtra("e_size",0) != 0){
+            /*if(data.getIntExtra("e_size",0) != 0){
                 setEraserMode();    // 지우개 상태로 전환
-            }
+            }*/
+            setEraserMode();    // 지우개 상태로 전환
         }
         else if(requestCode == REQUEST_INPUT_TITLE){
             Toast.makeText(MemoWriteActivity2.this, "종료값은 들어옴", Toast.LENGTH_SHORT).show();
@@ -602,9 +613,9 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
     @Override
     protected void onResume() {
+        Log.e(TAG, "onResume");
         super.onResume();
         onResumeProcess();
-
     }
 
     @Override
@@ -792,7 +803,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         alert.setView(input); // uncomment this line
         //=======================================
         // 4. 저장 버튼
-        alert.setPositiveButton("저장", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 note.TITLE = input.getText().toString();

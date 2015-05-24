@@ -24,6 +24,7 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -45,8 +46,8 @@ import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
-import yu.kyp.R;
 import yu.kyp.common.Pref;
+import yu.kyp.common.Settings;
 import yu.kyp.common.Utils;
 
 public class TouchImageView extends ImageView {
@@ -82,6 +83,10 @@ public class TouchImageView extends ImageView {
      */
     //private boolean mEraserMode;
     private boolean isScrollMode;
+    /**
+     *
+     */
+    public float scaleTemp = 1.0f;
 
     /**
      * Undo 리스트 리턴
@@ -154,12 +159,28 @@ public class TouchImageView extends ImageView {
         //Log.d("!!!!!!!!!!","값 나오는 중"+temp_color);
     }
 
-    public void drawText(String str, float x, float y) {
+    public void drawText(Context context, String str, float x, float y) {
         //paintOnTouchListener.mPaint.setStyle(Paint.Style.FILL);
         //paintOnTouchListener.mPaint.setColor(Color.BLACK);
-        float textSize = Utils.TransformTouchValueToCanvasValue(getImageMatrix(),30f);
+        float textSize = Utils.TransformTouchValueToCanvasValue(getImageMatrix(),50f);
         TextPaint textPaint=new TextPaint();
         textPaint.setTextSize(textSize);
+
+        Settings settings = new Settings(context);
+        Log.e(TAG,"settings.getFontType():"+settings.getFontType());
+        if(settings.getFontType().equals("0")==true) {
+            Log.e(TAG,"기본");
+            Typeface tf = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL);
+            textPaint.setTypeface(tf);
+        }
+        else if(settings.getFontType().equals("1")==true) {
+            Log.e(TAG, "NanumPen");
+            Typeface tf = Typeface.createFromAsset(context.getAssets(), "NanumPen.ttf");
+            textPaint.setTypeface(tf);
+        }
+
+
+
         StaticLayout textLayout = new StaticLayout(str, textPaint, canvasWrite.getWidth(), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
         canvasWrite.save();
@@ -197,35 +218,72 @@ public class TouchImageView extends ImageView {
     /**
      * 마지막 좌표를 기준으로 0.25% 줌을 한다.
      */
-    public void zoomInBitmap() {
-        /*float t = interpolate();
-        double deltaScale = calculateDeltaScale(t);
-        scaleImage(deltaScale, bitmapX, bitmapY, stretchImageToSuper);
-        translateImageToCenterTouchPosition(t);
-        fixScaleTrans();
-        setImageMatrix(matrix);
+    public void zoomInBitmap(Context context) {
 
-        //float scale = 1.25f;
-        int width = bitmapWrite.getWidth();
-        int height = bitmapWrite.getHeight();
-        PointF point = transformCoordTouchToBitmap(paintOnTouchListener.lastX, paintOnTouchListener.lastY, false);
-        double zoom = targetZoom;
-        double scale =  zoom / normalizedScale;
-        scaleImage(scale, point.x, point.y,false);
-        fixTrans();*/
-        //setZoom(scale);
-        //setZoom(scale, paintOnTouchListener.lastX / width, paintOnTouchListener.lastY / height);
+        //===================================
+        // 1. 배율 +25%,
+        //  - 최대배율은 350%까지.
+        Settings set = new Settings(context);
+        scaleTemp += set.getZoomFactor();
+        if(scaleTemp>3.5f)
+            scaleTemp = 3.5f;
+        //===================================
+        // 2. zoom할 좌표
+        //  - 0~1 범위로 표시
+        // 스크롤모드일때는 scrollOnTouchListener에서 마지막 좌표를 가져오고
+        // 펜글씨 모드일 때는 paintOnTouchListener에서 마지막 좌표를 가져온다.
+        PointF pointCanvas = new PointF();
+        if(isScrollMode==true)
+            pointCanvas.set(scrollOnTouchListener.pointCanvas);
+        else
+            pointCanvas.set(paintOnTouchListener.pointCanvas);
+        PointF focus = new PointF(pointCanvas.x/canvasWrite.getWidth(), pointCanvas.y/canvasWrite.getHeight());
+        /*Log.e(TAG,String.format("ZMIN (%.0f,%.0f)->(%.0f,%.0f) (%.2f,%.2f) canvasWrite.getWidth():%d bitmapWrite.getWidth():%d",
+                last.x,last.y,pointCanvas.x,pointCanvas.y,focus.x,focus.y, canvasWrite.getWidth(), bitmapWrite.getWidth()));
+*/
+        //Log.e(TAG, "줌인 scaleTemp:" + scaleTemp);
+
+        //===================================
+        // 3. zoom 처리
+        setZoom(scaleTemp,focus.x,focus.y);
+        invalidate();
+
 
     }
 
-    public void zoomOutBitmap() {
-        //float scale = 1.25f;
-        int width = bitmapWrite.getWidth();
-        int height = bitmapWrite.getHeight();
-        matrix.postTranslate(paintOnTouchListener.lastX, paintOnTouchListener.lastY);
-        fixTrans();
-        //setZoom(scale);
-        //setZoom(scale, paintOnTouchListener.lastX / width, paintOnTouchListener.lastY / height);
+    public void zoomOutBitmap(Context context) {
+        //===================================
+        // 1. 배율 -25%,
+        //  - 최소배율은 100%까지.
+        Settings set = new Settings(context);
+        scaleTemp -= set.getZoomFactor();
+        if(scaleTemp<1.0f)
+            scaleTemp = 1.0f;
+        //===================================
+        // 2. zoom할 좌표
+        //  - 0~1 범위로 표시
+        // 스크롤모드일때는 scrollOnTouchListener에서 마지막 좌표를 가져오고
+        // 펜글씨 모드일 때는 paintOnTouchListener에서 마지막 좌표를 가져온다.
+        PointF pointCanvas = new PointF();
+        if(isScrollMode==true)
+            pointCanvas.set(scrollOnTouchListener.pointCanvas);
+        else
+            pointCanvas.set(paintOnTouchListener.pointCanvas);
+        if(pointCanvas.x<0f)
+            pointCanvas.x = 0f;
+        if(pointCanvas.y<0f)
+            pointCanvas.y = 0f;
+        PointF focus = new PointF(pointCanvas.x/canvasWrite.getWidth(), pointCanvas.y/canvasWrite.getHeight());
+        /*Log.e(TAG,String.format("ZMOT (%.0f,%.0f)->(%.0f,%.0f) (%.2f,%.2f) canvasWrite.getWidth():%d bitmapWrite.getWidth():%d",
+                last.x,last.y,pointCanvas.x,pointCanvas.y,focus.x,focus.y, canvasWrite.getWidth(), bitmapWrite.getWidth()));
+*/
+        //Log.e(TAG, "줌out scaleTemp:" + scaleTemp);
+
+        //===================================
+        // 3. zoom 처리
+        setZoom(scaleTemp,focus.x,focus.y);
+        invalidate();
+
 
     }
 
@@ -306,20 +364,27 @@ public class TouchImageView extends ImageView {
         setScaleType(ScaleType.MATRIX);
         setState(State.NONE);
         onDrawReady = false;
+
         super.setOnTouchListener(new PrivateOnTouchListener());
     }
 
     public void setPaintTouchListener() {
         if(paintOnTouchListener == null)
             paintOnTouchListener = new PaintOnTouchListener();
+        if(scrollOnTouchListener == null)
+            scrollOnTouchListener = new PrivateOnTouchListener();
+
         setOnTouchListener(paintOnTouchListener);
         isScrollMode = false;
     }
 
     public void setScrollTouchListener()
     {
+        if(paintOnTouchListener == null)
+            paintOnTouchListener = new PaintOnTouchListener();
         if(scrollOnTouchListener == null)
             scrollOnTouchListener = new PrivateOnTouchListener();
+
 
         setOnTouchListener(scrollOnTouchListener);
         isScrollMode = true;
@@ -1047,6 +1112,7 @@ public class TouchImageView extends ImageView {
         // Remember last point position for dragging
         //
         public PointF last = new PointF();
+        public PointF pointCanvas = new PointF();
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -1055,12 +1121,11 @@ public class TouchImageView extends ImageView {
             PointF curr = new PointF(event.getX(), event.getY());
 
 
-
-
             if (state == State.NONE || state == State.DRAG || state == State.FLING) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         last.set(curr);
+                        pointCanvas = Utils.TransformTouchPointToCanvasPoint(getImageMatrix(), last.x, last.y);
                         if (fling != null)
                             fling.cancelFling();
                         setState(State.DRAG);
@@ -1075,6 +1140,7 @@ public class TouchImageView extends ImageView {
                             matrix.postTranslate(fixTransX, fixTransY);
                             fixTrans();
                             last.set(curr.x, curr.y);
+                            pointCanvas = Utils.TransformTouchPointToCanvasPoint(getImageMatrix(), last.x, last.y);
                         }
                         break;
 

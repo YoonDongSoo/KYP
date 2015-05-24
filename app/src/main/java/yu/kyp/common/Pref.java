@@ -82,4 +82,52 @@ public class Pref {
         editor.putInt(key, value);
         editor.commit();
     }
+
+    /**
+     * SharedPreferences에서 블루투스 장치주소 가져오기
+     * @param context
+     * @param defValue
+     * @return
+     */
+    public static String getDeviceAddress(Context context, String defValue) {
+        String key = "bluetooth_device_address";
+        return context.getSharedPreferences(PREF_NAME, context.MODE_PRIVATE).getString(key, defValue);
+    }
+
+    /**
+     * SharedPreferences에서 블루투스 장치주소 저장하기
+     * @param context
+     * @param value
+     */
+    public static void setDeviceAddress(Context context, String value)
+    {
+        String key = "bluetooth_device_address";
+        SharedPreferences.Editor editor = context.getSharedPreferences(PREF_NAME,Context.MODE_PRIVATE).edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    /**
+     * SharedPreferences에서 블루투스 이름 가져오기
+     * @param context
+     * @param defValue
+     * @return
+     */
+    public static String getDeviceName(Context context, String defValue) {
+        String key = "bluetooth_device_name";
+        return context.getSharedPreferences(PREF_NAME, context.MODE_PRIVATE).getString(key, defValue);
+    }
+
+    /**
+     * SharedPreferences에서 블루투스 이름 저장하기
+     * @param context
+     * @param value
+     */
+    public static void setDeviceName(Context context, String value)
+    {
+        String key = "bluetooth_device_name";
+        SharedPreferences.Editor editor = context.getSharedPreferences(PREF_NAME,Context.MODE_PRIVATE).edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
 }
