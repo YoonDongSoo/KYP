@@ -5,85 +5,33 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import yu.kyp.common.activity.ActivityBase;
+import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
 
 public class TrashActivity extends ActivityBase {
-    CheckedTextView tv;
-    ArrayList<Long> check = new ArrayList<>();
-    CheckBox alldelete;
-    boolean allchecked = false;
+
     private Context context = null;
     private NoteManager noteManager = null;
+    private Note note;
     private CustomCursorAdapter adapterListNote = null;
-    private AdapterView.OnItemClickListener listenerItemClick = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Log.i("!!!!", "onitemclickid " + id);
-            Log.i("!!!!", "onitemclick position " + position);
-            CheckBox ch = (CheckBox) view;
-            ch.setChecked(!ch.isChecked());
-
-
-            if(ch.isChecked()) {
-                check.add(id);
-            }
-            else
-                check.remove(id);
-        }
-    };
-
-//    private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
-//    {
-//        @Override
-//        public void onClick(DialogInterface dialog, int which) {
-//            switch(which)
-//            {
-//                case DialogInterface.BUTTON_POSITIVE:
-//                    ContentValues values = new ContentValues();
-//                    db.execDelete("NOTE", "NOTE_NO=" + id);
-//                    adapterListNote.checked[i]=false;
-////                    values.put("IS_DEL","1");
-////                    int cnt = db.execUpdate("NOTE", values, "NOTE_NO=" + deleteId);
-////                    Log.i("!!","cnt:"+cnt);
-//                    bindNote();
-//                    break;
-//                case DialogInterface.BUTTON_NEGATIVE:
-//                    break;
-//            }
-//        }
-//    };
-
-//    private AdapterView.OnItemLongClickListener longClickListenerListNote = new AdapterView.OnItemLongClickListener() {
-//        @Override
-//        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//            deleteId  = id;
-//            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//            builder.setMessage("삭제하시겠습니까?").setPositiveButton("Yes", dialogClickListener)
-//                    .setNegativeButton("No", dialogClickListener).show();
-//
-//            return true;
-//        }
-//    };
-
-
     private ListView listviewNote;
+    private CheckBox alldelete;
+    //전체 선택 버튼 체크됬는지 확인
+    private boolean allchecked = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,11 +103,14 @@ public class TrashActivity extends ActivityBase {
         finish();
     }
 
-    public void buttonDelete_OnClick(View v) {
+
+    /**
+     * 영구 삭제
+     * @param v
+     */
+    public void buttonDelete_OnClick(View v) throws Exception {
 
         DialogInterface.OnClickListener dialogClickListener = null;
-
-
 
 
         dialogClickListener = new DialogInterface.OnClickListener() {
@@ -167,6 +118,7 @@ public class TrashActivity extends ActivityBase {
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
+                        //체크된 목록의 id를 영구삭제
                         for (int i = 0; i < adapterListNote.checked.length; i++) {
                             if (adapterListNote.checked[i] == true) {
                                 long id = adapterListNote.getItemId(i);
@@ -176,6 +128,7 @@ public class TrashActivity extends ActivityBase {
                                 adapterListNote.checked[i] = false;
                             }
                         }
+                        //전체 체크 버튼이 눌려져있다면 해제
                         if(allchecked==true) {
                             alldelete.setChecked(!alldelete.isChecked());
                             allchecked = false;
@@ -188,72 +141,73 @@ public class TrashActivity extends ActivityBase {
             }
         };
 
-        int checkcount=0;
 
+
+        //체크 버튼이 선택되었을 때 영구삭제 버튼을 누르면 삭제 yes/no dialog를 띄운다.
+        //체크 버튼이 선택되지 않았을 때는 토스트를 띄운다.
         for (int i = 0; i < adapterListNote.checked.length; i++) {
-            if (adapterListNote.checked[i] == false)
-                checkcount++;
+            if (adapterListNote.checked[i] == true) {
+                Log.i("!!!!", "i " + i);
+                long id = adapterListNote.getItemId(i);
+                Log.i("!!!!", "id " + id);
+                Intent msg = new Intent(context, MemoWriteActivity.class);
+                int noteNo = msg.getIntExtra("NOTE_NO", (int) id);
+                if (noteNo > 0) {
+                    note = noteManager.getNote(noteNo);
+                    Log.e("!!!", "note " + noteNo);
+
+                }
+            }
+
         }
-        if(checkcount==adapterListNote.checked.length)
-        {
+
+
+        if (note == null) {
             Toast.makeText(context, "목록을 선택해주세요", Toast.LENGTH_SHORT).show();
+            if(allchecked==true) {
+            alldelete.setChecked(!alldelete.isChecked());
+            allchecked = false;
+            }
         }
         else
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setMessage("영구삭제 하시겠습니까?").setPositiveButton("Yes", dialogClickListener)
+            builder.setMessage("삭제 하시겠습니까?").setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
         }
-
+        note = null;
 //        for (int i = 0; i < adapterListNote.checked.length; i++) {
-//            if (adapterListNote.checked[i] == true) {
-////                long id = adapterListNote.getItemId(i);
-////                if (id > 0) {
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                    builder.setMessage("영구삭제 하시겠습니까?").setPositiveButton("Yes", dialogClickListener)
-//                            .setNegativeButton("No", dialogClickListener).show();
-//                }
-//            else
-//                checkcount++;
-//
-//            }
-
-
-
-
-
-
-//        for (i = 0; i < adapterListNote.checked.length; i++) {
-//            if(adapterListNote.checked[i]==true) {
-//
-//                id = adapterListNote.getItemId(i);
-//                if (id > 0) {
-
-
-//
-//                }
-//
-//
-//
-//
-//              //  adapterListNote.checked[i] = false;
-//            }
-//
+//            if (adapterListNote.checked[i] == false)
+//                checkcount1++;
 //        }
-
+//        if(checkcount1==adapterListNote.checked.length)
+//        {
+//            Toast.makeText(context, "목록을 선택해주세요", Toast.LENGTH_SHORT).show();
+//        }
+//
+//        else
+//        {
+//            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//            builder.setMessage("영구삭제 하시겠습니까?").setPositiveButton("Yes", dialogClickListener)
+//                    .setNegativeButton("No", dialogClickListener).show();
+//        }
 //        if(allchecked==true) {
 //            alldelete.setChecked(!alldelete.isChecked());
 //            allchecked = false;
 //        }
-//        bindNote();
 
 
     }
 
+    /**
+     * 전체 선택
+     * @param v
+     */
     public void buttonAllDelete_OnClick(View v)
     {
-       allchecked=true;
+
        alldelete = (CheckBox)findViewById(R.id.chkAll);
+       allchecked=alldelete.isChecked();
        adapterListNote.setAllChecked(alldelete.isChecked());
        adapterListNote.notifyDataSetChanged();
 
@@ -262,9 +216,14 @@ public class TrashActivity extends ActivityBase {
 
     }
 
+    /**
+     * 휴지통 복원 기능
+     * @param v
+     */
     public void buttonRestore_OnClick(View v)
     {
-
+        int checkcount=0;
+        //선택된 노트를 노트 목록에 다시 나타나게 한다.
         for (int i = 0; i < adapterListNote.checked.length; i++) {
             if(adapterListNote.checked[i]==true)
             {
@@ -275,6 +234,16 @@ public class TrashActivity extends ActivityBase {
                 int cnt = db.execUpdate("NOTE", values, "NOTE_NO=" + id);
 
                 adapterListNote.checked[i]=false;
+            }
+            else
+                checkcount++;
+        }
+        if(checkcount==adapterListNote.checked.length)
+        {
+            Toast.makeText(context, "목록을 선택해주세요", Toast.LENGTH_SHORT).show();
+            if(allchecked==true) {
+            alldelete.setChecked(!alldelete.isChecked());
+            allchecked = false;
             }
         }
         if(allchecked==true) {

@@ -11,15 +11,10 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CursorAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -60,16 +55,16 @@ public class MemoListActivity extends ActivityBase {
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Toast.makeText(MemoListActivity.this,"메모 하나 눌렸당 " + position + "," + id,Toast.LENGTH_SHORT).show();
-            sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putInt("p_size_value",2);
-            editor.commit();
-
-            sp2 = getSharedPreferences("current_e_size",MODE_PRIVATE);
-            SharedPreferences.Editor editor2 = sp2.edit();
-            editor2.putInt("e_size_value",2);
-            editor2.commit();
+//            Toast.makeText(MemoListActivity.this,"메모 하나 눌렸당 " + position + "," + id,Toast.LENGTH_SHORT).show();
+//            sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
+//            SharedPreferences.Editor editor = sp.edit();
+//            editor.putInt("p_size_value",2);
+//            editor.commit();
+//
+//            sp2 = getSharedPreferences("current_e_size",MODE_PRIVATE);
+//            SharedPreferences.Editor editor2 = sp2.edit();
+//            editor2.putInt("e_size_value",2);
+//            editor2.commit();
 
             Intent i = new Intent(context,MemoWriteActivity2.class);
             i.putExtra("NOTE_NO", (int) id);
@@ -298,8 +293,6 @@ public class MemoListActivity extends ActivityBase {
 //            memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
             ImageView iv = (ImageView) view.findViewById(R.id.for_thumbnail);
             iv.setPadding(0,10,20,10);
-            /*Drawable alpha = iv.getBackground();
-            alpha.setAlpha(70);*/
 
             Bitmap grid_image = Utils.getImage(cursor.getBlob(cursor.getColumnIndex("THUM_DATA")));
             Log.e("썸네일 데이터 확인", "" + for_thumbnail.getBlob(for_thumbnail.getColumnIndex("THUM_DATA")));
