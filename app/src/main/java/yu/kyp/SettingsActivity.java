@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -269,9 +270,11 @@ public class SettingsActivity extends PreferenceActivity{
 
     public static String ThemeBackGround = null;
     public static String Alarm = null;
+    public static String ListSetting = null;
     RelativeLayout memoListRelativeLayout;
     MemoListActivity memolistactivity;
     static SharedPreferences sp;
+    static SharedPreferences list_select;
 
       protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -281,10 +284,11 @@ public class SettingsActivity extends PreferenceActivity{
           memolistactivity = new MemoListActivity();
 
         final ListPreference button_background_setting = (ListPreference)findPreference("button_background_setting");
-        final Preference button_alarm_setting = (Preference)findPreference("button_alarm_setting");
-//        setOnPreferenceChange(findPreference("button_percent_setting"));
-//        setOnPreferenceChange(findPreference("button_zoominout_percent_setting"));
-//        setOnPreferenceChange(findPreference("button_font_setting"));
+          final ListPreference button_list_setting = (ListPreference)findPreference("button_list_setting");
+          final Preference button_alarm_setting = (Preference)findPreference("button_alarm_setting");
+        setOnPreferenceChange(findPreference("button_percent_setting"));
+        setOnPreferenceChange(findPreference("button_zoominout_percent_setting"));
+        setOnPreferenceChange(findPreference("button_font_setting"));
 //        setOnPreferenceChange(findPreference("button_background_setting"));
 //        setOnPreferenceChange(findPreference("button_alarm_setting"));
 //        setOnPreferenceChange(findPreference("button_list_setting"));
@@ -357,44 +361,83 @@ public class SettingsActivity extends PreferenceActivity{
                   return true;
               }
           });
+          ListSetting = button_list_setting.getValue();
+          //리스트 세팅 버튼이 눌렸을 때
+          button_list_setting.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+              @Override
+              public boolean onPreferenceChange(Preference preference, Object newValue) {
+                  StringBuffer result = new StringBuffer();
+                  result.append("설정이 완료되었습니다.");
+                  ListSetting = newValue.toString();
+
+                  if(preference instanceof ListPreference) {
+                      ListPreference listPreference = (ListPreference) preference;
+                      int index = listPreference.findIndexOfValue(ListSetting);
+                      preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
+//                      Toast.makeText(SettingsActivity.this,"선택한 리스트는? " + listPreference.getEntries()[index],Toast.LENGTH_SHORT).show();
+                      if(listPreference.getEntries()[index].equals("바둑판 배열")){
+                          Toast.makeText(SettingsActivity.this,"1",Toast.LENGTH_SHORT).show();
+                          list_select = getSharedPreferences("list_select",MODE_PRIVATE);
+                          SharedPreferences.Editor editor3 = list_select.edit();
+                          editor3.putInt("list_num", 1);
+                          editor3.commit();
+                      }
+                      else if(listPreference.getEntries()[index].equals("Timeline")){
+                          Toast.makeText(SettingsActivity.this,"2",Toast.LENGTH_SHORT).show();
+                          list_select = getSharedPreferences("list_select",MODE_PRIVATE);
+                          SharedPreferences.Editor editor3 = list_select.edit();
+                          editor3.putInt("list_num",2);
+                          editor3.commit();
+                      }
+                      else if(listPreference.getEntries()[index].equals("List")){
+                          Toast.makeText(SettingsActivity.this,"3",Toast.LENGTH_SHORT).show();
+                          list_select = getSharedPreferences("list_select",MODE_PRIVATE);
+                          SharedPreferences.Editor editor3 = list_select.edit();
+                          editor3.putInt("list_num",3);
+                          editor3.commit();
+                      }
+                  }
+                  return true;
+              }
+          });
       }
 
 
-//    private void setOnPreferenceChange(Preference mPreference) {
-//        mPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
+    private void setOnPreferenceChange(Preference mPreference) {
+        mPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
+
+        onPreferenceChangeListener.onPreferenceChange(mPreference,
+                PreferenceManager.getDefaultSharedPreferences(mPreference.getContext()).
+                        getString(mPreference.getKey(), ""));
+    }
+
+    private Preference.OnPreferenceChangeListener onPreferenceChangeListener = new
+            Preference.OnPreferenceChangeListener() {
+
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object newValue) {
+//            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences();
+//            int value = sharedPreferences.getInt("button_percent_setting",30);
+
+
+            String stringValue = newValue.toString();
+
+            if(preference instanceof ListPreference) {
+
+                ListPreference listPreference = (ListPreference) preference;
+                int index = listPreference.findIndexOfValue(stringValue);
+                preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
+
+            }
+//            else if(preference instanceof SeekBarPreference)
+//            {
 //
-//        onPreferenceChangeListener.onPreferenceChange(mPreference,
-//                PreferenceManager.getDefaultSharedPreferences(mPreference.getContext()).
-//                        getString(mPreference.getKey(), ""));
-//    }
-//
-//    private Preference.OnPreferenceChangeListener onPreferenceChangeListener = new
-//            Preference.OnPreferenceChangeListener() {
-//
-//        @Override
-//        public boolean onPreferenceChange(Preference preference, Object newValue) {
-////            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences();
-////            int value = sharedPreferences.getInt("button_percent_setting",30);
-//
-//
-//            String stringValue = newValue.toString();
-//
-//            if(preference instanceof ListPreference) {
-//
-//                ListPreference listPreference = (ListPreference) preference;
-//                int index = listPreference.findIndexOfValue(stringValue);
-//                preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
-//
+//                preference.setSummary(value);
 //            }
-////            else if(preference instanceof SeekBarPreference)
-////            {
-////
-////                preference.setSummary(value);
-////            }
-//            return true;
-//        }
-//
-//    };
+            return true;
+        }
+
+    };
 
 
 

@@ -78,6 +78,20 @@
         android:layout_above="@+id/linearLayout2"
        />
 
+    <GridView
+        android:id="@+id/memolist_gridview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:numColumns="3"
+        android:layout_below="@+id/relativeLayout"
+        android:layout_above="@+id/linearLayout2"
+        android:gravity="center"
+        android:horizontalSpacing="20dp"
+        android:verticalSpacing="20dp">
+
+    </GridView>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
