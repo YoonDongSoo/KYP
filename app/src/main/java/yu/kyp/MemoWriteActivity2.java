@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.content.SharedPreferences;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
