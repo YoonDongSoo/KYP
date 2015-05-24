@@ -291,9 +291,19 @@ public class NoteManager {
      * @param title
      * @return
      */
-    public Cursor titlegetCountNoteList(String title)
+    public Cursor titlegetCountNoteList(long title)
     {
         return db.execCursor("SELECT COUNT(NOTE_NO),NOTE_NO AS _id, * FROM NOTE WHERE TITLE LIKE '%"+ title + "%' ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
+    }
+
+    /**
+     * 현재 작성하고 있는 MEMO의 제목을 리턴한다.
+     * @return
+     * @param id
+     */
+    public Cursor memotitlegetNoteList(long id)
+    {
+        return db.execCursor("SELECT TITLE, NOTE_NO AS _id, * FROM NOTE WHERE NOTE_NO ="+ id); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
     }
 
     /**

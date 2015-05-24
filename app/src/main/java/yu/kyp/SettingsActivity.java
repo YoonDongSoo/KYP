@@ -268,6 +268,7 @@ import android.widget.Toast;
 public class SettingsActivity extends PreferenceActivity{
 
     public static String ThemeBackGround = null;
+    public static String Alarm = null;
     RelativeLayout memoListRelativeLayout;
     MemoListActivity memolistactivity;
     static SharedPreferences sp;
@@ -280,7 +281,7 @@ public class SettingsActivity extends PreferenceActivity{
           memolistactivity = new MemoListActivity();
 
         final ListPreference button_background_setting = (ListPreference)findPreference("button_background_setting");
-
+        final Preference button_alarm_setting = (Preference)findPreference("button_alarm_setting");
 //        setOnPreferenceChange(findPreference("button_percent_setting"));
 //        setOnPreferenceChange(findPreference("button_zoominout_percent_setting"));
 //        setOnPreferenceChange(findPreference("button_font_setting"));
@@ -289,6 +290,7 @@ public class SettingsActivity extends PreferenceActivity{
 //        setOnPreferenceChange(findPreference("button_list_setting"));
 
           ThemeBackGround = button_background_setting.getValue();
+          //설정화면에서 테마 설정 버튼이 눌렸을 때
           button_background_setting.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
               @Override
               public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -355,7 +357,6 @@ public class SettingsActivity extends PreferenceActivity{
                   return true;
               }
           });
-
       }
 
 
