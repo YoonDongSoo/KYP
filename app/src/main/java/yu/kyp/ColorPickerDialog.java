@@ -35,8 +35,10 @@ public class ColorPickerDialog extends Dialog {
             super(c);
             mListener = l;
             mColors = new int[] {
-                    0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00,
-                    0xFFFFFF00, 0xFFFFFFFF, 0xFFFF0000
+                    0xFFFF0000, 0xFFFF5E00, 0xFFFFBB00, 0xFFFFE400, 0xFFABF200,
+                    0xFF1DDB16, 0xFF00D8FF, 0xFF0054FF, 0xFF0100FF, 0xFF5F00FF,
+                    0xFFFF00DD, 0xFFFF007F, 0xFFFFFFFF, 0xFFBDBDBD, 0xFF000000,
+                    0xFFFF0000
             };
 
             //위의 색상들을 사용해 원형 그라디언트 생성성
@@ -115,9 +117,9 @@ public class ColorPickerDialog extends Dialog {
             setMeasuredDimension(CENTER_X*2, CENTER_Y*2);
         }
 
-        private static final int CENTER_X = 200;
-        private static final int CENTER_Y = 200;
-        private static final int CENTER_RADIUS = 50;
+        private static final int CENTER_X = 400;
+        private static final int CENTER_Y = 400;
+        private static final int CENTER_RADIUS = 120;
 
         private int floatToByte(float x) {
             int n = java.lang.Math.round(x);

@@ -6,5 +6,5 @@
         android:layout_width="@dimen/grid_view_width"
         android:layout_height="@dimen/grid_view_height"
         android:id="@+id/for_thumbnail"
-        android:background="@drawable/book"/>
+        android:background="@null"/>
 </LinearLayout>
