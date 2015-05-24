@@ -7,7 +7,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,6 +67,10 @@ public class SearchActivity extends ActivityBase{
                 bindNote();
             }
         });
+
+        // 배경설정
+        LinearLayout layoutTop = (LinearLayout)findViewById(R.id.layoutTop);
+        setBackground(layoutTop);
     }
     private void bindNote() {
         c = noteManager.titlegetNoteList(titleSearchEdit.getText().toString());

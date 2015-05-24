@@ -3,12 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/list_background">
+    android:background="@drawable/list_background"
+    android:id="@+id/layoutTop">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/select_list_top">
+        android:background="@drawable/top">
 
         <ImageButton
             android:layout_width="wrap_content"

@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import yu.kyp.common.Settings;
 import yu.kyp.common.activity.ActivityBase;
 import yu.kyp.image.NoteManager;
 
@@ -97,7 +98,7 @@ public class MemoListActivity extends ActivityBase {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_list);
 
-       // memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
+        memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
         //memoListRelativeLayout.setBackgroundColor(0xffffff);
 
         //memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
@@ -122,32 +123,7 @@ public class MemoListActivity extends ActivityBase {
     protected void onResume() {
         super.onResume();
 
-        sp3 = getSharedPreferences("setbackground", MODE_PRIVATE);
-
-        //SettingsActivity에서 받은 Preferences값을 이용하여 테마 이미지 처리
-        if(sp3.getInt("theme",0) == 1){
-            memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.cat2));
-        }
-        if(sp3.getInt("theme",0) == 2){
-            memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
-        }
-        if(sp3.getInt("theme",0) == 3){
-
-        }
-        if(sp3.getInt("theme",0) == 4){
-
-        }
-        if(sp3.getInt("theme",0) == 5){
-
-        }
-        if(sp3.getInt("theme",0) == 6){
-
-        }
-        if(sp3.getInt("theme",0) == 7){
-
-        }
-
-
+        setBackground(memoListRelativeLayout);
 
         // ListView에 노트 내용 뿌려주기.
         bindNote();
@@ -157,8 +133,10 @@ public class MemoListActivity extends ActivityBase {
         Log.i(TAG,"Setting.getZoomFactor():"+settings.getZoomFactor());
         Log.i(TAG,"Setting.getBackgroundType():"+settings.getBackgroundType());
         Log.i(TAG,"Setting.getAlarmType():"+settings.getAlarmType());
-        Log.i(TAG,"Setting.getListType():"+settings.getListType());
+        Log.i(TAG, "Setting.getListType():" + settings.getListType());
     }
+
+
 
     /**
      * ListView에 노트 내용 뿌려주기.

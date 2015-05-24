@@ -31,8 +31,9 @@ import java.util.List;
 
 import yu.kyp.R;
 import yu.kyp.common.Pref;
+import yu.kyp.common.activity.ActivityBase;
 
-public abstract  class BlunoLibrary extends Activity {
+public abstract  class BlunoLibrary extends ActivityBase {
 
 	private Context mainContext=this;
 

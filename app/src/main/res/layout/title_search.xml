@@ -1,53 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
+    android:layout_height="match_parent"
+    android:id="@+id/layoutTop"
+    android:background="@drawable/list_background">
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="60dp"
-        android:orientation="horizontal"
-        android:background="@drawable/search_background">
-    <EditText
-        android:layout_width="315dp"
-        android:layout_height="42dp"
-        android:id="@+id/titleSearchEdit"
-        android:singleLine="true"
-        android:background="@drawable/search_background2"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="3dp"
-        android:layout_marginBottom="10dp"
-        android:hint="  검색어를 입력해 주세요"
-        android:textColorHint="@color/White"/>
+        android:background="@drawable/top">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:id="@+id/titleSearchEdit"
+            android:singleLine="true"
+            android:background="@drawable/search_background2"
+            android:layout_marginLeft="8dp"
+            android:hint="  검색어를 입력해 주세요"
+            android:textColorHint="@color/White"
+            android:layout_toLeftOf="@+id/buttonTitleSearch"
+            android:layout_centerVertical="true"
+            android:textColor="@color/White" />
 
         <ImageButton
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="60dp"
             android:text="검색"
             android:id="@+id/buttonTitleSearch"
             android:onClick="buttonTitleSearch_OnClick"
-            android:src="@drawable/button_search"
-            android:background="@null" />
+            android:src="@drawable/button_searchclick"
+            android:background="@null"
+            android:layout_marginRight="8dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" />
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleSmall"
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/White">
+
+        <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/progressBar" />
+            android:id="@+id/search_list"
+            android:background="@color/White">
+        </ListView>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="검색 결과가 없습니다."
+            android:id="@+id/titlenotsearch"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:textSize="@dimen/font_size"
+            android:layout_marginTop="8dp" />
     </LinearLayout>
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/search_list">
-    </ListView>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="검색 결과가 없습니다."
-        android:id="@+id/titlenotsearch"
-        android:visibility="gone"
-        android:layout_gravity="center"
-        android:textSize="@dimen/font_size"
-        />
+
 </LinearLayout>

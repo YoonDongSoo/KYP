@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -28,6 +29,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -176,6 +178,10 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         ViewTreeObserver viewTree = viewTouchPaint.getViewTreeObserver();
         viewTree.addOnGlobalLayoutListener(touchViewPaint_OnGlobalLayoutLIstener);
 
+        // 5. 기본배경
+        RelativeLayout layoutTop = (RelativeLayout)findViewById(R.id.layoutTop);
+        setBackground(layoutTop);
+
         // 5. 노트배경
         // 2015-05-22 윤동수 수정: 배경을 직접 캔버스에 그리지 않고 drawable을 사용한다.
         int bt_type = getIntent().getIntExtra("bg_type", note.BACKGROUND);
@@ -201,6 +207,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         // 6. 설정 적용
         // 기본 글쓰기 설정
         mSize = Pref.getPenSize(this,20);
+        viewTouchPaint.updatePaintProperty(mColor,mSize);
         // 화면의 상단에 선택한 색상을 표시.
         displayPaintProperty();
 

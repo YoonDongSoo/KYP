@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -93,7 +94,9 @@ public class TrashActivity extends ActivityBase {
         listviewNote = (ListView) findViewById(R.id.listViewNote);
         listviewNote.setAdapter(adapterListNote);
 
-
+        // 배경설정
+        RelativeLayout layoutTop = (RelativeLayout)findViewById(R.id.layoutTop);
+        setBackground(layoutTop);
 
     }
 

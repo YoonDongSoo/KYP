@@ -17,12 +17,15 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import yu.kyp.common.Pref;
+import yu.kyp.common.activity.ActivityBase;
 
 /**
  * 선굵기를 선택하는 대화상자용 액티비티
@@ -30,7 +33,7 @@ import yu.kyp.common.Pref;
  * @author Mike
  *
  */
-public class PenPaletteActivity extends Activity {
+public class PenPaletteActivity extends ActivityBase {
 
     private static final String TAG = ColorPickerDialog.class.getSimpleName();
     private static final int REQUEST_PEN_SIZE = 3;
@@ -307,6 +310,10 @@ public class PenPaletteActivity extends Activity {
                 finish();
             }
         });
+
+        // 배경설정
+        LinearLayout layoutTop = (LinearLayout)findViewById(R.id.layoutTop);
+        setBackground(layoutTop);
     }
 //    public void colorChanged(int color) {
 //        System.out.println("color : " + color);

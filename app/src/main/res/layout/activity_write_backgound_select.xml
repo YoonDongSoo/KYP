@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="yu.kyp.WriteBackgoundSelectActivity"
-    android:background="@drawable/background7_500">
+    android:background="@drawable/list_background"
+    android:id="@+id/layoutTop">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -11,7 +12,7 @@
         android:layout_centerHorizontal="true"
         android:padding="10dp"
         android:id="@+id/top_relative"
-        android:background="@drawable/write_top">
+        android:background="@drawable/top">
 
         <ImageButton
             android:layout_width="35dp"

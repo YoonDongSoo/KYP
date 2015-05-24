@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.OutputStream;
@@ -81,6 +82,9 @@ public class SelectActivity extends ActivityBase {
         selectlistNote.setAdapter(adapterSelectlist);
         buttonCheck = (CheckBox) findViewById(R.id.buttonCheck);
 
+        // 배경설정
+        RelativeLayout layoutTop = (RelativeLayout)findViewById(R.id.layoutTop);
+        setBackground(layoutTop);
 
     }
 

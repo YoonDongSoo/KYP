@@ -130,4 +130,5 @@ public class Pref {
         editor.putString(key, value);
         editor.commit();
     }
+
 }
