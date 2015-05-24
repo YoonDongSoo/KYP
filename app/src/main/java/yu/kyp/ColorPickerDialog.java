@@ -15,8 +15,9 @@ import android.view.View;
 
 public class ColorPickerDialog extends Dialog {
 
-    public interface OnColorChangedListener {
+    public interface OnColorChangedListener  {
         void colorChanged(int color);
+
     }
 
     private OnColorChangedListener mListener;

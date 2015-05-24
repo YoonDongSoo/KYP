@@ -166,7 +166,7 @@ public class MemoWriteActivity extends BlunoLibrary {
         sizetextview = (TextView) findViewById(R.id.textviewsize);
         scrollBtn = (Button) findViewById(R.id.buttonScroll);
         recent_color_grid = (GridView) findViewById(R.id.recent_color_grid);
-        cancelBtn = (Button) findViewById(R.id.cancelBtn);
+       // cancelBtn = (Button) findViewById(R.id.cancelBtn);
         sizeSeekBar = (SeekBar) findViewById(R.id.sizeSeekBar);
 //        sizeSeekBar.setMax(100);
 
@@ -287,16 +287,17 @@ public class MemoWriteActivity extends BlunoLibrary {
         //addedLayout.invalidate();
     }
 
-//    public static void displayRecentColor(){
-//        int i=0;
-//
-//        if(color_save.size() != 0) {
-//            Log.i("displayRecentColor","출력 " + color_save.size());
-//            for (i = 0; i < color_save.size(); i++) {
-//                recentcoloradapter.recent_color_arraylist = color_save;
-//            }
-//        }
-//    }
+    public static void displayRecentColor(){
+        int i=0;
+
+        if(color_save.size() != 0) {
+            Log.i("!!!!displayRecentColor","출력 " + color_save.size());
+            for (i = 0; i < color_save.size(); i++) {
+                //recentcoloradapter.recent_color_arraylist = color_save;
+                recentcoloradapter.recent_color_arraylist.add(color_save.get(i));
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

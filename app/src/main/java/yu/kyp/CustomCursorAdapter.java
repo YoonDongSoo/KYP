@@ -28,6 +28,7 @@ public class CustomCursorAdapter extends CursorAdapter {
     int[] allchecked;
     private boolean[] isCheckedConfrim;
     String Title;
+    String Time;
     int rowID;
     int i=0;
     final ArrayList<Integer> listItem = new ArrayList<Integer>();
@@ -63,12 +64,13 @@ public class CustomCursorAdapter extends CursorAdapter {
 
 
 
-        final TextView trashnote = (TextView) view.findViewById(R.id.textview);
+        final TextView note = (TextView) view.findViewById(R.id.textview);
+        final TextView notetime = (TextView) view.findViewById(R.id.textview2);
 
-        //제목변경하면  "NOTE_NO"-> "TITLE" 로 바꾸기
-        Title = cursor.getString(cursor.getColumnIndex("NOTE_NO"));
-        trashnote.setText(Title);
-
+        Title = cursor.getString(cursor.getColumnIndex("TITLE"));
+        note.setText(Title);
+        Time = cursor.getString(cursor.getColumnIndex("LAST_MOD_DT"));
+        notetime.setText(Time);
 
         trashcheck = (CheckBox) view.findViewById(R.id.checkbox);
 

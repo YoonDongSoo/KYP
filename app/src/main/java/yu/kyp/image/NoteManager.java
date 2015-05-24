@@ -263,7 +263,7 @@ public class NoteManager {
             note.NOTE_DATA = Utils.getImage(rs.getBlob("NOTE_DATA"));
             note.LAST_MOD_DT = rs.getString("LAST_MOD_DT");
             note.IS_DEL = rs.getBoolean("IS_DEL");
-            note.BACKGROUND = rs.getString("BACKGROUND");
+            note.BACKGROUND = rs.getInt("BACKGROUND");
         }
         return note;
     }
@@ -343,7 +343,7 @@ public class NoteManager {
         note.NOTE_DATA = bitmap;
         note.LAST_MOD_DT = Utils.getYYYYMMDDHHMMSS();
         note.IS_DEL = false;
-        note.BACKGROUND = "DEFAULT";
+        note.BACKGROUND = 0;
         Thumbnail thumb = new Thumbnail(bitmap);
         note.thumbnail = thumb;
         note.alarm = null;

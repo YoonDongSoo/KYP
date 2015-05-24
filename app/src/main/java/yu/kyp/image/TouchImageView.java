@@ -31,6 +31,9 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -41,6 +44,10 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
+
+import yu.kyp.R;
+import yu.kyp.common.Pref;
+import yu.kyp.common.Utils;
 
 public class TouchImageView extends ImageView {
 
@@ -53,6 +60,7 @@ public class TouchImageView extends ImageView {
     //
     private static final float SUPER_MIN_MULTIPLIER = .75f;
     private static final float SUPER_MAX_MULTIPLIER = 1.25f;
+    private static final String TAG = TouchImageView.class.getSimpleName();
 
     //
     // Scale of image ranges from minScale to maxScale, where minScale == 1
@@ -66,13 +74,13 @@ public class TouchImageView extends ImageView {
     // saved prior to the screen rotating.
     //
     private Matrix matrix, prevMatrix;
-    private Canvas canvasWrite;
+    public Canvas canvasWrite;
     private Bitmap bitmapWrite;
-    private Bitmap bitmapBackground;
+    //private Bitmap bitmapBackground;
     /**
      * 지우개 모드일때 손을 떼고 나서 지워지는 문제점을 발견하여 다음의 코드를 추가
      */
-    private boolean mEraserMode;
+    //private boolean mEraserMode;
     private boolean isScrollMode;
 
     /**
@@ -101,25 +109,24 @@ public class TouchImageView extends ImageView {
         paintOnTouchListener.undo.pop();
         Bitmap prev = paintOnTouchListener.undo.getLast();
         if (prev != null){
-            //이건 필요 없는것 같은데?
-            //drawBackground(canvasWrite);
-            canvasWrite.drawBitmap(bitmapBackground,0,0,null);
-            canvasWrite.drawBitmap(prev, 0, 0, null/*mPaint*/);
+            canvasWrite.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            canvasWrite.drawBitmap(prev, 0, 0, null);
             invalidate();
 
 
         }
     }
 
-    public void setBackgroundBitmap(Bitmap bitmapBackground) {
+    /*public void setBackgroundBitmap(Bitmap bitmapBackground) {
         this.bitmapBackground = bitmapBackground;
-    }
+    }*/
 
     /**
      * PaintOnTouchListner.mPaint에 Alpha값을 설정한다.
      * @param alpha_value
      */
     public void setPaintAlpha(int alpha_value) {
+        //Log.e(TAG,"alpha_value:"+ alpha_value);
         paintOnTouchListener.mPaint.setAlpha(alpha_value);
     }
 
@@ -132,9 +139,9 @@ public class TouchImageView extends ImageView {
      */
     public void updatePaintProperty(int color, int size) {
         //지우개 모드를 false로 변경
-        mEraserMode = false;
+        //mEraserMode = false;
         paintOnTouchListener.mPaint.setXfermode(null);
-        // 알파값은 따로 설정되지 않나?
+        // 알파값은 0xFF로 해줘야 되나?
         //paintOnTouchListener.mPaint.setAlpha(0xFF);
 //        mPaint.setAlpha(20);
 
@@ -148,26 +155,19 @@ public class TouchImageView extends ImageView {
     }
 
     public void drawText(String str, float x, float y) {
-        //        super.onDraw(canvas);
+        //paintOnTouchListener.mPaint.setStyle(Paint.Style.FILL);
+        //paintOnTouchListener.mPaint.setColor(Color.BLACK);
+        float textSize = Utils.TransformTouchValueToCanvasValue(getImageMatrix(),30f);
+        TextPaint textPaint=new TextPaint();
+        textPaint.setTextSize(textSize);
+        StaticLayout textLayout = new StaticLayout(str, textPaint, canvasWrite.getWidth(), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
-//        Log.i("onDraw","");
-//        Log.d("!!!!!!!!!!","ondraw");
+        canvasWrite.save();
+        canvasWrite.translate(x, y);
+        textLayout.draw(canvasWrite);
+        canvasWrite.restore();
 
-        //canvasBackground.drawBitmap(mBitmap, 0, 0, null);
-        //canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-        paintOnTouchListener.mPaint.setStyle(Paint.Style.FILL);
-        paintOnTouchListener.mPaint.setColor(Color.BLACK);
-        canvasWrite.drawColor(Color.TRANSPARENT);
-
-//
-////        Rect rt = new Rect();
-////        mPaint.getTextBounds(str,0,str.length(),rt);
-////        rt.set((int) x, (int) y + rt.top, (int) x + rt.width(), (int) y + rt.bottom);
-////        canvasWrite.drawRect(rt,ptRound);
-        canvasWrite.drawText(str, x, y, paintOnTouchListener.mPaint);
-        paintOnTouchListener.mPaint.setStyle(Paint.Style.STROKE);
-//        mTextMode = true;
-
+        //paintOnTouchListener.mPaint.setStyle(Paint.Style.STROKE);
         // undo 목록에 넣기
         paintOnTouchListener.undo.addList(getWriteBitmap());
     }
@@ -179,7 +179,7 @@ public class TouchImageView extends ImageView {
     public void setEraserPaint(int size) {
         Log.d("!!!!","지우개모드들어옴");
         //지우개 모드를 true로 바꾼다.
-        mEraserMode=true;
+        //mEraserMode=true;
 
         //setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR)) -> 검은색 펜
         // 을 이용하여 지우개와 동일한 기능을 사용할 수 있다.
@@ -198,10 +198,39 @@ public class TouchImageView extends ImageView {
      * 마지막 좌표를 기준으로 0.25% 줌을 한다.
      */
     public void zoomInBitmap() {
-        /*float scale = getScaleX()+0.25f;
-        int width = bitmapBackground.getWidth();
-        int height = bitmapBackground.getHeight();
-        setZoom(scale,paintOnTouchListener.lastX/width,paintOnTouchListener.lastY/height);*/
+        /*float t = interpolate();
+        double deltaScale = calculateDeltaScale(t);
+        scaleImage(deltaScale, bitmapX, bitmapY, stretchImageToSuper);
+        translateImageToCenterTouchPosition(t);
+        fixScaleTrans();
+        setImageMatrix(matrix);
+
+        //float scale = 1.25f;
+        int width = bitmapWrite.getWidth();
+        int height = bitmapWrite.getHeight();
+        PointF point = transformCoordTouchToBitmap(paintOnTouchListener.lastX, paintOnTouchListener.lastY, false);
+        double zoom = targetZoom;
+        double scale =  zoom / normalizedScale;
+        scaleImage(scale, point.x, point.y,false);
+        fixTrans();*/
+        //setZoom(scale);
+        //setZoom(scale, paintOnTouchListener.lastX / width, paintOnTouchListener.lastY / height);
+
+    }
+
+    public void zoomOutBitmap() {
+        //float scale = 1.25f;
+        int width = bitmapWrite.getWidth();
+        int height = bitmapWrite.getHeight();
+        matrix.postTranslate(paintOnTouchListener.lastX, paintOnTouchListener.lastY);
+        fixTrans();
+        //setZoom(scale);
+        //setZoom(scale, paintOnTouchListener.lastX / width, paintOnTouchListener.lastY / height);
+
+    }
+
+    public Canvas getWriteCanvas() {
+        return canvasWrite;
     }
 
 
@@ -456,25 +485,28 @@ public class TouchImageView extends ImageView {
             // 1. 현재 위치 표시
             Paint paint = new Paint();
             paint.setColor(Color.BLUE);
+            paint.setAlpha(70);
             canvas.drawCircle(scrollOnTouchListener.last.x, scrollOnTouchListener.last.y, 15, paint);
 
         }
 
 
         if(isScrollMode==false && paintOnTouchListener!=null) {
+
+            // alpha test
+            setPaintAlpha(Pref.getAlpha(context, 255));
+
             //======================================================
             // 1. 스케일과 offset을 가져와서 StrokeWidth 맞추기
             Paint tempPaint = new Paint(paintOnTouchListener.mPaint);
-            float[] mv = new float[9];
-            Matrix matrix = getImageMatrix();
-            matrix.getValues(mv);
-            float stokeWidth = tempPaint.getStrokeWidth()*(1/mv[Matrix.MSCALE_Y]);
+            float stokeWidth = Utils.TransformTouchValueToCanvasValue(getImageMatrix(), tempPaint.getStrokeWidth());
             tempPaint.setStrokeWidth(stokeWidth);
+
 
             //======================================================
             // 2. drawPath
-            canvasWrite.drawPath(paintOnTouchListener.mPath, tempPaint);
-
+            // 2015-05-23 윤동수 주석: PaintOnTouchListener의 OnTouch에서 drawPath하도록 수정
+            //canvasWrite.drawPath(paintOnTouchListener.mPath, tempPaint);
 
 
         }
@@ -1261,7 +1293,7 @@ public class TouchImageView extends ImageView {
      * 			to the bounds of the bitmap size.
      * @return Coordinates of the point touched, in the coordinate system of the original drawable.
      */
-    private PointF transformCoordTouchToBitmap(float x, float y, boolean clipToBitmap) {
+    public PointF transformCoordTouchToBitmap(float x, float y, boolean clipToBitmap) {
         matrix.getValues(m);
         float origW = getDrawable().getIntrinsicWidth();
         float origH = getDrawable().getIntrinsicHeight();

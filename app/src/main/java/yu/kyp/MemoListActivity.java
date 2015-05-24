@@ -25,6 +25,7 @@ import yu.kyp.image.NoteManager;
 public class MemoListActivity extends ActivityBase {
 
     private static final String TAG = MemoListActivity.class.getSimpleName();
+    private static final int REQUEST_WRITE_BG = 5;
     private NoteManager noteManager = null;
     private Context context = null;
     private static SharedPreferences sp;
@@ -32,6 +33,9 @@ public class MemoListActivity extends ActivityBase {
     static SharedPreferences sp2;
     private static SharedPreferences sp3;
     static int theme_num =7;
+    private ListCursorAdapter adapterlist = null;
+    private ListView ListViewNote;
+
     private static SharedPreferences for_alpha;
     private static SharedPreferences memo_title;
     Cursor c;
@@ -49,29 +53,12 @@ public class MemoListActivity extends ActivityBase {
             editor2.putInt("e_size_value",2);
             editor2.commit();
 
-            for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
-            SharedPreferences.Editor editor3 = for_alpha.edit();
-            editor3.putInt("alpha_value_is",255);
-            editor3.commit();
-
-//            sp3 = getSharedPreferences("currnt_e_size",MODE_PRIVATE);
-//            SharedPreferences.Editor editor4 = sp3.edit();
-//            editor4.putInt("e_size_value",2);
-//            editor4.commit();
-
-
-
             Intent i = new Intent(context,MemoWriteActivity2.class);
             i.putExtra("NOTE_NO", (int) id);
             startActivity(i);
-
-//            c = noteManager.memotitlegetNoteList(id);
-//            c.moveToNext();
-//            Toast.makeText(MemoListActivity.this,"메모",Toast.LENGTH_SHORT).show();
-
         }
     };
-    private SimpleCursorAdapter adapterListNote = null;
+//    private SimpleCursorAdapter adapterListNote = null;
     private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
     {
         @Override
@@ -110,26 +97,18 @@ public class MemoListActivity extends ActivityBase {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_list);
 
-        memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
-        memoListRelativeLayout.setBackgroundColor(0xffffff);
+       // memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
+        //memoListRelativeLayout.setBackgroundColor(0xffffff);
 
-//        memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
+        //memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
 
         context = this;
         noteManager = new NoteManager(this);
 
-
-
-        /*// 노트 SEED데이터 입력
-        try {
-            noteManager.insertSeedData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-        // ListView OnItemClickLIstener 설정
-        ListView listviewNote = (ListView) findViewById(R.id.listViewNote);
-        listviewNote.setOnItemClickListener(listenerListNote);
-        listviewNote.setOnItemLongClickListener(longClickListenerListNote);
+        // 2. ListView OnItemClickLIstener 설정
+        ListViewNote = (ListView) findViewById(R.id.listViewNote);
+        ListViewNote.setOnItemClickListener(listenerListNote);
+        ListViewNote.setOnItemLongClickListener(longClickListenerListNote);
 
     }
 
@@ -186,15 +165,17 @@ public class MemoListActivity extends ActivityBase {
      */
     private void bindNote() {
         Cursor c = noteManager.getNoteList();
-        if(adapterListNote==null) {
-            adapterListNote = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, c, new String[]{"TITLE", "LAST_MOD_DT"}, new int[]{android.R.id.text1, android.R.id.text2});
-            ListView listviewNote = (ListView) findViewById(R.id.listViewNote);
-
-            listviewNote.setAdapter(adapterListNote);
+        if(adapterlist==null) {
+//            adapterListNote = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, c, new String[]{"TITLE", "LAST_MOD_DT"}, new int[]{android.R.id.text1, android.R.id.text2});
+//            ListView ListViewNote = (ListView) findViewById(R.id.listViewNote);
+//            ListViewNote.setAdapter(adapterListNote);
+            adapterlist = new ListCursorAdapter(this,c);
+            if(adapterlist!=null)
+                ListViewNote.setAdapter(adapterlist);
         }
         else
         {
-            adapterListNote.changeCursor(c);
+            adapterlist.changeCursor(c);
         }
 
     }
@@ -224,8 +205,8 @@ public class MemoListActivity extends ActivityBase {
 
     public void buttonNewMemo_OnClick(View v)
     {
-        Intent i = new Intent(context,MemoWriteActivity2.class);
-        startActivity(i);
+        Intent i = new Intent(context,WriteBackgoundSelectActivity.class);
+        startActivityForResult(i, REQUEST_WRITE_BG);
     }
 
 
@@ -243,9 +224,29 @@ public class MemoListActivity extends ActivityBase {
 
     public void buttonSetting_OnClick(View v)
     {
-        startActivity(new Intent(this,SettingsActivity.class));
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG,"requestCode:"+requestCode+" resultCode:"+resultCode);
+        if(requestCode==REQUEST_WRITE_BG)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                if(data!=null)
+                {
+                    // 1. 결과값으로 배경 종류를 받는다. (0:라인 1:무지 2:회의록)
+                    int position = data.getIntExtra("position",0);
+                    Intent i = new Intent(context,MemoWriteActivity2.class);
+                    i.putExtra("bg_type",position);
+                    startActivity(i);
 
+
+                }
+            }
+        }
+    }
 }
 
