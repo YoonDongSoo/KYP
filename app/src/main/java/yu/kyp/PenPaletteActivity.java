@@ -55,7 +55,6 @@ public class PenPaletteActivity extends Activity {
     NeonPenDataAdapter neonpenadapter;
     Paint mPaint;
     GridView recent_color_grid;
-    MemoWriteActivity memowriteactivity;
     PaintBoard paintBoard;
     ArrayList<Integer> recent_color_list = new ArrayList<Integer>();
     static int current_size;
@@ -74,17 +73,17 @@ public class PenPaletteActivity extends Activity {
 
 
 
-    ColorPickerDialog.OnColorChangedListener colorChangedListener = new ColorPickerDialog.OnColorChangedListener() {
-        @Override
-        public void colorChanged(int color) {
-            if (PenPaletteActivity.colorlistener != null) {
-                PenPaletteActivity.colorlistener.onColorSelected(color);
-            }
-
-            finish();
-            Log.d(TAG, "color:" + color);
-        }
-    };
+//    ColorPickerDialog.OnColorChangedListener colorChangedListener = new ColorPickerDialog.OnColorChangedListener() {
+//        @Override
+//        public void colorChanged(int color) {
+//            if (PenPaletteActivity.colorlistener != null) {
+//                PenPaletteActivity.colorlistener.onColorSelected(color);
+//            }
+//
+//            finish();
+//            Log.d(TAG, "color:" + color);
+//        }
+//    };
 
     public interface OnPenSelectedListener {
         public void onPenSelected(int pen);
@@ -118,7 +117,6 @@ public class PenPaletteActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pendialog);
 
-        memowriteactivity = new MemoWriteActivity();
         paintBoard = new PaintBoard(this);
 
         mPaint = new Paint();
@@ -246,6 +244,7 @@ public class PenPaletteActivity extends Activity {
 
 
         colorgrid.setColumnWidth(14);
+        //colorgrid.setBackgroundColor(Color.GRAY);
         colorgrid.setVerticalSpacing(4);
         colorgrid.setHorizontalSpacing(4);
 
@@ -276,9 +275,9 @@ public class PenPaletteActivity extends Activity {
         neonPen.setAdapter(neonpenadapter);
         neonPen.setNumColumns(neonpenadapter.getNumColumns());
 
-        recent_color_list = memowriteactivity.color_save;
+        recent_color_list = getIntent().getIntegerArrayListExtra("color_save");
         recentcoloradapter.recent_color_arraylist = recent_color_list;
-        Log.i("!!!!!onCreate@@@@@@@@", "어레이갯수" + recent_color_list.size());
+//        Log.i("!!!!!onCreate@@@@@@@@", "어레이갯수" + recent_color_list.size());
 //        cancel.setOnClickListener(new OnClickListener() {
 //            public void onClick(View v) {
 //
@@ -400,7 +399,7 @@ class ColorDataAdapter extends BaseAdapter {
     //펜의 색상 선택을 위한 Int형 색상 배열 생성
     public static final int [] colors = new int[] {
 
-            0xff000000,0xffec2028,0xffFBED1F,0xff016938,0xff2A3B8E,0xff9D2063,-1
+            0xff000000,0xffec2028,0xffFBED1F,0xff016938,0xff2A3B8E,0xff9D2063,0
 
     };
 
@@ -493,7 +492,6 @@ class ColorDataAdapter extends BaseAdapter {
         aItem.setAlpha(20);
         aItem.setLayoutParams(params);
         aItem.setPadding(4, 4, 4, 4);
-        Log.i("!!!!","position~~ "+position);
         aItem.setBackgroundResource(imageId[position]);
         aItem.setHeight(64);
         aItem.setTag(colors[position]);
@@ -506,14 +504,17 @@ class ColorDataAdapter extends BaseAdapter {
         aItem.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (PenPaletteActivity.colorlistener != null) {
-                    PenPaletteActivity.colorlistener.onColorSelected(((Integer) v.getTag()).intValue());
-                    if( ((Integer)v.getTag()).intValue()==-1)
+                    if( ((Integer)v.getTag()).intValue()==0)
                     {
 
                         ColorPickerDialog dlg =  new ColorPickerDialog(mContext, colorChangedListener,Color.RED);
                         //컬러피커 다이얼로그 show
                         dlg.show();
+
                     }
+                    else
+                        PenPaletteActivity.colorlistener.onColorSelected(((Integer) v.getTag()).intValue());
+
                 }
 
 //                ((PenPaletteDialog)mContext).finish();
@@ -774,8 +775,10 @@ class RecentColorAdapter extends BaseAdapter{
 
         }
         else if(recent_color_arraylist.size() != 0) {
+            int count = recent_color_arraylist.size();
             if(recent_color_arraylist.size() >= 7){
-                recent_color_arraylist.remove(0);
+                for(int n=0; n<count-7; n++)
+                    recent_color_arraylist.remove(n);
             }
             Log.i("******최근색상그리드뷰*****","" + recent_color_arraylist.size());
             for (i = recent_color_arraylist.size()-1; i >=0 ; i--) {
@@ -802,9 +805,15 @@ class RecentColorAdapter extends BaseAdapter{
             // create a Button with the color
 
             aItem.setText(" ");
+
             aItem.setLayoutParams(params);
             aItem.setPadding(4, 4, 4, 4);
-            aItem.setBackgroundColor(recent_colors[position]);
+            aItem.setBackground(mContext.getResources().getDrawable(R.drawable.neon_blank));
+            if(position<recent_color_arraylist.size())
+            {
+
+                aItem.setBackgroundColor(recent_colors[position]);
+            }
             aItem.setHeight(64);
             aItem.setTag(recent_colors[position]);
 
@@ -816,6 +825,7 @@ class RecentColorAdapter extends BaseAdapter{
         aItem.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (PenPaletteActivity.recentcolorlistener != null) {
+
                     PenPaletteActivity.recentcolorlistener.onRecentColorSelected(((Integer)v.getTag()).intValue());
 //                    Log.i("pen thickness","clicked");
                 }
