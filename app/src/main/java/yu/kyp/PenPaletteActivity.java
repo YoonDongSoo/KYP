@@ -23,7 +23,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import yu.kyp.common.Pref;
-import yu.kyp.common.Utils;
 
 /**
  * 선굵기를 선택하는 대화상자용 액티비티
@@ -247,7 +246,6 @@ public class PenPaletteActivity extends Activity {
 
 
         colorgrid.setColumnWidth(14);
-        colorgrid.setBackgroundColor(Color.GRAY);
         colorgrid.setVerticalSpacing(4);
         colorgrid.setHorizontalSpacing(4);
 

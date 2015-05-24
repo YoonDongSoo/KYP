@@ -45,7 +45,6 @@ import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
-import yu.kyp.R;
 import yu.kyp.common.Pref;
 import yu.kyp.common.Utils;
 
@@ -157,7 +156,7 @@ public class TouchImageView extends ImageView {
     public void drawText(String str, float x, float y) {
         //paintOnTouchListener.mPaint.setStyle(Paint.Style.FILL);
         //paintOnTouchListener.mPaint.setColor(Color.BLACK);
-        float textSize = Utils.TransformTouchValueToCanvasValue(getImageMatrix(),30f);
+        float textSize = Utils.TransformTouchValueToCanvasValue(getImageMatrix(),50f);
         TextPaint textPaint=new TextPaint();
         textPaint.setTextSize(textSize);
         StaticLayout textLayout = new StaticLayout(str, textPaint, canvasWrite.getWidth(), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);

@@ -7,18 +7,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CursorAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import yu.kyp.common.Utils;
 import yu.kyp.common.activity.ActivityBase;
+import yu.kyp.image.Note;
 import yu.kyp.image.NoteManager;
 
 
@@ -27,6 +34,7 @@ public class MemoListActivity extends ActivityBase {
     private static final String TAG = MemoListActivity.class.getSimpleName();
     private static final int REQUEST_WRITE_BG = 5;
     private NoteManager noteManager = null;
+    private NoteManager noteManager2 = null;
     private Context context = null;
     private static SharedPreferences sp;
     RelativeLayout memoListRelativeLayout;
@@ -39,6 +47,14 @@ public class MemoListActivity extends ActivityBase {
     private static SharedPreferences for_alpha;
     private static SharedPreferences memo_title;
     Cursor c;
+    Cursor for_thumbnail;
+    private Note note;
+    private Context mContext;
+    static int memo_theme_number = 3;
+    private ImageAdapter adapterGridNote = null;
+    GridView memolist_gridview;
+//    ListView listviewNote;
+
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -92,18 +108,21 @@ public class MemoListActivity extends ActivityBase {
         }
     };
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_list);
 
-       // memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
-        //memoListRelativeLayout.setBackgroundColor(0xffffff);
+        memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
+        memoListRelativeLayout.setBackgroundColor(0xffffff);
 
         //memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
 
         context = this;
         noteManager = new NoteManager(this);
+        noteManager2 = new NoteManager(this);
 
         // 2. ListView OnItemClickLIstener 설정
         ListViewNote = (ListView) findViewById(R.id.listViewNote);
@@ -149,15 +168,72 @@ public class MemoListActivity extends ActivityBase {
 
 
 
-        // ListView에 노트 내용 뿌려주기.
-        bindNote();
+        //         ListView에 노트 내용 뿌려주기.
+        sp = getSharedPreferences("list_select", MODE_PRIVATE);
+        memo_theme_number = sp.getInt("list_num",0);
+        if (memo_theme_number == 1) {
+            Toast.makeText(MemoListActivity.this,"리스트종류"+memo_theme_number,Toast.LENGTH_SHORT).show();
+            //바둑판()
+
+
+            memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
+
+            ListViewNote.setVisibility(View.GONE);
+            memolist_gridview.setVisibility(View.VISIBLE);
+
+            gridviewbindNote();
+            //memolist_gridview.setAdapter(adapterGridNote);
+
+            //그리드뷰의 한 부분이 클릭되었을 때
+            memolist_gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView parent, View v, int position, long id) {
+                    Toast.makeText(MemoListActivity.this,"그리드뷰",Toast.LENGTH_SHORT).show();
+                    sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putInt("p_size_value",2);
+                    editor.commit();
+
+                    sp2 = getSharedPreferences("current_e_size",MODE_PRIVATE);
+                    SharedPreferences.Editor editor2 = sp2.edit();
+                    editor2.putInt("e_size_value",2);
+                    editor2.commit();
+
+                    for_alpha = getSharedPreferences("alpha_value",MODE_PRIVATE);
+                    SharedPreferences.Editor editor3 = for_alpha.edit();
+                    editor3.putInt("alpha_value_is",255);
+                    editor3.commit();
+
+
+                    Intent i = new Intent(context,MemoWriteActivity2.class);
+                    i.putExtra("NOTE_NO", (int) id);
+                    startActivity(i);
+                }
+            });
+
+        }
+        else if (memo_theme_number == 2){
+            //타임라인 형식으로 리스트 생성
+            Toast.makeText(MemoListActivity.this,"리스트종류"+memo_theme_number,Toast.LENGTH_SHORT).show();
+        }
+        else if (memo_theme_number == 3){
+            Toast.makeText(MemoListActivity.this,"리스트종류"+memo_theme_number,Toast.LENGTH_SHORT).show();
+
+            memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
+
+            //리스트 형식으로 리스트 생성(기본 형태)
+            ListViewNote.setVisibility(View.VISIBLE);
+            memolist_gridview.setVisibility(View.GONE);
+            bindNote();
+//            listviewNote.setVisibility(View.GONE);
+
+        }
         Log.d(TAG, "onResume");
         Log.d(TAG, "Settings.getDefaultFactor():" + settings.getDefaultFactor());
         Log.i(TAG,"Setting.getFontType():"+settings.getFontType());
         Log.i(TAG,"Setting.getZoomFactor():"+settings.getZoomFactor());
-        Log.i(TAG,"Setting.getBackgroundType():"+settings.getBackgroundType());
-        Log.i(TAG,"Setting.getAlarmType():"+settings.getAlarmType());
-        Log.i(TAG,"Setting.getListType():"+settings.getListType());
+        Log.i(TAG, "Setting.getBackgroundType():" + settings.getBackgroundType());
+        Log.i(TAG, "Setting.getAlarmType():" + settings.getAlarmType());
+        Log.i(TAG, "Setting.getListType():" + settings.getListType());
     }
 
     /**
@@ -180,6 +256,77 @@ public class MemoListActivity extends ActivityBase {
 
     }
 
+    /**
+     * GridView에 노트 내용 뿌려주기.
+     */
+    private void gridviewbindNote() {
+        for_thumbnail = noteManager2.getNoteList();
+
+
+        while (for_thumbnail.moveToNext()) {
+            int noteNo = for_thumbnail.getInt(for_thumbnail.getColumnIndex("_id"));
+            String temp = for_thumbnail.getString(for_thumbnail.getColumnIndex("THUM_NO"));
+            int thumNo = for_thumbnail.getInt(for_thumbnail.getColumnIndex("THUM_NO"));
+            Log.e(TAG, "thumNo:" + thumNo + " noteNo:" + noteNo + " temp:" + temp);
+//            adapterGridNote = new ImageAdapter(this,for_thumbnail);
+//            memolist_gridview.setAdapter(adapterGridNote);
+        }
+        for_thumbnail.moveToFirst();
+        if(adapterGridNote==null) {
+            adapterGridNote = new ImageAdapter(this,for_thumbnail);
+            memolist_gridview.setAdapter(adapterGridNote);
+            memolist_gridview.setPadding(10,20,0,20);
+//            Log.e("썸네일 개수!!!", "" + for_thumbnail.getCount());
+        }
+        else
+        {
+            adapterGridNote.changeCursor(for_thumbnail);
+        }
+    }
+
+
+
+    //그리드뷰로 이미지를 처리하기 위한 부분
+    public class ImageAdapter extends CursorAdapter {
+        public ImageAdapter(Context context, Cursor cursor) {
+            super(context, cursor, 0);
+            noteManager2 = new NoteManager(context);
+        }
+
+
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            View v = inflater.inflate(R.layout.image_view, parent, false);
+            return v;
+
+        }
+
+        /**
+         * 그리드뷰에 썸네일 뿌려주기
+         * @param view
+         * @param context
+         * @param cursor
+         */
+        // 1.노트 목록 가져오기 Cursor c = noteManager.getNoteList();
+        // 2.커서어뎁터에 set
+        // 3.bindView에서 blob->Bitmap 으로 변환. Utils.getImage()
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+//            memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
+            ImageView iv = (ImageView) view.findViewById(R.id.for_thumbnail);
+            iv.setPadding(0,10,20,10);
+
+            Bitmap grid_image = Utils.getImage(cursor.getBlob(cursor.getColumnIndex("THUM_DATA")));
+            Log.e("썸네일 데이터 확인", "" + for_thumbnail.getBlob(for_thumbnail.getColumnIndex("THUM_DATA")));
+            iv.setImageBitmap(grid_image);
+
+//            Bitmap grid_image = Utils.getImage(cursor.getBlob(cursor.getColumnIndex("THUM_DATA")));
+//            Log.e("썸네일 데이터 확인", "" + for_thumbnail.getBlob(for_thumbnail.getColumnIndex("THUM_DATA")));
+//            viewHolder.iv.setImageBitmap(grid_image);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
