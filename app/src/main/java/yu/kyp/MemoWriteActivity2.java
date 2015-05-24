@@ -399,6 +399,8 @@ public class MemoWriteActivity2 extends BlunoLibrary {
      * 스크롤 모드로 전환한다.
      */
     private void setScrollMode() {
+        //Toast.makeText(this,"스크롤 모드",Toast.LENGTH_SHORT).show();
+
         Log.i("scrollBtn", "clicked.");
         textBtn.setEnabled(false);
         penBtn.setEnabled(false);
@@ -633,6 +635,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     }
 
     private void setDrawPenMode() {
+        Toast.makeText(this,"글쓰기 모드",Toast.LENGTH_SHORT).show();
         //int pen_size = data.getIntExtra("p_size", 0);
         /*Log.i("펜의 사이즈", "" + pen_size);
         //oldSize = mSize;
@@ -667,6 +670,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 editor2.putInt("e_size_value",eraser_size);
                 editor2.commit();*/
 
+        Toast.makeText(this,"지우개 모드",Toast.LENGTH_SHORT).show();
         mSize = Pref.getEraserSize(context, 50);
 
         //펜 사이즈, 크기  저장

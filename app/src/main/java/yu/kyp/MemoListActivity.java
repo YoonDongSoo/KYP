@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,7 +52,7 @@ public class MemoListActivity extends ActivityBase {
     Cursor for_thumbnail;
     private Note note;
     private Context mContext;
-    static int memo_theme_number = 3;
+    //static int memo_theme_number = 3;
     private ImageAdapter adapterGridNote = null;
     GridView memolist_gridview;
 //    ListView listviewNote;
@@ -144,8 +145,67 @@ public class MemoListActivity extends ActivityBase {
 
         setBackground(memoListRelativeLayout);
 
-        // ListView에 노트 내용 뿌려주기.
-        bindNote();
+        //ListView에 노트 내용 뿌려주기.
+        //0:바둑판 1:timeline 2:리스트
+        int listType = settings.getListType();
+        //sp = getSharedPreferences("list_select", MODE_PRIVATE);
+        //memo_theme_number = sp.getInt("list_num",0);
+        if (listType == 0) {
+            Toast.makeText(MemoListActivity.this,"리스트종류"+listType,Toast.LENGTH_SHORT).show();
+            //바둑판()
+
+
+            memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
+
+            ListViewNote.setVisibility(View.GONE);
+            memolist_gridview.setVisibility(View.VISIBLE);
+
+            gridviewbindNote();
+            //memolist_gridview.setAdapter(adapterGridNote);
+
+            //그리드뷰의 한 부분이 클릭되었을 때
+            memolist_gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView parent, View v, int position, long id) {
+                    Toast.makeText(MemoListActivity.this, "그리드뷰", Toast.LENGTH_SHORT).show();
+                    sp = getSharedPreferences("current_p_size", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putInt("p_size_value", 2);
+                    editor.commit();
+
+                    sp2 = getSharedPreferences("current_e_size", MODE_PRIVATE);
+                    SharedPreferences.Editor editor2 = sp2.edit();
+                    editor2.putInt("e_size_value", 2);
+                    editor2.commit();
+
+                    for_alpha = getSharedPreferences("alpha_value", MODE_PRIVATE);
+                    SharedPreferences.Editor editor3 = for_alpha.edit();
+                    editor3.putInt("alpha_value_is", 255);
+                    editor3.commit();
+
+
+                    Intent i = new Intent(context, MemoWriteActivity2.class);
+                    i.putExtra("NOTE_NO", (int) id);
+                    startActivity(i);
+                }
+            });
+
+        }
+        else if (listType == 1){
+            //타임라인 형식으로 리스트 생성
+            Toast.makeText(MemoListActivity.this,"리스트종류"+listType,Toast.LENGTH_SHORT).show();
+        }
+        else if (listType == 2){
+            Toast.makeText(MemoListActivity.this,"리스트종류"+listType,Toast.LENGTH_SHORT).show();
+
+            memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
+
+            //리스트 형식으로 리스트 생성(기본 형태)
+            ListViewNote.setVisibility(View.VISIBLE);
+            memolist_gridview.setVisibility(View.GONE);
+            bindNote();
+//            listviewNote.setVisibility(View.GONE);
+
+        }
         Log.d(TAG, "onResume");
         Log.d(TAG, "Settings.getDefaultFactor():" + settings.getDefaultFactor());
         Log.i(TAG,"Setting.getFontType():"+settings.getFontType());
@@ -238,6 +298,8 @@ public class MemoListActivity extends ActivityBase {
 //            memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
             ImageView iv = (ImageView) view.findViewById(R.id.for_thumbnail);
             iv.setPadding(0,10,20,10);
+            /*Drawable alpha = iv.getBackground();
+            alpha.setAlpha(70);*/
 
             Bitmap grid_image = Utils.getImage(cursor.getBlob(cursor.getColumnIndex("THUM_DATA")));
             Log.e("썸네일 데이터 확인", "" + for_thumbnail.getBlob(for_thumbnail.getColumnIndex("THUM_DATA")));

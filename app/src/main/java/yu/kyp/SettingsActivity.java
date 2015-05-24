@@ -289,9 +289,9 @@ public class SettingsActivity extends PreferenceActivity{
         setOnPreferenceChange(findPreference("button_percent_setting"));
         setOnPreferenceChange(findPreference("button_zoominout_percent_setting"));
         setOnPreferenceChange(findPreference("button_font_setting"));
-//        setOnPreferenceChange(findPreference("button_background_setting"));
-//        setOnPreferenceChange(findPreference("button_alarm_setting"));
-//        setOnPreferenceChange(findPreference("button_list_setting"));
+        setOnPreferenceChange(findPreference("button_background_setting"));
+        setOnPreferenceChange(findPreference("button_alarm_setting"));
+        setOnPreferenceChange(findPreference("button_list_setting"));
 
           ThemeBackGround = button_background_setting.getValue();
           //설정화면에서 테마 설정 버튼이 눌렸을 때
@@ -314,7 +314,7 @@ public class SettingsActivity extends PreferenceActivity{
                       ListPreference listPreference = (ListPreference) preference;
                       int index = listPreference.findIndexOfValue(ThemeBackGround);
                       preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
-                      Toast.makeText(SettingsActivity.this,"선택한 테마는? " + listPreference.getEntries()[index],Toast.LENGTH_SHORT).show();
+                      /*Toast.makeText(SettingsActivity.this,"선택한 테마는? " + listPreference.getEntries()[index],Toast.LENGTH_SHORT).show();
                       if(listPreference.getEntries()[index].equals("테마1")){
                           sp = getSharedPreferences("setbackground",MODE_PRIVATE);
                           SharedPreferences.Editor editor2 = sp.edit();
@@ -356,7 +356,7 @@ public class SettingsActivity extends PreferenceActivity{
                           SharedPreferences.Editor editor2 = sp.edit();
                           editor2.putInt("theme",7);
                           editor2.commit();
-                      }
+                      }*/
                   }
                   return true;
               }
@@ -375,7 +375,7 @@ public class SettingsActivity extends PreferenceActivity{
                       int index = listPreference.findIndexOfValue(ListSetting);
                       preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
 //                      Toast.makeText(SettingsActivity.this,"선택한 리스트는? " + listPreference.getEntries()[index],Toast.LENGTH_SHORT).show();
-                      if(listPreference.getEntries()[index].equals("바둑판 배열")){
+                     /* if(listPreference.getEntries()[index].equals("바둑판 배열")){
                           Toast.makeText(SettingsActivity.this,"1",Toast.LENGTH_SHORT).show();
                           list_select = getSharedPreferences("list_select",MODE_PRIVATE);
                           SharedPreferences.Editor editor3 = list_select.edit();
@@ -395,7 +395,7 @@ public class SettingsActivity extends PreferenceActivity{
                           SharedPreferences.Editor editor3 = list_select.edit();
                           editor3.putInt("list_num",3);
                           editor3.commit();
-                      }
+                      }*/
                   }
                   return true;
               }
