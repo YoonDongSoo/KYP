@@ -104,50 +104,22 @@ public class CustomCursorAdapter extends CursorAdapter {
             }
 
 
-//            CheckBox trashallcheck = (CheckBox)view.findViewById(R.id.allcheck);
-//            trashallcheck.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    for(int i=0;i<allchecked.length;i++)
-//                    {
-//                        trashcheck.setChecked(true);
-//                    }
-//                }
-//            });
-//
-//
-//            i = 0;
-//
+
         }
 
 
     }
 
 
+    //전체 체크/해제
     public void setAllChecked(boolean ischecked) {
 
         for (int i = 0; i < checked.length; i++) {
-            // 체크를 한다.
+
             checked[i] = ischecked;
         }
     }
 
-//        if (isChecked != ischecked) {
-//
-////            Log.i("!!!!", "ischecked1 " + ischecked);
-////            trashcheck.setChecked(ischecked);
-////            isChecked = ischecked;
-//
-//        }
-
-
-//        // 아니라면 체크 안함!
-//        if (!isChecked) {
-//            Log.i("!!!!", "ischecked2 ");
-//            trashcheck.setChecked(isChecked);
-//            isChecked = true;
-//        }
-//        trashcheck.setChecked(ischecked);
 
 
 

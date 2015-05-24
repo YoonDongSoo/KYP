@@ -15,8 +15,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import yu.kyp.common.activity.ActivityBase;
 import yu.kyp.image.NoteManager;
@@ -42,16 +40,16 @@ public class MemoListActivity extends ActivityBase {
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Toast.makeText(MemoListActivity.this,"메모 하나 눌렸당 " + position + "," + id,Toast.LENGTH_SHORT).show();
-            sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putInt("p_size_value",2);
-            editor.commit();
-
-            sp2 = getSharedPreferences("current_e_size",MODE_PRIVATE);
-            SharedPreferences.Editor editor2 = sp2.edit();
-            editor2.putInt("e_size_value",2);
-            editor2.commit();
+//            Toast.makeText(MemoListActivity.this,"메모 하나 눌렸당 " + position + "," + id,Toast.LENGTH_SHORT).show();
+//            sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
+//            SharedPreferences.Editor editor = sp.edit();
+//            editor.putInt("p_size_value",2);
+//            editor.commit();
+//
+//            sp2 = getSharedPreferences("current_e_size",MODE_PRIVATE);
+//            SharedPreferences.Editor editor2 = sp2.edit();
+//            editor2.putInt("e_size_value",2);
+//            editor2.commit();
 
             Intent i = new Intent(context,MemoWriteActivity2.class);
             i.putExtra("NOTE_NO", (int) id);
