@@ -3,7 +3,8 @@
     android:layout_height="match_parent"
      tools:context="yu.kyp.TrashActivity"
     android:alpha="0.8"
-    android:background="@drawable/list_background">
+    android:background="@drawable/list_background"
+    >
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -19,7 +20,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
             android:onClick="buttonBack_OnClick"
-            android:src="@drawable/button_back"
+            android:src="@drawable/button_backclick"
             android:background="@null" />
 
         <TextView
@@ -101,14 +102,15 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:id="@+id/linearLayout"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true">
 
 
         <ImageButton
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="복원"
         android:id="@+id/Restore"
@@ -118,7 +120,7 @@
             android:layout_weight="1" />
 
         <ImageButton
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="영구삭제"
         android:id="@+id/buttonDelete"

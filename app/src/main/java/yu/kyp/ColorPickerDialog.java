@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -35,7 +36,7 @@ public class ColorPickerDialog extends Dialog {
             mListener = l;
             mColors = new int[] {
                     0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00,
-                    0xFFFFFF00, 0xFFFF0000
+                    0xFFFFFF00, 0xFFFFFFFF, 0xFFFF0000
             };
 
             //위의 색상들을 사용해 원형 그라디언트 생성성
@@ -256,6 +257,7 @@ public class ColorPickerDialog extends Dialog {
         super(context);
 
         mListener = listener;
+        Log.e("!!!!!@##%^$&","color피커 처음 색"+initialColor);
         mInitialColor = initialColor;
     }
 

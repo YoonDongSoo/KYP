@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import yu.kyp.common.activity.ActivityBase;
 import yu.kyp.image.NoteManager;
@@ -35,9 +36,13 @@ public class MemoListActivity extends ActivityBase {
     private ListCursorAdapter adapterlist = null;
     private ListView ListViewNote;
 
+    private static SharedPreferences for_alpha;
+    private static SharedPreferences memo_title;
+    Cursor c;
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Toast.makeText(MemoListActivity.this,"메모 하나 눌렸당 " + position + "," + id,Toast.LENGTH_SHORT).show();
             sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
             SharedPreferences.Editor editor = sp.edit();
             editor.putInt("p_size_value",2);
@@ -49,11 +54,11 @@ public class MemoListActivity extends ActivityBase {
             editor2.commit();
 
             Intent i = new Intent(context,MemoWriteActivity2.class);
-            i.putExtra("NOTE_NO",(int)id);
+            i.putExtra("NOTE_NO", (int) id);
             startActivity(i);
         }
     };
-   // private SimpleCursorAdapter adapterListNote = null;
+//    private SimpleCursorAdapter adapterListNote = null;
     private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
     {
         @Override
@@ -74,6 +79,7 @@ public class MemoListActivity extends ActivityBase {
     };
 
     private long deleteId;
+    //메모리스트에서 메모를 롱클릭하였을 때
     private AdapterView.OnItemLongClickListener longClickListenerListNote = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

@@ -6,9 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
-import android.widget.Toast;
 
 import yu.kyp.common.Pref;
 
@@ -18,7 +17,7 @@ import yu.kyp.common.Pref;
  *
  */
 public class EraserPaletteActivity extends Activity {
-    Button closeBtn;
+    ImageButton buttonBack;
     private static SharedPreferences sp1;
     private static SharedPreferences sp2;
     SeekBar eraserSeekBar;
@@ -47,7 +46,7 @@ public class EraserPaletteActivity extends Activity {
         context = this;
 
         //취소버튼
-        closeBtn = (Button) findViewById(R.id.closeBtn);
+        buttonBack = (ImageButton) findViewById(R.id.buttonBack);
         //지우개 사이즈 선택 시크바
         eraserSeekBar = (SeekBar) findViewById(R.id.eraserSeekBar);
         eraserSeekBar.setMax(50);
@@ -98,7 +97,7 @@ public class EraserPaletteActivity extends Activity {
         });
 
         //닫기 버튼을 눌렀을 때
-        closeBtn.setOnClickListener(new View.OnClickListener() {
+        buttonBack.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 //지우개 액티비티 종료

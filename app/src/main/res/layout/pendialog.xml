@@ -12,16 +12,17 @@
 
         <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:text="뒤로"
             android:id="@+id/buttonBack"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:onClick="buttonback_OnClick"
-            android:src="@drawable/button_back"
+            android:src="@drawable/button_backclick"
             android:background="@null"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="10dp"
+            android:layout_alignParentEnd="false" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -96,7 +97,7 @@
         android:layout_height="wrap_content"
         android:text="두께"
         android:textColor="@color/White"
-        android:textSize="20dp"
+        android:textSize="18dp"
         android:layout_margin="10dp"
        />
     <ImageView
@@ -155,7 +156,7 @@
         android:layout_height="wrap_content"
         android:text="투명도"
         android:textColor="@color/White"
-        android:textSize="20dp"
+        android:textSize="18dp"
         android:layout_margin="10dp"/>
 
         <ImageView
@@ -224,11 +225,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginBottom="20dp">
-
+        android:orientation="vertical">
+        <!--android:layout_marginLeft="20dp"-->
+        <!--android:layout_marginBottom="10dp"-->
 
         <TextView
             android:layout_width="wrap_content"
@@ -236,27 +235,24 @@
             android:text="펜"
             android:textColor="@color/White"
             android:textSize="15dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="18dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="5dp"
-            />
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"/>
         <GridView
             android:id="@+id/colorGrid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="5dp"/>
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="20dp">
+        android:orientation="vertical"
+        >
 
 
     <TextView
@@ -265,39 +261,43 @@
         android:text="형광펜"
         android:textColor="@color/White"
         android:textSize="15dp"
-        android:layout_margin="8dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
         />
     <GridView
         android:id="@+id/neonPen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="5dp"/>
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginBottom="20dp">
+        android:orientation="vertical">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="최근 사용"
         android:textColor="@color/White"
         android:textSize="15dp"
-        android:layout_margin="5dp"
-        />
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="20dp" />
     <GridView
         android:id="@+id/recent_color_grid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="5dp"
-        />
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="@null" />
     </LinearLayout>
     <!--<LinearLayout-->
         <!--android:id="@+id/buttonLayout"-->

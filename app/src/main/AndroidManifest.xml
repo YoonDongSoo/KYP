@@ -17,6 +17,10 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+
+    <supports-screens android:largeScreens="true" android:anyDensity="true"/>
 
     <supports-screens
         android:anyDensity="true"
@@ -94,6 +98,9 @@
         <activity
             android:name=".WriteBackgoundSelectActivity"
             android:label="@string/title_activity_write_backgound_select" >
+        </activity>
+        <activity android:name=".AlarmActivity"
+            android:label="">
         </activity>
     </application>
 

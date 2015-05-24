@@ -1,6 +1,9 @@
 package yu.kyp;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +13,8 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -19,13 +24,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 import yu.kyp.bluno.BlunoLibrary;
 import yu.kyp.common.Pref;
@@ -46,6 +56,12 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     private static final int REQUEST_INPUT_TITLE = 5;
     private StringBuffer strBuffer = new StringBuffer();
     private NoteManager noteManager = null;
+    Date curDate = new Date();
+    Uri eventUriString;
+    Calendar mCalendar = Calendar.getInstance();
+    static int select_memo_year;
+    static int select_memo_month;
+    static int select_memo_day;
     /**
      * 노트 객체
      */
@@ -73,6 +89,9 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     private int mColor = Color.BLACK;
     private int oldColor;
     private ArrayList<Integer> color_save = new ArrayList<Integer>();
+    private int alpha_temp_value;
+    private boolean text_flag;
+    private static SharedPreferences memo_title;
     private boolean isEraserMode;
     private Context context;
     private boolean textSelected;
@@ -82,14 +101,14 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         public void onGlobalLayout() {
             int height = viewTouchPaint.getHeight();
             int width = viewTouchPaint.getWidth();
-            Log.e(TAG,String.format("width:%d height:%d",width,height));
+            Log.e(TAG, String.format("width:%d height:%d", width, height));
 
 
 
             //=========================================
             // 1. width,height로 빈 비트맵을 만들거나
             //    기존 데이터를 DB에서 가져온다.
-            if(note.NOTE_DATA==null) {
+            if (note.NOTE_DATA == null) {
                 bitmapWrite = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                 canvasWrite = new Canvas(bitmapWrite);
                 // 2015-05-22 윤동수 수정: 백그라운드는 그리지 않는다.
@@ -252,7 +271,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
     @Override
     public void onConectionStateChange(connectionStateEnum theConnectionState) {
-        switch (theConnectionState) {											//Four connection state
+        switch (theConnectionState) {                                            //Four connection state
             case isConnected:
                 Log.d(TAG, "Connected");
                 //buttonScan.setText("Connected");
@@ -440,8 +459,27 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 oldColor = mColor;
                 mColor = color;
 
-                //최근 사용한 색상을 저장
+                int count=0;
                 color_save.add(mColor);
+                //최근 사용한 색상을 저장
+                for(int i=0; i<color_save.size(); i++)
+                {
+                    if(mColor == color_save.get(i))
+                    {
+                        count++;
+                        if(count>=2)
+                        {
+                        color_save.remove(i);
+
+                        }
+
+                    }
+
+
+                }
+
+
+
 
 //                recentcoloradapter.recent_color_list = color_save;
 //                displayRecentColor();
@@ -458,9 +496,26 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             public void onRecentColorSelected(int color){
                 mColor = color;
                 oldColor = mColor;
-
+                int count=0;
                 //최근 사용한 색상을 저장
-                color_save.add(mColor);
+                //color_save.add(mColor);
+                for(int i=0; i<color_save.size(); i++)
+                {
+
+                        if(mColor == color_save.get(i))
+                        {
+                            count++;
+                            if(count>=2)
+                            {
+                                color_save.remove(i);
+
+                            }
+
+                        }
+
+
+
+                }
 
                 viewTouchPaint.setPaintAlpha(Pref.getAlpha(context, 0));
 
@@ -508,6 +563,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
         //펜 색상, 굵기변경 팔레트 띄우기
         Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
+        intent.putIntegerArrayListExtra("color_save",color_save);
         startActivityForResult(intent, REQUEST_PEN_SIZE);
     }
 
@@ -613,7 +669,6 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
     @Override
     protected void onResume() {
-        Log.e(TAG, "onResume");
         super.onResume();
         onResumeProcess();
     }
@@ -820,4 +875,181 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         });
         alert.show();
     }
+
+    public void buttonAlarm_OnClick(View v) {
+        Toast.makeText(MemoWriteActivity2.this, "알람 눌렸다", Toast.LENGTH_SHORT).show();
+
+        Date curDate = new Date();
+        String curDateStr = String.valueOf(curDate.getTime());
+        Calendar calendar = Calendar.getInstance();
+        Date date = new Date();
+        calendar.setTime(date);
+
+        setCalendar();
+        setMemoDate();
+
+        new DatePickerDialog(
+                MemoWriteActivity2.this,
+                dateSetListener,
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private void setCalendar() {
+        Toast.makeText(MemoWriteActivity2.this, "캘린더버튼이야", Toast.LENGTH_SHORT).show();
+        Calendar calendar = Calendar.getInstance();
+        Date date = new Date();
+
+        calendar.setTime(date);
+
+        new TimePickerDialog(
+                MemoWriteActivity2.this,
+                timeSetListener,
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true
+        ).show();
+
+
+        Date curDate = new Date();
+        mCalendar.setTime(curDate);
+
+        int year = mCalendar.get(Calendar.YEAR);
+        int monthOfYear = mCalendar.get(Calendar.MONTH);
+        int dayOfMonth = mCalendar.get(Calendar.DAY_OF_MONTH);
+
+        String monthStr = String.valueOf(monthOfYear + 1);
+        if (monthOfYear < 9) {
+            monthStr = "0" + monthStr;
+        }
+
+        String dayStr = String.valueOf(dayOfMonth);
+        if (dayOfMonth < 10) {
+            dayStr = "0" + dayStr;
+        }
+
+        int hourOfDay = mCalendar.get(Calendar.HOUR_OF_DAY);
+        int minute = mCalendar.get(Calendar.MINUTE);
+
+        String hourStr = String.valueOf(hourOfDay);
+        if (hourOfDay < 10) {
+            hourStr = "0" + hourStr;
+        }
+
+        String minuteStr = String.valueOf(minute);
+        if (minute < 10) {
+            minuteStr = "0" + minuteStr;
+        }
+
+    }
+
+    private void setMemoDate() {
+        Date date = new Date();
+
+        //Calendar calendar = Calendar.getInstance();
+        mCalendar.setTime(date);
+
+        int year = mCalendar.get(Calendar.YEAR);
+        int monthOfYear = mCalendar.get(Calendar.MONTH);
+        int dayOfMonth = mCalendar.get(Calendar.DAY_OF_MONTH);
+
+        String monthStr = String.valueOf(monthOfYear + 1);
+        if (monthOfYear < 9) {
+            monthStr = "0" + monthStr;
+        }
+
+        String dayStr = String.valueOf(dayOfMonth);
+        if (dayOfMonth < 10) {
+            dayStr = "0" + dayStr;
+        }
+
+        int hourOfDay = mCalendar.get(Calendar.HOUR_OF_DAY);
+        int minute = mCalendar.get(Calendar.MINUTE);
+
+        String hourStr = String.valueOf(hourOfDay);
+        if (hourOfDay < 10) {
+            hourStr = "0" + hourStr;
+        }
+
+        String minuteStr = String.valueOf(minute);
+        if (minute < 10) {
+            minuteStr = "0" + minuteStr;
+        }
+
+    }
+
+    /**
+     * 날짜 설정 리스너
+     */
+    DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+
+            mCalendar.set(year, monthOfYear, dayOfMonth);
+
+            select_memo_year = year-1900;
+            select_memo_month = monthOfYear;
+            select_memo_day = dayOfMonth;
+            Toast.makeText(MemoWriteActivity2.this, "날짜 설정이 눌렸음" + select_memo_year
+                    + "," + select_memo_month + ","
+                    + select_memo_day, Toast.LENGTH_SHORT).show();
+
+            String monthStr = String.valueOf(monthOfYear + 1);
+            if (monthOfYear < 9) {
+                monthStr = "0" + monthStr;
+            }
+
+            String dayStr = String.valueOf(dayOfMonth);
+            if (dayOfMonth < 10) {
+                dayStr = "0" + dayStr;
+            }
+
+        }
+    };
+
+    /**
+     * 시간 설정 리스너
+     */
+    TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+        public void onTimeSet(TimePicker view, int hour_of_day, int minute) {
+            String title = note.TITLE;
+            Log.e(TAG, "title:" + title);
+            Toast.makeText(MemoWriteActivity2.this, "시간 설정이 눌렸음", Toast.LENGTH_SHORT).show();
+            mCalendar.set(Calendar.HOUR_OF_DAY, hour_of_day);
+            mCalendar.set(Calendar.MINUTE, minute);
+
+            String hourStr = String.valueOf(hour_of_day);
+            if (hour_of_day < 10) {
+                hourStr = "0" + hourStr;
+            }
+
+            String minuteStr = String.valueOf(minute);
+            if (minute < 10) {
+                minuteStr = "0" + minuteStr;
+            }
+
+            ContentValues eventValues = new ContentValues();
+
+            if(Build.VERSION.SDK_INT >= 8)
+                eventUriString  = Uri.parse("content://com.android.calendar/events");
+            else
+                eventUriString  = Uri.parse("content://calendar/events");
+
+            eventValues.put("calendar_id", 1); // id, We need to choose from our mobile for primary its 1
+            eventValues.put("title", title);
+            eventValues.put("description", "");
+            eventValues.put("eventLocation", "");
+
+            //hour 값 - 9 = 한국 시간
+            eventValues.put("dtstart", Date.UTC(select_memo_year, select_memo_month, select_memo_day, hour_of_day-9, minute, 00));
+            eventValues.put("dtend", Date.UTC(select_memo_year, select_memo_month, select_memo_day, hour_of_day-9, minute, 00));
+            eventValues.put("eventTimezone", TimeZone.getDefault().getID());
+            eventValues.put("eventStatus", 1); // This information is sufficient for most entries tentative (0), confirmed (1) or canceled (2):
+            eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
+
+            //캘린더에 넣기
+            getContentResolver().insert(eventUriString, eventValues);
+        }
+    };
 }
+
