@@ -194,11 +194,11 @@ public class NoteManager {
 
             //=======================================
             // 2.알람 객체 생성기 -> note.alarm에 추가
-            alarm = getAlarmInstance(rs, note);
+            note.alarm = getAlarmInstance(rs, note);
 
             //=======================================
             // 3.썸네일 객체 생성 -> note.alarm에 추가
-            thumb = getThumbnailInstance(rs,note);
+            note.thumbnail = getThumbnailInstance(rs,note);
 
         }//end while(rs.next())
 
@@ -274,7 +274,26 @@ public class NoteManager {
      */
     public Cursor getNoteList()
     {
-        return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE WHERE IS_DEL=0 ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
+        String sql = String.format(
+                "SELECT A.NOTE_NO AS _id " +
+                        ",A.TITLE " +
+                        ",A.NOTE_DATA " +
+                        ",A.LAST_MOD_DT " +
+                        ",A.IS_DEL " +
+                        ",A.BACKGROUND " +
+                        ",B.THUM_NO " +
+                        ",B.THUM_DATA " +
+                        ",C.ALARM_NO " +
+                        ",C.ALARM_DT " +
+                        "FROM NOTE A " +
+                        "LEFT JOIN THUMBNAIL B " +
+                        "   ON B.NOTE_NO = A.NOTE_NO " +
+                        "LEFT JOIN ALARM C " +
+                        "   ON C.NOTE_NO = A.NOTE_NO " +
+                        "WHERE A.IS_DEL=0 " +
+                        "ORDER BY A.LAST_MOD_DT DESC ");
+        //return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE WHERE IS_DEL=0 ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
+        return db.execCursor(sql); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
     }
 
     /**

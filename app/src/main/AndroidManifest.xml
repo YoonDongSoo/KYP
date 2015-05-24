@@ -99,9 +99,6 @@
             android:name=".WriteBackgoundSelectActivity"
             android:label="@string/title_activity_write_backgound_select" >
         </activity>
-        <activity android:name=".AlarmActivity"
-            android:label="">
-        </activity>
     </application>
 
 </manifest>

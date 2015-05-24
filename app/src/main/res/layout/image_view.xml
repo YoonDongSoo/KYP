@@ -2,5 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+    <ImageView
+        android:layout_width="@dimen/grid_view_width"
+        android:layout_height="@dimen/grid_view_height"
+        android:id="@+id/for_thumbnail"
+        android:background="@drawable/book"/>
 </LinearLayout>

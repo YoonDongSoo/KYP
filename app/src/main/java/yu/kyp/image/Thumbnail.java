@@ -1,7 +1,6 @@
 package yu.kyp.image;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 
 /**
@@ -12,7 +11,7 @@ public class Thumbnail {
     /**
      * 썸네일 고유번호
      */
-    public Integer THUM_NO;
+    public Integer THUM_NO = null;
     /**
      * 노트 고유번호
      */
@@ -20,7 +19,7 @@ public class Thumbnail {
     /**
      * 썸네일 이미지 데이터
      */
-    public Bitmap THUM_DATA=null;
+    public Bitmap THUM_DATA = null;
 
     public Thumbnail() {
 
@@ -32,7 +31,7 @@ public class Thumbnail {
      */
     public Thumbnail(Bitmap bitmap) {
 
-        ThumbnailUtils.extractThumbnail(bitmap, THUMBSIZE, THUMBSIZE);
+        THUM_DATA = ThumbnailUtils.extractThumbnail(bitmap, THUMBSIZE, THUMBSIZE);
     }
 
 
