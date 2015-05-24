@@ -8,27 +8,62 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="65dp"
         android:id="@+id/relativeLayout2"
-        android:background="@android:color/holo_blue_dark">
+        android:background="@drawable/trash_top">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:text="뒤로"
             android:id="@+id/buttonBack"
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
-            android:onClick="buttonTrash_OnClick" />
+            android:onClick="buttonBack_OnClick"
+            android:src="@drawable/button_back"
+            android:background="@null" />
 
-        <Button
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="All"
+            android:id="@+id/buttonAllDelete"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/font_size"
+            android:textStyle="italic"
+            android:layout_alignTop="@+id/textView5"
+            android:layout_toStartOf="@+id/chkAll" />
+
+        <CheckBox
+            android:id="@+id/chkAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:onClick="buttonAllDelete_OnClick"
+            android:layout_toStartOf="@+id/buttonDelete"/>
+
+        <!--<Button-->
+            <!--android:layout_width="70dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="All"-->
+            <!--android:id="@+id/buttonAllDelete"-->
+            <!--android:onClick="buttonAllDelete_OnClick"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_toStartOf="@+id/buttonAllDelete" />-->
+
+
+
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:text="삭제"
             android:id="@+id/buttonDelete"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:onClick="buttonDelete_OnClick" />
+            android:onClick="buttonDelete_OnClick"
+            android:src="@drawable/button_finaldelete"
+            android:background="@null" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -37,6 +72,17 @@
             android:text="Trash"
             android:id="@+id/textView5"
             android:layout_centerInParent="true" />
+
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:text="복원"
+            android:id="@+id/Restore"
+            android:onClick="buttonRestore_OnClick"
+            android:src="@drawable/button_backup"
+            android:background="@null"
+            android:layout_alignTop="@+id/textView5"
+            android:layout_toEndOf="@+id/buttonBack" />
     </RelativeLayout>
 
     <ListView

@@ -3,8 +3,17 @@
     package="yu.kyp" >
 
     <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"  />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    <grant-uri-permission android:path="string"
+        android:pathPattern="string"
+        android:pathPrefix="string" />
+    <!--<uses-permission-->
+        <!--android:name="android.permission.READ_EXTERNAL_STORAGE"-->
+        <!--android:maxSdkVersion="18"/>-->
+
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -73,6 +82,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="yu.kyp.common.activity.ActivityBase" />
+        </activity>
+        <activity
+            android:name=".SelectActivity"
+            android:label="" >
         </activity>
         <activity
             android:name=".SearchActivity"

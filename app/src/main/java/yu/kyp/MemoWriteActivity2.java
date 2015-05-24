@@ -426,10 +426,10 @@ public class MemoWriteActivity2 extends BlunoLibrary {
      * 현재 선택된 색상을 표시
      */
     private void displayPaintProperty() {
-        //ShapeDrawable bgShape = (ShapeDrawable)colorBtn.getBackground();
+        GradientDrawable bgShape = (GradientDrawable)colorBtn.getBackground();
         //bgShape.getPaint().setColor(mColor);
-        //bgShape.setColor(mColor);
-        colorBtn.setBackgroundColor(mColor);
+        bgShape.setColor(mColor);
+        //colorBtn.setBackgroundColor(mColor);
         //sizetextview.setText("Size : " + mSize);
     }
 

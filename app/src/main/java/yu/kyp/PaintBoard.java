@@ -154,7 +154,7 @@ public class PaintBoard extends View {
         testheight = getContext().getResources().getDisplayMetrics().heightPixels;;
 
         originwidth = testwidth;
-        originheight = testheight-m.topviewh-m.belowtopviewh-m.bottomviewh;
+        //originheight = testheight-m.topviewh-m.belowtopviewh-m.bottomviewh;
         Log.i("!!!","origin width"+originwidth);
         Log.i("!!!","origin height"+originheight);
 
@@ -169,8 +169,126 @@ public class PaintBoard extends View {
         Log.i("!!!!","testh"+y);
     }
 
-    private float getFixedX(float x, float scaleX) {
+    /**
+     * PaintBoard View를 25% 확대한다.
+     */
+    public void zoomInBitmap() {
+        zoomBitmap(0.25f);
+        Log.i("!!!","zoom canvas width"+canvasWrite.getWidth());
+        Log.i("!!!","zzz canvas height"+canvasWrite.getHeight());
+        Log.i("!!!","zzz bitmap width"+mBitmap.getWidth());
+        Log.i("!!!","zzz bitmap height"+mBitmap.getHeight());
+    }
+    /**
+     * PaintBoard View를 25% 축소한다.
+     */
+    public void zoomOutBitmap() {
+        zoomBitmap(-0.25f);
+    }
 
+    /**
+     * 비율을 받아 PaintBoard View를 원하는 위치에서 확대/축소한다.
+     */
+    public void zoomBitmap(float additionalFactor) {
+        iszoom =true;
+
+        // 배율이 25% 밑으로 떨어지지 않도록 처리.
+        if(sx+additionalFactor <= 0f || sy+additionalFactor<= 0f)
+            return;
+        // 배율이 100%보다 작을 때에는 이미지를 center에 놓이도록 한다.
+        if(sx+additionalFactor < 1f || sy+additionalFactor< 1f)
+        {
+            x = right/2;
+            y = bottom/2;
+
+
+        }
+
+        Paint paintLine = new Paint();  // 선을 긋기 위한 페인트 생성
+        paintLine.setARGB(70, 255, 0, 0);
+        paintLine.setStrokeWidth(5);  // 굵기
+
+        float[] values = new float[9];
+        int x1, y1, x2, y2;
+
+        //배율값을 계속 더해줘서 배율값만큼 계속 확대/축소가 되도록한다.
+        sx += additionalFactor;
+        sy += additionalFactor;
+
+
+        //글쓰기 화면의 canvas를 배경으로 둔다.
+        drawBackground(canvasWrite);
+
+
+        //터치값이 없을 경우 화면의 중앙을 중심으로 줌인/아웃
+        if(istouched==false)
+        {
+//            x= right/2;
+//            y = bottom/2;
+            x = originwidth/2;
+            y=(originheight)/2;
+        }
+        float xF = getFixedX(x, sx - additionalFactor);
+        float yF = getFixedY(y, sy - additionalFactor);
+        Log.i("!!!","xF "+xF);
+        Log.i("!!!","yF "+yF);
+
+        // 배율이 100%보다 작을 때에는 이미지를 center에 놓이도록 한다.
+        if(sx+additionalFactor < 1f || sy+additionalFactor< 1f)
+        {
+            xF = right/2;
+            yF = bottom/2;
+        }
+
+        //터치한 위치를 중심으로 확대/축소를 하기위한 위치값 계산
+//        x1 =(int) ((1-sx)*xF);
+//        y1 = (int) (0*sy + (1-sy)*(yF));
+//        x2=(int)(width*sx +(1-sx)*xF);
+//        y2=(int)((height+0)*sy + (1-sy)*(yF));
+
+
+        //테스트
+
+        x1 =(int) ((1-sx)*xF);
+        y1 = (int) (0*sy + (1-sy)*(yF));
+        x2=(int)(originwidth*sx +(1-sx)*xF);
+        y2=(int)((originheight+0)*sy + (1-sy)*(yF));
+        Log.i("!!!!!!!!","x1 "+x1);
+        Log.i("!!!!!!!!","Y1 "+y1);
+        Log.i("!!!!!!!!","X2 "+x2);
+        Log.i("!!!!!!!!","Y2 "+y2);
+
+        //이미지 좌표 값
+        globalX = x1;
+        globalY = y1;
+        int scalewidth = x2-x1;
+        int scaleheight = y2-y1;
+//        int minusw = (int)width - originwidth;
+//        int minush = (int)height - originheight;
+//        Log.i("!!!","minusw"+minusw);
+//        Log.i("!!!","minush"+minush);
+        //마지막에 저장된 비트맵을 불러와 확대/축소하고 비트맵을 다시 그려준다.
+        Bitmap bitmap = undo.getLast();
+        resize = Bitmap.createScaledBitmap(bitmap, (int)(originwidth*sx),(int)(originheight*sy) ,true);
+        // bitmap = resize;
+        Log.i("!!!","resize width"+resize.getWidth());
+        Log.i("!!!","resize height"+resize.getHeight());
+
+        canvasWrite.drawBitmap(bitmap, new Rect(0 ,0,(int)originwidth, (int)originheight), new Rect(x1,y1,x2,y2), null/*mPaint*/);
+        //canvasWrite.drawBitmap(bitmap, new Rect(0 ,0,(int)width, (int)height), new Rect(0 ,0,(int)width, (int)height), null/*mPaint*/);
+        canvasWrite.drawLine(0, (bottom - 0) / 2, right, (bottom - 0) / 2, paintLine);
+        canvasWrite.drawLine(right / 2, 0, right / 2, bottom, paintLine);
+        //canvasWrite.drawRect(globalX, globalY, globalX+scalewidth, globalY+scaleheight, paintLine);   // 사각형
+        invalidate();
+
+        lastXF = xF;
+        lastYF = yF;
+
+    }
+
+    private float getFixedX(float x, float scaleX) {
+        float test = (x-(1-scaleX)*lastXF)/scaleX;
+        Log.i("!!!","getFixedX"+test);
         return (x-(1-scaleX)*lastXF)/scaleX;
 
     }
