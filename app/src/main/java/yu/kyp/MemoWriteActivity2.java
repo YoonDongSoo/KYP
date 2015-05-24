@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -431,8 +430,27 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 oldColor = mColor;
                 mColor = color;
 
-                //최근 사용한 색상을 저장
+                int count=0;
                 color_save.add(mColor);
+                //최근 사용한 색상을 저장
+                for(int i=0; i<color_save.size(); i++)
+                {
+                    if(mColor == color_save.get(i))
+                    {
+                        count++;
+                        if(count>=2)
+                        {
+                        color_save.remove(i);
+
+                        }
+
+                    }
+
+
+                }
+
+
+
 
 //                recentcoloradapter.recent_color_list = color_save;
 //                displayRecentColor();
@@ -449,9 +467,26 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             public void onRecentColorSelected(int color){
                 mColor = color;
                 oldColor = mColor;
-
+                int count=0;
                 //최근 사용한 색상을 저장
-                color_save.add(mColor);
+                //color_save.add(mColor);
+                for(int i=0; i<color_save.size(); i++)
+                {
+
+                        if(mColor == color_save.get(i))
+                        {
+                            count++;
+                            if(count>=2)
+                            {
+                                color_save.remove(i);
+
+                            }
+
+                        }
+
+
+
+                }
 
                 viewTouchPaint.setPaintAlpha(Pref.getAlpha(context, 0));
 
@@ -499,6 +534,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
 
         //펜 색상, 굵기변경 팔레트 띄우기
         Intent intent = new Intent(getApplicationContext(), PenPaletteActivity.class);
+        intent.putIntegerArrayListExtra("color_save",color_save);
         startActivityForResult(intent, REQUEST_PEN_SIZE);
     }
 
