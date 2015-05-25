@@ -316,10 +316,11 @@ public class SelectActivity extends ActivityBase {
             ContentValues values = new ContentValues();
             values.put(MediaStore.Images.Media.TITLE, "Title");
             values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-            //이미지가 저장될 파일 경로 설정
+
             Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     values);
 
+            Log.e("!!!!!","uri "+uri);
 
 
 

@@ -280,11 +280,8 @@ public class SettingsActivity extends PreferenceActivity{
         memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
 
         addPreferencesFromResource(R.xml.pref_settings);
-          memolistactivity = new MemoListActivity();
+        memolistactivity = new MemoListActivity();
 
-        final ListPreference button_background_setting = (ListPreference)findPreference("button_background_setting");
-          final ListPreference button_list_setting = (ListPreference)findPreference("button_list_setting");
-          final ListPreference button_alarm_setting = (ListPreference)findPreference("button_alarm_setting");
         setOnPreferenceChange(findPreference("button_percent_setting"));
         setOnPreferenceChange(findPreference("button_zoominout_percent_setting"));
         setOnPreferenceChange(findPreference("button_font_setting"));
@@ -292,66 +289,7 @@ public class SettingsActivity extends PreferenceActivity{
         setOnPreferenceChange(findPreference("button_alarm_setting"));
         setOnPreferenceChange(findPreference("button_list_setting"));
 
-          ThemeBackGround = button_background_setting.getValue();
-          //설정화면에서 테마 설정 버튼이 눌렸을 때
-          button_background_setting.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-              @Override
-              public boolean onPreferenceChange(Preference preference, Object newValue) {
-                  StringBuffer result = new StringBuffer();
-                  result.append("설정이 완료되었습니다.");
-                  ThemeBackGround = newValue.toString();
 
-                  sp = getSharedPreferences("setbackground", MODE_PRIVATE);
-                  SharedPreferences.Editor editor = sp.edit();
-                  editor.putInt("notheme", 1);
-                  editor.commit();
-
-                  //A instanceof B란 A의 객체가 B에 속해있는지(상속) 여부를 판단
-                  //만약 속해있다면 TRUE를 출력한다.
-                  if(preference instanceof ListPreference) {
-
-                      ListPreference listPreference = (ListPreference) preference;
-                      int index = listPreference.findIndexOfValue(ThemeBackGround);
-                      preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
-
-                  }
-                  return true;
-              }
-          });
-          ListSetting = button_list_setting.getValue();
-          //리스트 세팅 버튼이 눌렸을 때
-          button_list_setting.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-              @Override
-              public boolean onPreferenceChange(Preference preference, Object newValue) {
-                  StringBuffer result = new StringBuffer();
-                  result.append("설정이 완료되었습니다.");
-                  ListSetting = newValue.toString();
-
-                  if(preference instanceof ListPreference) {
-                      ListPreference listPreference = (ListPreference) preference;
-                      int index = listPreference.findIndexOfValue(ListSetting);
-                      preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
-                  }
-                  return true;
-              }
-          });
-
-          Alarm = button_alarm_setting.getValue();
-          //알람 세팅 버튼이 눌렸을 때
-          button_alarm_setting.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-              @Override
-              public boolean onPreferenceChange(Preference preference, Object newValue) {
-                  StringBuffer result = new StringBuffer();
-                  result.append("설정이 완료되었습니다.");
-                  Alarm = newValue.toString();
-                  if (preference instanceof ListPreference) {
-                      ListPreference listPreference = (ListPreference) preference;
-                      int index = listPreference.findIndexOfValue(Alarm);
-                      preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
-                  }
-                  return true;
-              }
-          });
       }
 
 
@@ -381,11 +319,7 @@ public class SettingsActivity extends PreferenceActivity{
                 preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
 
             }
-//            else if(preference instanceof SeekBarPreference)
-//            {
-//
-//                preference.setSummary(value);
-//            }
+
             return true;
         }
 
