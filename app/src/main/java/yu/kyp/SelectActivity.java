@@ -261,7 +261,7 @@ public class SelectActivity extends ActivityBase {
                 Log.i("!!!!", "i " + i);
                 id = adapterSelectlist.getItemId(i);
                 Log.i("!!!!", "id " + id);
-                Intent msg = new Intent(context, MemoWriteActivity.class);
+                Intent msg = new Intent(context, MemoWriteActivity2.class);
                 noteNo = msg.getIntExtra("NOTE_NO", (int) id);
                 if (noteNo > 0) {
                     note = noteManager.getNote(noteNo);
@@ -377,7 +377,7 @@ public class SelectActivity extends ActivityBase {
                 Log.i("!!!!", "i " + i);
                 id = adapterSelectlist.getItemId(i);
                 Log.i("!!!!", "id " + id);
-                Intent msg = new Intent(context, MemoWriteActivity.class);
+                Intent msg = new Intent(context, MemoWriteActivity2.class);
                 noteNo = msg.getIntExtra("NOTE_NO", (int) id);
                 if (noteNo > 0) {
                     note = noteManager.getNote(noteNo);
