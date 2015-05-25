@@ -117,8 +117,8 @@ public class ColorPickerDialog extends Dialog {
             setMeasuredDimension(CENTER_X*2, CENTER_Y*2);
         }
 
-        private static final int CENTER_X = 400;
-        private static final int CENTER_Y = 400;
+        private static final int CENTER_X = 300;
+        private static final int CENTER_Y = 300;
         private static final int CENTER_RADIUS = 120;
 
         private int floatToByte(float x) {

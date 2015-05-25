@@ -1,7 +1,6 @@
 
 package yu.kyp;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +17,6 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -530,9 +528,14 @@ class ColorDataAdapter extends BaseAdapter {
                 for_recent_color.add(((Integer) v.getTag()).intValue());
                 Log.e("!!!!!!!!!!!!aItem","출력 : " + for_recent_color.get(for_recent_color.size()-1));
                 Log.e("!!!!!!!!!!!!aItem size","출력 : " + for_recent_color.size());
-                if(for_recent_color.size() >=7){
-                    for_recent_color.remove(0);
+                int count = for_recent_color.size();
+                if(for_recent_color.size() >= 7) {
+                    for (int n = 0; n < count - 7; n++)
+                        for_recent_color.remove(n);
                 }
+//                if(for_recent_color.size() >=7){
+//                    for_recent_color.remove(0);
+//                }
 
                 Log.e("!!!aItem size","remove한 후 출력 : " + for_recent_color.size());
 
@@ -698,6 +701,7 @@ class RecentColorAdapter extends BaseAdapter{
 
     public static final int[] recent_colors = new int[7];
 
+
     public static final int[] recentimageId = {
             R.drawable.neon_blank, R.drawable.neon_blank,  R.drawable.neon_blank,
             R.drawable.neon_blank, R.drawable.neon_blank,  R.drawable.neon_blank, R.drawable.neon_blank
@@ -767,6 +771,8 @@ class RecentColorAdapter extends BaseAdapter{
     public View getView(int position, View view, ViewGroup group) {
         int i=0;
         Button aItem = new Button(mContext);
+
+
         if(recent_color_arraylist.size() == 0)
         {
             GridView.LayoutParams params = new GridView.LayoutParams(
@@ -789,9 +795,11 @@ class RecentColorAdapter extends BaseAdapter{
             }
             Log.i("******최근색상그리드뷰*****","" + recent_color_arraylist.size());
             for (i = recent_color_arraylist.size()-1; i >=0 ; i--) {
+                Log.e("!!!!!!","첫번째 들어옴");
                 recent_colors[(recent_color_arraylist.size()-1)-i] = recent_color_arraylist.get(i);
             }
             for(i=recent_color_arraylist.size(); i<7; i++){
+                Log.e("!!!!!!","두번째 들어옴");
                 recent_colors[i] = 0xffffffff;
             }
 
@@ -832,10 +840,16 @@ class RecentColorAdapter extends BaseAdapter{
         aItem.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (PenPaletteActivity.recentcolorlistener != null) {
+//                    if(recent_color_arraylist.size()!=0) {
+                        //  Log.i("!!!!!!","펜클릭"+((Integer)v.getTag()).intValue());
+                        Object tagg = v.getTag();
+                        if (tagg != null) {
 
-                    PenPaletteActivity.recentcolorlistener.onRecentColorSelected(((Integer)v.getTag()).intValue());
+                            PenPaletteActivity.recentcolorlistener.onRecentColorSelected(((Integer) tagg).intValue());
+                        }
 //                    Log.i("pen thickness","clicked");
-                }
+                    }
+ //               }
 
             }
         });
