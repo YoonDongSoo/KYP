@@ -1,6 +1,5 @@
 package yu.kyp;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -102,6 +101,12 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     private boolean textSelected;
     //세팅에서 받아온 알람의 값을 위해
     protected Settings settings = null;
+    static String hourStr = null;
+    static String minuteStr = null;
+    static int selectHour = 0;
+    static int selectMinute = 0;
+    static String set_alarm = null;
+
 
     private ViewTreeObserver.OnGlobalLayoutListener touchViewPaint_OnGlobalLayoutLIstener = new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
@@ -430,6 +435,48 @@ public class MemoWriteActivity2 extends BlunoLibrary {
      */
     public void buttonSave_OnClick(View v)
     {
+        String note_title = note.TITLE;
+        if(note_title == null){
+            note_title = "(제목 없음)";
+        }
+
+        ContentValues eventValues = new ContentValues();
+
+        if(Build.VERSION.SDK_INT >= 8)
+            eventUriString  = Uri.parse("content://com.android.calendar/events");
+        else
+            eventUriString  = Uri.parse("content://calendar/events");
+
+        eventValues.put("calendar_id", 1); // id, We need to choose from our mobile for primary its 1
+        eventValues.put("title", note_title);
+        eventValues.put("description", "");
+        eventValues.put("eventLocation", "");
+
+        //hour 값 - 9 = 한국 시간
+        eventValues.put("dtstart", Date.UTC(select_memo_year, select_memo_month, select_memo_day, selectHour - 9, selectMinute, 00));
+        eventValues.put("dtend", Date.UTC(select_memo_year, select_memo_month, select_memo_day, selectHour - 9, selectMinute, 00));
+        eventValues.put("eventTimezone", TimeZone.getDefault().getID());
+        eventValues.put("eventStatus", 1); // This information is sufficient for most entries tentative (0), confirmed (1) or canceled (2):
+        eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
+
+        //선택한 날짜, 시간에 맞게 캘린더에 넣기
+        final Uri uri = getContentResolver().insert(eventUriString, eventValues);
+
+        int AlarmType = settings.getAlarmType();
+        if(AlarmType == 1) {
+            Uri REMINDERS_URI = Uri.parse("content://com.android.calendar/" + "reminders");
+            eventValues = new ContentValues();
+            eventValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
+            eventValues.put("method", 1);
+            eventValues.put("minutes", 0);
+            getContentResolver().insert(REMINDERS_URI, eventValues);
+        }
+
+        //저장할 날짜, 시간 노트에 저장하기
+        Log.e("날짜 확인", "" + Integer.toString(select_memo_year + 1900)
+                + "," + Integer.toString(select_memo_month + 1) + ","
+                + Integer.toString(select_memo_day));
+
         // DB에 저장
         saveNote(true);
     }
@@ -918,7 +965,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("등록된 스케줄 확인")        // 제목 설정
                     .setMessage("스케줄 이름 : "+ note_title +
-                            "\n시간 : " + note.alarm.ALARM_DT)        // 메세지 설정
+                            "\n시간 : " + set_alarm)        // 메세지 설정
                     .setCancelable(true)        // 뒤로 버튼 클릭시 취소 가능 설정
                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
@@ -1069,62 +1116,34 @@ public class MemoWriteActivity2 extends BlunoLibrary {
      */
     public TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hour_of_day, int minute) {
-            AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-            String title = note.TITLE;
-            Log.e(TAG, "title:" + title);
-            Toast.makeText(MemoWriteActivity2.this, "시간 설정이 눌렸음 " + hour_of_day, Toast.LENGTH_SHORT).show();
+//            AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+//            String title = note.TITLE;
+//            Log.e(TAG, "title:" + title);
+//            Toast.makeText(MemoWriteActivity2.this, "시간 설정이 눌렸음 " + hour_of_day, Toast.LENGTH_SHORT).show();
             mCalendar.set(Calendar.HOUR_OF_DAY, hour_of_day);
             mCalendar.set(Calendar.MINUTE, minute);
 
-            String hourStr = String.valueOf(hour_of_day);
+            selectHour = hour_of_day;
+            selectMinute = minute;
+
+
+            hourStr = String.valueOf(hour_of_day);
             if (hour_of_day < 10) {
                 hourStr = "0" + hourStr;
             }
 
-            String minuteStr = String.valueOf(minute);
+            minuteStr = String.valueOf(minute);
             if (minute < 10) {
                 minuteStr = "0" + minuteStr;
             }
 
-           ContentValues eventValues = new ContentValues();
 
-            if(Build.VERSION.SDK_INT >= 8)
-                eventUriString  = Uri.parse("content://com.android.calendar/events");
-            else
-                eventUriString  = Uri.parse("content://calendar/events");
 
-            eventValues.put("calendar_id", 1); // id, We need to choose from our mobile for primary its 1
-            eventValues.put("title", title);
-            eventValues.put("description", "");
-            eventValues.put("eventLocation", "");
-
-            //hour 값 - 9 = 한국 시간
-            eventValues.put("dtstart", Date.UTC(select_memo_year, select_memo_month, select_memo_day, hour_of_day - 9, minute, 00));
-            eventValues.put("dtend", Date.UTC(select_memo_year, select_memo_month, select_memo_day, hour_of_day - 9, minute, 00));
-            eventValues.put("eventTimezone", TimeZone.getDefault().getID());
-            eventValues.put("eventStatus", 1); // This information is sufficient for most entries tentative (0), confirmed (1) or canceled (2):
-            eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
-
-            //선택한 날짜, 시간에 맞게 캘린더에 넣기
-            final Uri uri = getContentResolver().insert(eventUriString, eventValues);
-
-            int AlarmType = settings.getAlarmType();
-            if(AlarmType == 1) {
-                Uri REMINDERS_URI = Uri.parse("content://com.android.calendar/" + "reminders");
-                eventValues = new ContentValues();
-                eventValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
-                eventValues.put("method", 1);
-                eventValues.put("minutes", 0);
-                getContentResolver().insert(REMINDERS_URI, eventValues);
-            }
-
-            //저장할 날짜, 시간 노트에 저장하기
-            Log.e("날짜 확인", "" + Integer.toString(select_memo_year + 1900)
-                    + "," + Integer.toString(select_memo_month + 1) + ","
-                    + Integer.toString(select_memo_day));
-            note.alarm.ALARM_DT = String.format("%d-%02d-%02d %s:%s:00",
+            set_alarm = String.format("%d-%02d-%02d %s:%s:00",
                     select_memo_year + 1900,select_memo_month +1,select_memo_day,
                     hourStr,minuteStr);
+            note.alarm.ALARM_DT = set_alarm;
+
 //            Log.e(TAG,"note.alarm.ALARM_DT:"+note.alarm.ALARM_DT);
         }
     };
