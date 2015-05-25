@@ -31,8 +31,6 @@
             android:text="메모지 선택"
             android:id="@+id/textViewTitle"
             android:textColor="@color/White"
-            android:onClick="textViewTitle_OnClick"
-            android:clickable="true"
             android:layout_centerInParent="true" />
 
 
