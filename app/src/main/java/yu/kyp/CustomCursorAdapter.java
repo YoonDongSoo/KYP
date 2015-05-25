@@ -21,7 +21,7 @@ import yu.kyp.image.NoteManager;
 public class CustomCursorAdapter extends CursorAdapter {
     protected Context mContext;
     protected Cursor mCursor;
-    private CheckBox trashcheck;
+    //private CheckBox trashcheck;
     private ArrayList<Boolean> itemChecked = new ArrayList<Boolean>();
     private NoteManager noteManager = null;
     boolean[] checked;
@@ -64,16 +64,25 @@ public class CustomCursorAdapter extends CursorAdapter {
 
 
 
+        // 1. 기본 변수
         final TextView note = (TextView) view.findViewById(R.id.textview);
         final TextView notetime = (TextView) view.findViewById(R.id.textview2);
 
+        // 2. 내용 설정
         Title = cursor.getString(cursor.getColumnIndex("TITLE"));
         note.setText(Title);
         Time = cursor.getString(cursor.getColumnIndex("LAST_MOD_DT"));
         notetime.setText(Time);
 
-        trashcheck = (CheckBox) view.findViewById(R.id.checkbox);
-
+        // 3. 체크박스 설정
+        final CheckBox trashcheck = (CheckBox) view.findViewById(R.id.checkbox);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checked[position] = !checked[position];
+                trashcheck.setChecked(checked[position]);
+            }
+        });
         //체크박스가 null이 아니면...
         if (trashcheck != null) {
             // 체크박스의 상태 변화를 체크한다.
@@ -86,27 +95,10 @@ public class CustomCursorAdapter extends CursorAdapter {
 
                 }
             });
-
-
-            boolean isChecked = false;
-            for (int i = 0; i < checked.length; i++) {
-                // 만약 체크되었던 아이템이라면
-                if (checked[i] == true) {
-                    // 체크를 한다.
-                    trashcheck.setChecked(true);
-                    isChecked = true;
-                    break;
-                }
-            }
-            // 아니라면 체크 안함!
-            if (!isChecked) {
-                trashcheck.setChecked(false);
-            }
-
-
-
+            trashcheck.setChecked(checked[position]);
         }
 
+        // 4. 아이템 선택 배경 설정
 
     }
 

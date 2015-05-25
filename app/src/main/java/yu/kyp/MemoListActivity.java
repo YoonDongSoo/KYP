@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import yu.kyp.common.Pref;
 import yu.kyp.common.Utils;
 import yu.kyp.common.activity.ActivityBase;
 import yu.kyp.image.Note;
@@ -59,6 +60,10 @@ public class MemoListActivity extends ActivityBase {
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            //Pref.setPenSize(context,30);
+            //Pref.setEraserSize(context,50);
+            //Pref.setAlpha(context,120);
+
             Intent i = new Intent(context,MemoWriteActivity2.class);
             i.putExtra("NOTE_NO", (int) id);
             startActivity(i);
@@ -72,10 +77,14 @@ public class MemoListActivity extends ActivityBase {
             {
                 case DialogInterface.BUTTON_POSITIVE:
                     ContentValues values = new ContentValues();
-                    values.put("IS_DEL","1");
+                    values.put("IS_DEL", "1");
                     int cnt = db.execUpdate("NOTE", values, "NOTE_NO=" + deleteId);
-                    Log.i(TAG,"cnt:"+cnt);
-                    bindNote();
+                    Log.i(TAG, "cnt:" + cnt);
+                    if(settings.getListType()==0)   // 바둑판형식일 때
+                        gridviewbindNote();
+                    else                            // 리스트 형식일때
+                        bindNote();
+
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     break;
@@ -147,30 +156,9 @@ public class MemoListActivity extends ActivityBase {
             gridviewbindNote();
 
             //그리드뷰의 한 부분이 클릭되었을 때
-            memolist_gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView parent, View v, int position, long id) {
-                    Toast.makeText(MemoListActivity.this, "그리드뷰", Toast.LENGTH_SHORT).show();
-                    sp = getSharedPreferences("current_p_size", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putInt("p_size_value", 2);
-                    editor.commit();
-
-                    sp2 = getSharedPreferences("current_e_size", MODE_PRIVATE);
-                    SharedPreferences.Editor editor2 = sp2.edit();
-                    editor2.putInt("e_size_value", 2);
-                    editor2.commit();
-
-                    for_alpha = getSharedPreferences("alpha_value", MODE_PRIVATE);
-                    SharedPreferences.Editor editor3 = for_alpha.edit();
-                    editor3.putInt("alpha_value_is", 255);
-                    editor3.commit();
-
-
-                    Intent i = new Intent(context, MemoWriteActivity2.class);
-                    i.putExtra("NOTE_NO", (int) id);
-                    startActivity(i);
-                }
-            });
+            memolist_gridview.setOnItemClickListener(listenerListNote);
+            // 그리드뷰 롱클릭 처리
+            memolist_gridview.setOnItemLongClickListener(longClickListenerListNote);
 
         }
         else if (listType == 1){
@@ -268,15 +256,38 @@ public class MemoListActivity extends ActivityBase {
         // 3.bindView에서 blob->Bitmap 으로 변환. Utils.getImage()
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-//            memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
-            ImageView iv = (ImageView) view.findViewById(R.id.for_thumbnail);
-            iv.setPadding(0,10,20,10);
-            Drawable alpha = iv.getBackground();
-            alpha.setAlpha(150);
+            // 1.기본 변수
+            ImageView viewThumbnail = (ImageView) view.findViewById(R.id.for_thumbnail);
+            viewThumbnail.setPadding(0, 10, 20, 10);
 
+
+            // 2.이미지 배경 설정 (
+            int backgroundType = cursor.getInt(cursor.getColumnIndex("BACKGROUND"));
+            switch (backgroundType)
+            {
+                case 0:
+                    viewThumbnail.setBackgroundResource(R.drawable.note_line_500); // 줄노트
+                    break;
+                case 1:
+                    viewThumbnail.setBackgroundResource(R.drawable.note_clean_500); // 무지노트
+                    break;
+                case 2:
+                    //viewThumbnail.setBackgroundResource(R.drawable.note_clean_500); // 회의노트
+                    Drawable d = context.getResources().getDrawable(R.drawable.back_book_white);
+                    d.setAlpha(140);
+                    viewThumbnail.setBackgroundDrawable(d); // 회의노트
+                    break;
+                default:
+                    viewThumbnail.setBackgroundResource(R.drawable.note_line_500); // 줄노트
+                    break;
+            }
+
+            // 3.썸네일 설정
             Bitmap grid_image = Utils.getImage(cursor.getBlob(cursor.getColumnIndex("THUM_DATA")));
-            Log.e("썸네일 데이터 확인", "" + for_thumbnail.getBlob(for_thumbnail.getColumnIndex("THUM_DATA")));
-            iv.setImageBitmap(grid_image);
+            viewThumbnail.setImageBitmap(grid_image);
+            //Log.e("썸네일 데이터 확인", "" + for_thumbnail.getBlob(for_thumbnail.getColumnIndex("THUM_DATA")));
+
+
         }
     }
 
