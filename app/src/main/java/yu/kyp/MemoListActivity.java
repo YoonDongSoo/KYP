@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,23 +59,11 @@ public class MemoListActivity extends ActivityBase {
     private AdapterView.OnItemClickListener listenerListNote = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//            Toast.makeText(MemoListActivity.this,"메모 하나 눌렸당 " + position + "," + id,Toast.LENGTH_SHORT).show();
-//            sp = getSharedPreferences("current_p_size",MODE_PRIVATE);
-//            SharedPreferences.Editor editor = sp.edit();
-//            editor.putInt("p_size_value",2);
-//            editor.commit();
-//
-//            sp2 = getSharedPreferences("current_e_size",MODE_PRIVATE);
-//            SharedPreferences.Editor editor2 = sp2.edit();
-//            editor2.putInt("e_size_value",2);
-//            editor2.commit();
-
             Intent i = new Intent(context,MemoWriteActivity2.class);
             i.putExtra("NOTE_NO", (int) id);
             startActivity(i);
         }
     };
-//    private SimpleCursorAdapter adapterListNote = null;
     private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
     {
         @Override
@@ -116,9 +105,6 @@ public class MemoListActivity extends ActivityBase {
         setContentView(R.layout.activity_memo_list);
 
         memoListRelativeLayout = (RelativeLayout)findViewById(R.id.memoListRelativeLayout);
-        //memoListRelativeLayout.setBackgroundColor(0xffffff);
-
-        //memoListRelativeLayout.setBackground(getResources().getDrawable(R.drawable.background));
 
         context = this;
         noteManager = new NoteManager(this);
@@ -159,7 +145,6 @@ public class MemoListActivity extends ActivityBase {
             memolist_gridview.setVisibility(View.VISIBLE);
 
             gridviewbindNote();
-            //memolist_gridview.setAdapter(adapterGridNote);
 
             //그리드뷰의 한 부분이 클릭되었을 때
             memolist_gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -221,9 +206,6 @@ public class MemoListActivity extends ActivityBase {
     private void bindNote() {
         Cursor c = noteManager.getNoteList();
         if(adapterlist==null) {
-//            adapterListNote = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, c, new String[]{"TITLE", "LAST_MOD_DT"}, new int[]{android.R.id.text1, android.R.id.text2});
-//            ListView ListViewNote = (ListView) findViewById(R.id.listViewNote);
-//            ListViewNote.setAdapter(adapterListNote);
             adapterlist = new ListCursorAdapter(this,c);
             if(adapterlist!=null)
                 ListViewNote.setAdapter(adapterlist);
@@ -232,7 +214,6 @@ public class MemoListActivity extends ActivityBase {
         {
             adapterlist.changeCursor(c);
         }
-
     }
 
     /**
@@ -241,14 +222,11 @@ public class MemoListActivity extends ActivityBase {
     private void gridviewbindNote() {
         for_thumbnail = noteManager2.getNoteList();
 
-
         while (for_thumbnail.moveToNext()) {
             int noteNo = for_thumbnail.getInt(for_thumbnail.getColumnIndex("_id"));
             String temp = for_thumbnail.getString(for_thumbnail.getColumnIndex("THUM_NO"));
             int thumNo = for_thumbnail.getInt(for_thumbnail.getColumnIndex("THUM_NO"));
             Log.e(TAG, "thumNo:" + thumNo + " noteNo:" + noteNo + " temp:" + temp);
-//            adapterGridNote = new ImageAdapter(this,for_thumbnail);
-//            memolist_gridview.setAdapter(adapterGridNote);
         }
         for_thumbnail.moveToFirst();
         if(adapterGridNote==null) {
@@ -272,14 +250,11 @@ public class MemoListActivity extends ActivityBase {
             noteManager2 = new NoteManager(context);
         }
 
-
-
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(context);
             View v = inflater.inflate(R.layout.image_view, parent, false);
             return v;
-
         }
 
         /**
@@ -296,14 +271,12 @@ public class MemoListActivity extends ActivityBase {
 //            memolist_gridview = (GridView) findViewById(R.id.memolist_gridview);
             ImageView iv = (ImageView) view.findViewById(R.id.for_thumbnail);
             iv.setPadding(0,10,20,10);
+            Drawable alpha = iv.getBackground();
+            alpha.setAlpha(150);
 
             Bitmap grid_image = Utils.getImage(cursor.getBlob(cursor.getColumnIndex("THUM_DATA")));
             Log.e("썸네일 데이터 확인", "" + for_thumbnail.getBlob(for_thumbnail.getColumnIndex("THUM_DATA")));
             iv.setImageBitmap(grid_image);
-
-//            Bitmap grid_image = Utils.getImage(cursor.getBlob(cursor.getColumnIndex("THUM_DATA")));
-//            Log.e("썸네일 데이터 확인", "" + for_thumbnail.getBlob(for_thumbnail.getColumnIndex("THUM_DATA")));
-//            viewHolder.iv.setImageBitmap(grid_image);
         }
     }
 
@@ -335,13 +308,10 @@ public class MemoListActivity extends ActivityBase {
         startActivityForResult(i, REQUEST_WRITE_BG);
     }
 
-
-
     public void buttonSelect_OnClick(View v)
     {
         startActivity(new Intent(this,SelectActivity.class));
     }
-
 
     public void buttonTrash_OnClick(View v)
     {
@@ -368,8 +338,6 @@ public class MemoListActivity extends ActivityBase {
                     Intent i = new Intent(context,MemoWriteActivity2.class);
                     i.putExtra("bg_type",position);
                     startActivity(i);
-
-
                 }
             }
         }
