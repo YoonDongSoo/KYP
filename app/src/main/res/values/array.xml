@@ -32,13 +32,13 @@
     </string-array>
 
     <string-array name="entries_background">
-        <item>테마1</item>
-        <item>테마2</item>
-        <item>테마3</item>
-        <item>테마4</item>
-        <item>테마5</item>
-        <item>테마6</item>
-        <item>테마7</item>
+        <item>블루베리 마카롱</item>
+        <item>왕수박바</item>
+        <item>생귤탱귤</item>
+        <item>죠스바</item>
+        <item>빠삐코</item>
+        <item>키위</item>
+        <item>뽕따</item>
 
     </string-array>
     <string-array name="entryvalues_background">
@@ -75,13 +75,11 @@
 
     <string-array name="entries_list">
         <item>바둑판 배열</item>
-        <item>Timeline</item>
         <item>List</item>
 
     </string-array>
     <string-array name="entryvalues_list">
         <item>0</item>
-        <item>1</item>
         <item>2</item>
 
     </string-array>
