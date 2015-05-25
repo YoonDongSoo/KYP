@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.content.SharedPreferences;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -101,6 +100,8 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     private boolean isEraserMode;
     private Context context;
     private boolean textSelected;
+    //세팅에서 받아온 알람의 값을 위해
+    protected Settings settings = null;
 
     private ViewTreeObserver.OnGlobalLayoutListener touchViewPaint_OnGlobalLayoutLIstener = new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
@@ -221,6 +222,8 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         viewTouchPaint.scaleTemp = setting.getDefaultFactor();
         viewTouchPaint.setZoom(setting.getDefaultFactor());
         viewTouchPaint.invalidate();
+
+        settings = new Settings(this);
     }
 
     @Override
@@ -902,14 +905,19 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         final Calendar calendar = Calendar.getInstance();
         Date date = new Date();
         calendar.setTime(date);
-//        note.alarm = new Alarm();
+
+        //메모를 처음 저장하기 전 타이틀이 null 상태일 때
+        String note_title = note.TITLE;
+        if(note_title == null){
+            note_title = "(제목 없음)";
+        }
 
         if(note.alarm !=null)
         {
-            Toast.makeText(MemoWriteActivity2.this, "알람이 이미 하나 있음", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MemoWriteActivity2.this, "알람이 존재", Toast.LENGTH_SHORT).show();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("등록된 스케줄 확인")        // 제목 설정
-                    .setMessage("스케줄 이름 : "+ note.TITLE +
+                    .setMessage("스케줄 이름 : "+ note_title +
                             "\n시간 : " + note.alarm.ALARM_DT)        // 메세지 설정
                     .setCancelable(true)        // 뒤로 버튼 클릭시 취소 가능 설정
                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
@@ -1078,7 +1086,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                 minuteStr = "0" + minuteStr;
             }
 
-           final ContentValues eventValues = new ContentValues();
+           ContentValues eventValues = new ContentValues();
 
             if(Build.VERSION.SDK_INT >= 8)
                 eventUriString  = Uri.parse("content://com.android.calendar/events");
@@ -1100,33 +1108,17 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             //선택한 날짜, 시간에 맞게 캘린더에 넣기
             final Uri uri = getContentResolver().insert(eventUriString, eventValues);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(MemoWriteActivity2.this);
-            builder.setTitle("")        // 제목 설정
-                    .setMessage("알람을 켜시겠습니까?")        // 메세지 설정
-                    .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
-                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            Uri REMINDERS_URI = Uri.parse("content://com.android.calendar/" + "reminders");
-                            ContentValues eventValues = new ContentValues();
-                            eventValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
-                            eventValues.put("method", 1);
-                            eventValues.put("minutes", 0);
-                            getContentResolver().insert(REMINDERS_URI,eventValues);
-                            dialog.cancel();
-                        }
-                    })
-                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                        // 취소 버튼 클릭시 설정
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            dialog.cancel();
-                        }
-                    });
-            AlertDialog dialog = builder.create();    // 알림창 객체 생성
-            dialog.show();    // 알림창 띄우기
+            int AlarmType = settings.getAlarmType();
+            if(AlarmType == 1) {
+                Uri REMINDERS_URI = Uri.parse("content://com.android.calendar/" + "reminders");
+                eventValues = new ContentValues();
+                eventValues.put("event_id", Long.parseLong(uri.getLastPathSegment()));
+                eventValues.put("method", 1);
+                eventValues.put("minutes", 0);
+                getContentResolver().insert(REMINDERS_URI, eventValues);
+            }
 
             //저장할 날짜, 시간 노트에 저장하기
-//            note.alarm.ALARM_NO = note.NOTE_NO;
-//            note.alarm.NOTE_NO = note.NOTE_NO;
             Log.e("날짜 확인", "" + Integer.toString(select_memo_year + 1900)
                     + "," + Integer.toString(select_memo_month + 1) + ","
                     + Integer.toString(select_memo_day));
@@ -1134,7 +1126,6 @@ public class MemoWriteActivity2 extends BlunoLibrary {
                     select_memo_year + 1900,select_memo_month +1,select_memo_day,
                     hourStr,minuteStr);
 //            Log.e(TAG,"note.alarm.ALARM_DT:"+note.alarm.ALARM_DT);
-//            alarm_flag = 1;
         }
     };
 }
