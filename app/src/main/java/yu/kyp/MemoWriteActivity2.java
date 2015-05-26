@@ -415,12 +415,14 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         eraserBtn.setEnabled(false);
         undoBtn.setEnabled(false);
         alarmBtn.setEnabled(false);
+        scrollBtn.setEnabled(true);
 //            scrollBtn.setEnabled(false);
         textBtn.invalidate();
         penBtn.invalidate();
         eraserBtn.invalidate();
         undoBtn.invalidate();
         alarmBtn.invalidate();
+        scrollBtn.invalidate();
 //                        scrollBtn.invalidate();
         // 줌스크롤용 터치리스너 붙이기
         viewTouchPaint.setScrollTouchListener();

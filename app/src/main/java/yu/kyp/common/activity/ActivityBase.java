@@ -34,7 +34,7 @@ public class ActivityBase extends Activity {
 
     protected void setBackground(View v) {
 
-        Log.e(TAG, "set.getBackgroundType():" + settings.getBackgroundType());
+        //Log.e(TAG, "set.getBackgroundType():" + settings.getBackgroundType());
         switch(settings.getBackgroundType())
         {
             case 0:

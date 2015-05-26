@@ -302,7 +302,7 @@ public class NoteManager {
      */
     public Cursor titlegetNoteList(String title)
     {
-        return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE WHERE TITLE LIKE '%"+ title + "%' ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
+        return db.execCursor("SELECT NOTE_NO AS _id, * FROM NOTE WHERE TITLE LIKE '%"+ title + "%' AND IS_DEL=0 ORDER BY LAST_MOD_DT DESC"); // cursorAdapter를 사용하려면 _id컬럼이 있어야함.
     }
 
     /**

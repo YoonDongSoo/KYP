@@ -177,7 +177,7 @@ public abstract  class BlunoLibrary extends ActivityBase {
 	 * 상태는 mConnectionState에 저장된다
 	 */
 	protected void connectUsedBluetoothLe() {
-		//Log.e(TAG,"connectUsedBluetoothLe");
+		Log.e(TAG,"mConnectionState:"+mConnectionState);
 		String deviceName = Pref.getDeviceName(mainContext, "No Device Available");
 		String deviceAddress = Pref.getDeviceAddress(mainContext, "No Address Available");
 
@@ -307,6 +307,7 @@ public abstract  class BlunoLibrary extends ActivityBase {
         public void onReceive(Context context, Intent intent) {
         	final String action = intent.getAction();
             System.out.println("mGattUpdateReceiver->onReceive->action="+action);
+			Log.e(TAG,"action:"+action);
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
             	mHandler.removeCallbacks(mConnectingOverTimeRunnable);

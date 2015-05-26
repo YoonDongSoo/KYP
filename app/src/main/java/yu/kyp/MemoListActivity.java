@@ -214,7 +214,7 @@ public class MemoListActivity extends ActivityBase {
             int noteNo = for_thumbnail.getInt(for_thumbnail.getColumnIndex("_id"));
             String temp = for_thumbnail.getString(for_thumbnail.getColumnIndex("THUM_NO"));
             int thumNo = for_thumbnail.getInt(for_thumbnail.getColumnIndex("THUM_NO"));
-            Log.e(TAG, "thumNo:" + thumNo + " noteNo:" + noteNo + " temp:" + temp);
+            //Log.e(TAG, "thumNo:" + thumNo + " noteNo:" + noteNo + " temp:" + temp);
         }
         for_thumbnail.moveToFirst();
         if(adapterGridNote==null) {
