@@ -34,7 +34,8 @@ public class WriteBackgoundSelectActivity extends ActivityBase {
         ListView listView = (ListView)findViewById(R.id.listViewBackground);
 
         // 2. 이미지 리스트뷰 설정
-        Integer[] items = new Integer[] {R.drawable.icon_note_line, R.drawable.icon_note_empty, R.drawable.icon_note_conf};
+        //Integer[] items = new Integer[] {R.drawable.icon_note_line, R.drawable.icon_note_empty, R.drawable.icon_note_conf};
+        Integer[] items = new Integer[] {R.drawable.icon_note_line, R.drawable.icon_note_empty};
         WriteBackgroundAdapter adapter = new WriteBackgroundAdapter(this,R.layout.write_background_select_list_item,items);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(listenerWriteBgSelect);

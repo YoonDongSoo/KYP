@@ -320,7 +320,7 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     public void onSerialReceived(String theString) {
         //serialReceivedText.append(theString);							//append the text into the EditText
         //The Serial data from the BLUNO may be sub-packaged, so using a recvBuffer to hold the String is a good choice.
-        //Log.e(TAG,"onSerialReceived:"+theString);
+        Log.e(TAG,"onSerialReceived:"+theString);
         strBuffer.append(theString);
 
         // 임시로 주석처리
