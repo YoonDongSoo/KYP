@@ -45,6 +45,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
+import android.widget.Toast;
 
 import yu.kyp.common.Pref;
 import yu.kyp.common.Settings;
@@ -167,7 +168,7 @@ public class TouchImageView extends ImageView {
         textPaint.setTextSize(textSize);
 
         Settings settings = new Settings(context);
-        Log.e(TAG,"settings.getFontType():"+settings.getFontType());
+        Log.e(TAG, "settings.getFontType():" + settings.getFontType());
         if(settings.getFontType().equals("0")==true) {
             Log.e(TAG,"기본");
             Typeface tf = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL);
@@ -225,8 +226,10 @@ public class TouchImageView extends ImageView {
         //  - 최대배율은 350%까지.
         Settings set = new Settings(context);
         scaleTemp += set.getZoomFactor();
-        if(scaleTemp>3.5f)
-            scaleTemp = 3.5f;
+        if(scaleTemp>3.00f) {
+            Toast.makeText(context,"최대배율 입니다.",Toast.LENGTH_SHORT).show();
+            scaleTemp = 3.00f;
+        }
         //===================================
         // 2. zoom할 좌표
         //  - 0~1 범위로 표시
@@ -237,6 +240,12 @@ public class TouchImageView extends ImageView {
             pointCanvas.set(scrollOnTouchListener.pointCanvas);
         else
             pointCanvas.set(paintOnTouchListener.pointCanvas);
+        PointF pointScreen = new PointF();
+        if(isScrollMode==true)
+            pointScreen.set(scrollOnTouchListener.last);
+        else
+            pointScreen.set(paintOnTouchListener.last);
+
         PointF focus = new PointF(pointCanvas.x/canvasWrite.getWidth(), pointCanvas.y/canvasWrite.getHeight());
         /*Log.e(TAG,String.format("ZMIN (%.0f,%.0f)->(%.0f,%.0f) (%.2f,%.2f) canvasWrite.getWidth():%d bitmapWrite.getWidth():%d",
                 last.x,last.y,pointCanvas.x,pointCanvas.y,focus.x,focus.y, canvasWrite.getWidth(), bitmapWrite.getWidth()));
@@ -245,8 +254,11 @@ public class TouchImageView extends ImageView {
 
         //===================================
         // 3. zoom 처리
-        setZoom(scaleTemp,focus.x,focus.y);
-        invalidate();
+        //setZoom(scaleTemp,focus.x,focus.y);
+        //invalidate();
+        DoubleTapZoom doubleTap = new DoubleTapZoom(scaleTemp, pointScreen.x, pointScreen.y, true);
+        compatPostOnAnimation(doubleTap);
+
 
 
     }
@@ -257,8 +269,10 @@ public class TouchImageView extends ImageView {
         //  - 최소배율은 100%까지.
         Settings set = new Settings(context);
         scaleTemp -= set.getZoomFactor();
-        if(scaleTemp<1.0f)
+        if(scaleTemp<1.0f) {
+            Toast.makeText(context,"최소배율 입니다.",Toast.LENGTH_SHORT).show();
             scaleTemp = 1.0f;
+        }
         //===================================
         // 2. zoom할 좌표
         //  - 0~1 범위로 표시
@@ -281,8 +295,10 @@ public class TouchImageView extends ImageView {
 
         //===================================
         // 3. zoom 처리
-        setZoom(scaleTemp,focus.x,focus.y);
-        invalidate();
+        /*setZoom(scaleTemp,focus.x,focus.y);
+        invalidate();*/
+        DoubleTapZoom doubleTap = new DoubleTapZoom(scaleTemp, pointCanvas.x, pointCanvas.y, true);
+        compatPostOnAnimation(doubleTap);
 
 
     }
@@ -686,6 +702,7 @@ public class TouchImageView extends ImageView {
         matrix.getValues(m);
         m[Matrix.MTRANS_X] = -((focusX * getImageWidth()) - (viewWidth * 0.5f));
         m[Matrix.MTRANS_Y] = -((focusY * getImageHeight()) - (viewHeight * 0.5f));
+
         matrix.setValues(m);
         fixTrans();
         setImageMatrix(matrix);

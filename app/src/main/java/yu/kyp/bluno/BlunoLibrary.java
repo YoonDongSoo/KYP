@@ -119,6 +119,7 @@ public abstract  class BlunoLibrary extends ActivityBase {
 	
     public void onCreateProcess()
     {
+		Log.e(TAG,"onCreateProcess");
     	if(!initiate())
 		{
 			Toast.makeText(mainContext, R.string.error_bluetooth_not_supported,
@@ -177,7 +178,8 @@ public abstract  class BlunoLibrary extends ActivityBase {
 	 * 상태는 mConnectionState에 저장된다
 	 */
 	protected void connectUsedBluetoothLe() {
-		Log.e(TAG,"mConnectionState:"+mConnectionState);
+		//Log.e(TAG, "mConnectionState:" + mConnectionState);
+		Log.e(TAG,"connectUsedBluetoothLe");
 		String deviceName = Pref.getDeviceName(mainContext, "No Device Available");
 		String deviceAddress = Pref.getDeviceAddress(mainContext, "No Address Available");
 
@@ -204,27 +206,31 @@ public abstract  class BlunoLibrary extends ActivityBase {
 
 
 	public void onResumeProcess() {
-    	System.out.println("BlUNOActivity onResume");
+		//System.out.println("BlUNOActivity onResume");
+		Log.e(TAG,"onResumeProcess");
 		// Ensures Bluetooth is enabled on the device. If Bluetooth is not
 		// currently enabled,
 		// fire an intent to display a dialog asking the user to grant
 		// permission to enable it.
-		if (!mBluetoothAdapter.isEnabled()) {
-			if (!mBluetoothAdapter.isEnabled()) {
-				Intent enableBtIntent = new Intent(
-						BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				((Activity) mainContext).startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-			}
+		if (mBluetoothAdapter == null || mBluetoothAdapter.isEnabled()==false) {
+			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			((Activity) mainContext).startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 		}
+
 		
-		
+		// onPause에서 unregister리시버 처리함.
 	    mainContext.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 
-		connectUsedBluetoothLe();
+		// 블루투스가 비활성화 되어있다면
+		// 블루투스 기능을 활성화 시킨다.
+		if(mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()==true) {
+			connectUsedBluetoothLe();
+		}
 	}
     
 
     public void onPauseProcess() {
+		Log.e(TAG,"onPauseProcess");
     	System.out.println("BLUNOActivity onPause");
 		scanLeDevice(false);
 		mainContext.unregisterReceiver(mGattUpdateReceiver);
@@ -245,7 +251,7 @@ public abstract  class BlunoLibrary extends ActivityBase {
 
 	
 	public void onStopProcess() {
-		Log.e(TAG,"MiUnoActivity onStop");
+		Log.e(TAG,"onStopProcess");
 		if(mBluetoothLeService!=null)
 		{
 //			mBluetoothLeService.disconnect();
@@ -257,6 +263,7 @@ public abstract  class BlunoLibrary extends ActivityBase {
 	}
 
 	public void onDestroyProcess() {
+		Log.e(TAG,"onDestroyProcess");
         mainContext.unbindService(mServiceConnection);
         mBluetoothLeService = null;
 	}
@@ -311,13 +318,14 @@ public abstract  class BlunoLibrary extends ActivityBase {
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
             	mHandler.removeCallbacks(mConnectingOverTimeRunnable);
-
+				Toast.makeText(mainContext,"블루투스 연결됨",Toast.LENGTH_SHORT).show();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
                 mConnectionState = connectionStateEnum.isToScan;
                 onConectionStateChange(mConnectionState);
             	mHandler.removeCallbacks(mDisonnectingOverTimeRunnable);
             	mBluetoothLeService.close();
+				Toast.makeText(mainContext,"블루투스 연결끊김",Toast.LENGTH_SHORT).show();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
             	for (BluetoothGattService gattService : mBluetoothLeService.getSupportedGattServices()) {
@@ -405,22 +413,22 @@ public abstract  class BlunoLibrary extends ActivityBase {
     }
     
 	void scanLeDevice(final boolean enable) {
-		if (enable) {
-			// Stops scanning after a pre-defined scan period.
+			if (enable) {
+				// Stops scanning after a pre-defined scan period.
 
-			System.out.println("mBluetoothAdapter.startLeScan");
-			
-			if(mLeDeviceListAdapter != null)
-			{
-				mLeDeviceListAdapter.clear();
-				mLeDeviceListAdapter.notifyDataSetChanged();
-			}
-			
-			if(!mScanning)
-			{
-				mScanning = true;
-				mBluetoothAdapter.startLeScan(mLeScanCallback);
-			}
+				System.out.println("mBluetoothAdapter.startLeScan");
+
+				if(mLeDeviceListAdapter != null)
+				{
+					mLeDeviceListAdapter.clear();
+					mLeDeviceListAdapter.notifyDataSetChanged();
+				}
+
+				if(!mScanning)
+				{
+					mScanning = true;
+					mBluetoothAdapter.startLeScan(mLeScanCallback);
+				}
 		} else {
 			if(mScanning)
 			{
@@ -444,7 +452,11 @@ public abstract  class BlunoLibrary extends ActivityBase {
 			else
 			{
 				// SharedPreference에 저장된 DeviceName과 DeviceAddress으로 BLE 접속한다.
-				connectUsedBluetoothLe();
+				// 블루투스가 비활성화 되어있다면
+				// 블루투스 기능을 활성화 시킨다.
+				if(mBluetoothAdapter != null && mBluetoothAdapter.isEnabled()==true) {
+					connectUsedBluetoothLe();
+				}
 			}
         }
 

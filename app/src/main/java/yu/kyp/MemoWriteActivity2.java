@@ -744,12 +744,13 @@ public class MemoWriteActivity2 extends BlunoLibrary {
     protected void onPause() {
         super.onPause();
         onPauseProcess();
+        onStopProcess();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        onStopProcess();
+
     }
 
     @Override
