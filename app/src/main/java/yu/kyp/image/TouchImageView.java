@@ -254,10 +254,9 @@ public class TouchImageView extends ImageView {
 
         //===================================
         // 3. zoom 처리
-        //setZoom(scaleTemp,focus.x,focus.y);
-        //invalidate();
-        DoubleTapZoom doubleTap = new DoubleTapZoom(scaleTemp, pointScreen.x, pointScreen.y, true);
-        compatPostOnAnimation(doubleTap);
+        setZoom(scaleTemp,focus.x,focus.y);
+        /*DoubleTapZoom doubleTap = new DoubleTapZoom(scaleTemp, pointCanvas.x, pointCanvas.y, true);
+        compatPostOnAnimation(doubleTap);*/
 
 
 
@@ -295,10 +294,9 @@ public class TouchImageView extends ImageView {
 
         //===================================
         // 3. zoom 처리
-        /*setZoom(scaleTemp,focus.x,focus.y);
-        invalidate();*/
-        DoubleTapZoom doubleTap = new DoubleTapZoom(scaleTemp, pointCanvas.x, pointCanvas.y, true);
-        compatPostOnAnimation(doubleTap);
+        setZoom(scaleTemp,focus.x,focus.y);
+        /*DoubleTapZoom doubleTap = new DoubleTapZoom(scaleTemp, pointCanvas.x, pointCanvas.y, true);
+        compatPostOnAnimation(doubleTap);*/
 
 
     }

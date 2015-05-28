@@ -323,7 +323,6 @@ public class MemoWriteActivity2 extends BlunoLibrary {
         Log.e(TAG,"onSerialReceived:"+theString);
         strBuffer.append(theString);
 
-        // 임시로 주석처리
         if(theString.contains("ZMIN")==true)
         {
             viewTouchPaint.zoomInBitmap(context);
@@ -336,7 +335,6 @@ public class MemoWriteActivity2 extends BlunoLibrary {
             viewTouchPaint.zoomOutBitmap(context);
 
             Log.e(TAG,"ZMOT");
-            //viewTouchPaint.zoomInBitmap(2.0f);
             strBuffer = new StringBuffer();
         }
         else if(theString.contains("ERSE")==true)
